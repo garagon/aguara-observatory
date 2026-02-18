@@ -25,6 +25,17 @@ def test_parse_finding():
     assert f.line == 10
 
 
+def test_parse_finding_numeric_severity():
+    """Aguara outputs severity as int: 4=CRITICAL, 3=HIGH, etc."""
+    raw = {"rule_id": "S-1", "severity": 4, "category": "supply-chain"}
+    f = parse_finding(raw)
+    assert f.severity == Severity.CRITICAL
+
+    raw2 = {"rule_id": "S-2", "severity": 2, "category": "test"}
+    f2 = parse_finding(raw2)
+    assert f2.severity == Severity.MEDIUM
+
+
 def test_parse_finding_invalid_severity():
     raw = {"rule_id": "X-1", "severity": "BOGUS", "category": "unknown"}
     f = parse_finding(raw)
