@@ -7,6 +7,7 @@ PulseMCP has a public API for listing MCP servers.
 from __future__ import annotations
 
 import logging
+import os
 
 import requests
 
@@ -16,29 +17,53 @@ from crawlers.utils import content_hash
 
 logger = logging.getLogger("observatory.mcp_registry")
 
-PULSEMCP_API = "https://api.pulsemcp.com/v0beta1"
+PULSEMCP_API = "https://api.pulsemcp.com/v0.1"
 
 
 class PulseMCPCrawler(BaseCrawler):
     registry_id = "mcp-registry"
 
+    def _api_headers(self) -> dict:
+        """Build API headers with auth if available."""
+        headers = {"User-Agent": "AguaraObservatory/0.1"}
+        api_key = os.environ.get("PULSEMCP_API_KEY", "")
+        tenant_id = os.environ.get("PULSEMCP_TENANT_ID", "")
+        if api_key:
+            headers["X-API-Key"] = api_key
+        if tenant_id:
+            headers["X-Tenant-ID"] = tenant_id
+        return headers
+
     def discover(self) -> list[dict]:
-        """Fetch all MCP servers from PulseMCP API."""
+        """Fetch all MCP servers from PulseMCP API.
+
+        Requires PULSEMCP_API_KEY and PULSEMCP_TENANT_ID env vars.
+        """
+        headers = self._api_headers()
+        if "X-API-Key" not in headers:
+            logger.warning("PULSEMCP_API_KEY not set — skipping PulseMCP crawl")
+            return []
+
         all_servers = []
-        offset = 0
+        cursor = None
         limit = 100
 
         while True:
-            url = f"{PULSEMCP_API}/servers?count_per_page={limit}&offset={offset}"
+            params = {"limit": limit}
+            if cursor:
+                params["cursor"] = cursor
             try:
                 self.rate_limiter.wait()
-                resp = requests.get(url, timeout=30, headers={
-                    "User-Agent": "AguaraObservatory/0.1"
-                })
+                resp = requests.get(
+                    f"{PULSEMCP_API}/servers",
+                    params=params,
+                    headers=headers,
+                    timeout=30,
+                )
                 resp.raise_for_status()
                 data = resp.json()
             except Exception as e:
-                logger.error("PulseMCP API error at offset %d: %s", offset, e)
+                logger.error("PulseMCP API error: %s", e)
                 break
 
             servers = data.get("servers", [])
@@ -63,9 +88,9 @@ class PulseMCPCrawler(BaseCrawler):
                     },
                 })
 
-            if len(servers) < limit:
+            cursor = data.get("next_cursor")
+            if not cursor or len(servers) < limit:
                 break
-            offset += limit
             logger.info("Discovered %d servers so far...", len(all_servers))
 
         return all_servers

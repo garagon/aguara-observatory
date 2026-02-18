@@ -17,9 +17,9 @@ from crawlers.utils import content_hash
 
 logger = logging.getLogger("observatory.lobehub")
 
-# LobeHub publishes plugin indexes as JSON on GitHub
-LOBEHUB_PLUGINS_INDEX = "https://raw.githubusercontent.com/lobehub/lobe-chat-plugins/main/public/index.json"
-LOBEHUB_TOOLS_INDEX = "https://raw.githubusercontent.com/lobehub/lobe-chat-tools/main/public/index.json"
+# LobeHub publishes indexes as JSON via CDN
+LOBEHUB_PLUGINS_INDEX = "https://chat-plugins.lobehub.com/index.json"
+LOBEHUB_AGENTS_INDEX = "https://chat-agents.lobehub.com/index.json"
 
 
 class LobeHubCrawler(BaseCrawler):
@@ -29,9 +29,9 @@ class LobeHubCrawler(BaseCrawler):
         """Fetch all plugins/tools from LobeHub indexes."""
         all_plugins = []
 
-        for index_url, kind in [
-            (LOBEHUB_PLUGINS_INDEX, "plugin"),
-            (LOBEHUB_TOOLS_INDEX, "tool"),
+        for index_url, kind, items_key in [
+            (LOBEHUB_PLUGINS_INDEX, "plugin", "plugins"),
+            (LOBEHUB_AGENTS_INDEX, "agent", "agents"),
         ]:
             try:
                 self.rate_limiter.wait()
@@ -42,7 +42,7 @@ class LobeHubCrawler(BaseCrawler):
                 logger.warning("Failed to fetch LobeHub %s index: %s", kind, e)
                 continue
 
-            plugins = data.get("plugins", data.get("tools", []))
+            plugins = data.get(items_key, [])
             for plugin in plugins:
                 identifier = plugin.get("identifier", "")
                 if not identifier:
@@ -52,7 +52,7 @@ class LobeHubCrawler(BaseCrawler):
                 all_plugins.append({
                     "slug": slug,
                     "name": plugin.get("meta", {}).get("title", identifier),
-                    "url": f"https://lobehub.com/plugins/{identifier}" if kind == "plugin" else f"https://lobehub.com/tools/{identifier}",
+                    "url": f"https://lobehub.com/{kind}s/{identifier}",
                     "metadata": {
                         "kind": kind,
                         "identifier": identifier,
