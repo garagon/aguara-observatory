@@ -93,7 +93,8 @@ class BaseCrawler(ABC):
 
             # Check if content changed
             try:
-                result = self.download(slug, **skill_info)
+                kwargs = {k: v for k, v in skill_info.items() if k != "slug"}
+                result = self.download(slug, **kwargs)
             except Exception as e:
                 logger.warning("[%s] Failed to download %s: %s", self.registry_id, slug, e)
                 self.stats["failed"] += 1

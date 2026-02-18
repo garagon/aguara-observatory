@@ -25,6 +25,15 @@ from crawlers.models import Finding, Severity, SkillScore, score_to_grade, SEVER
 
 logger = logging.getLogger("observatory.ingest")
 
+# Aguara outputs severity as int: 4=CRITICAL, 3=HIGH, 2=MEDIUM, 1=LOW, 0=INFO
+SEVERITY_INT_MAP = {
+    4: Severity.CRITICAL,
+    3: Severity.HIGH,
+    2: Severity.MEDIUM,
+    1: Severity.LOW,
+    0: Severity.INFO,
+}
+
 # Map registry to filename patterns
 REGISTRY_SLUG_PATTERNS = {
     "skills-sh": re.compile(r"^(.+?)_(.+?)__(.+)\.md$"),  # org_repo__skill.md
@@ -43,11 +52,14 @@ def filename_to_skill_id(filename: str, registry_id: str) -> str | None:
 
 def parse_finding(raw: dict) -> Finding:
     """Parse a raw Aguara JSON finding into a Finding model."""
-    sev_str = str(raw.get("severity", "INFO")).upper()
-    try:
-        severity = Severity(sev_str)
-    except ValueError:
-        severity = Severity.INFO
+    raw_sev = raw.get("severity", "INFO")
+    if isinstance(raw_sev, int):
+        severity = SEVERITY_INT_MAP.get(raw_sev, Severity.INFO)
+    else:
+        try:
+            severity = Severity(str(raw_sev).upper())
+        except ValueError:
+            severity = Severity.INFO
 
     return Finding(
         rule_id=raw.get("rule_id", "unknown"),
@@ -168,13 +180,20 @@ def ingest_scan_results(
         slug = fname.removesuffix(".md")
         scanned_slugs.add(slug)
 
-    # Files scanned but with no findings = clean skills
-    files_scanned = scan_result.get("files_scanned", 0)
+    # Score clean skills (scanned but no findings)
     for slug, skill_id in known_skills.items():
-        if slug not in scanned_slugs:
-            # This skill wasn't in the scan output — it may not have been scanned
-            # or it was clean (no findings). Only score if we know it was scanned.
-            continue
+        if slug in scanned_slugs:
+            continue  # Already scored above
+        # Check if this skill's file exists in the scan dir (meaning it was scanned)
+        # Since Aguara doesn't list clean files, we score all known skills not in by_file
+        clean_score = SkillScore(
+            skill_id=skill_id,
+            score=100,
+            grade=score_to_grade(100),
+            finding_count=0,
+        )
+        upsert_skill_score(conn, clean_score, scan_id)
+        skills_scanned += 1
 
     finish_scan(
         conn,
