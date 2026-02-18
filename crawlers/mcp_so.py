@@ -52,10 +52,12 @@ class McpSoCrawler(BaseCrawler):
             seen_this_page = set()
             for card in cards:
                 href = card.get("href", "")
-                slug = href.removeprefix("/server/").strip("/")
-                if not slug or slug in seen_this_page:
+                raw_slug = href.removeprefix("/server/").strip("/")
+                if not raw_slug or raw_slug in seen_this_page:
                     continue
-                seen_this_page.add(slug)
+                seen_this_page.add(raw_slug)
+                # Sanitize slug for filesystem safety (consistent with _save_content)
+                slug = raw_slug.replace("/", "_").replace(":", "_")
 
                 # Apply shard filter
                 if self.shard and not shard_matches(slug, self.shard):
@@ -65,7 +67,7 @@ class McpSoCrawler(BaseCrawler):
                 all_servers.append({
                     "slug": slug,
                     "name": name,
-                    "url": f"{MCP_SO_BASE}/server/{slug}",
+                    "url": f"{MCP_SO_BASE}/server/{raw_slug}",
                 })
 
             logger.info("Page %d: found %d servers (total: %d)", page, len(seen_this_page), len(all_servers))
