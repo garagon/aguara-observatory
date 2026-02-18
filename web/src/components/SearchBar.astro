@@ -1,0 +1,105 @@
+---
+/**
+ * Client-side search using Fuse.js.
+ * The search index is embedded as JSON in a data attribute.
+ */
+interface Props {
+  placeholder?: string;
+}
+
+const { placeholder = "Search skills..." } = Astro.props;
+---
+
+<div class="relative" id="search-container">
+  <div class="relative">
+    <svg
+      class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" />
+    </svg>
+    <input
+      type="text"
+      id="search-input"
+      placeholder={placeholder}
+      class="w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/50 transition-colors"
+    />
+  </div>
+  <div
+    id="search-results"
+    class="absolute top-full mt-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-80 overflow-y-auto hidden z-50"
+  >
+  </div>
+</div>
+
+<script>
+  import Fuse from "fuse.js";
+
+  const base = document.querySelector("base")?.getAttribute("href") ?? "/aguara-observatory/";
+
+  async function initSearch() {
+    const input = document.getElementById("search-input") as HTMLInputElement;
+    const results = document.getElementById("search-results") as HTMLDivElement;
+    if (!input || !results) return;
+
+    // Fetch search index (registries as fallback)
+    let items: { name: string; id: string; registry: string; score?: number; grade?: string }[] = [];
+    try {
+      const resp = await fetch(`${base}api/v1/registries.json`);
+      if (resp.ok) {
+        const registries = await resp.json();
+        items = registries.map((r: { id: string; name: string; skill_count: number; avg_score: number }) => ({
+          name: r.name,
+          id: r.id,
+          registry: r.id,
+          score: Math.round(r.avg_score),
+        }));
+      }
+    } catch {
+      // No data yet
+    }
+
+    const fuse = new Fuse(items, {
+      keys: ["name", "id"],
+      threshold: 0.4,
+    });
+
+    input.addEventListener("input", () => {
+      const query = input.value.trim();
+      if (!query) {
+        results.classList.add("hidden");
+        return;
+      }
+
+      const matches = fuse.search(query, { limit: 10 });
+      if (matches.length === 0) {
+        results.innerHTML = '<p class="p-4 text-sm text-gray-500">No results found.</p>';
+        results.classList.remove("hidden");
+        return;
+      }
+
+      results.innerHTML = matches
+        .map(({ item }) => {
+          return `<a href="${base}registries/${item.registry}/" class="flex items-center justify-between p-3 hover:bg-gray-800 transition-colors border-b border-gray-800/50 last:border-0">
+            <span class="text-sm text-gray-200">${item.name}</span>
+            ${item.score !== undefined ? `<span class="text-xs text-gray-500">${item.score}/100</span>` : ""}
+          </a>`;
+        })
+        .join("");
+      results.classList.remove("hidden");
+    });
+
+    // Close on outside click
+    document.addEventListener("click", (e) => {
+      if (!(e.target as HTMLElement).closest("#search-container")) {
+        results.classList.add("hidden");
+      }
+    });
+  }
+
+  initSearch();
+</script>

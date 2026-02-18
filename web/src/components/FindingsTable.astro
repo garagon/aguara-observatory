@@ -1,0 +1,57 @@
+---
+import SeverityBadge from "./SeverityBadge.astro";
+
+interface Finding {
+  rule_id: string;
+  severity: string;
+  category: string;
+  subcategory?: string;
+  line?: number;
+  message?: string;
+}
+
+interface Props {
+  findings: Finding[];
+  compact?: boolean;
+}
+
+const { findings, compact = false } = Astro.props;
+
+const severityOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFO: 4 };
+const sorted = [...findings].sort(
+  (a, b) => (severityOrder[a.severity] ?? 5) - (severityOrder[b.severity] ?? 5)
+);
+---
+
+<div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-gray-800 text-left text-gray-400">
+        <th class="pb-3 pr-4 font-medium">Severity</th>
+        <th class="pb-3 pr-4 font-medium">Rule</th>
+        <th class="pb-3 pr-4 font-medium">Category</th>
+        {!compact && <th class="pb-3 pr-4 font-medium">Line</th>}
+        {!compact && <th class="pb-3 font-medium">Message</th>}
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-800/50">
+      {sorted.map((f) => (
+        <tr class="hover:bg-gray-900/50 transition-colors">
+          <td class="py-2.5 pr-4">
+            <SeverityBadge severity={f.severity} />
+          </td>
+          <td class="py-2.5 pr-4 font-mono text-xs text-gray-300">{f.rule_id}</td>
+          <td class="py-2.5 pr-4 text-gray-300">{f.category}</td>
+          {!compact && <td class="py-2.5 pr-4 text-gray-500">{f.line ?? "—"}</td>}
+          {!compact && (
+            <td class="py-2.5 text-gray-400 max-w-md truncate">{f.message ?? "—"}</td>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+{findings.length === 0 && (
+  <p class="text-gray-500 text-center py-8">No findings.</p>
+)}

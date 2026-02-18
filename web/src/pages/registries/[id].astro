@@ -1,0 +1,126 @@
+---
+import Base from "../../layouts/Base.astro";
+import StatCard from "../../components/StatCard.astro";
+import ScoreGrade from "../../components/ScoreGrade.astro";
+import SeverityBadge from "../../components/SeverityBadge.astro";
+import { getRegistries, getRegistryStats } from "../../lib/api";
+
+export function getStaticPaths() {
+  const registries = getRegistries();
+  if (registries.length === 0) {
+    // Fallback: generate pages for known registry IDs
+    return ["skills-sh", "clawhub", "mcp-registry", "mcp-so", "lobehub"].map((id) => ({
+      params: { id },
+    }));
+  }
+  return registries.map((r) => ({ params: { id: r.id } }));
+}
+
+const { id } = Astro.params;
+const registries = getRegistries();
+const registry = registries.find((r) => r.id === id);
+const stats = getRegistryStats(id!);
+
+function scoreToGrade(score: number): string {
+  if (score >= 90) return "A";
+  if (score >= 75) return "B";
+  if (score >= 50) return "C";
+  if (score >= 25) return "D";
+  return "F";
+}
+
+const names: Record<string, string> = {
+  "skills-sh": "Skills.sh",
+  clawhub: "ClawHub",
+  "mcp-registry": "PulseMCP",
+  "mcp-so": "mcp.so",
+  lobehub: "LobeHub",
+};
+const displayName = registry?.name ?? names[id!] ?? id;
+
+const gradeColors: Record<string, string> = {
+  A: "bg-emerald-500", B: "bg-green-500", C: "bg-yellow-500", D: "bg-orange-500", F: "bg-red-500",
+};
+---
+
+<Base title={displayName!}>
+  <div class="mb-8">
+    <a href={`${import.meta.env.BASE_URL}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
+      &larr; All Registries
+    </a>
+  </div>
+
+  <div class="flex items-start justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-white">{displayName}</h1>
+      {registry && (
+        <p class="text-gray-400 mt-2">{registry.description}</p>
+      )}
+      {registry && (
+        <a href={registry.url} class="text-sm text-aguara-400 hover:text-aguara-300 mt-1 inline-block" target="_blank" rel="noopener noreferrer">
+          {registry.url} &nearr;
+        </a>
+      )}
+    </div>
+    {registry && (
+      <ScoreGrade grade={scoreToGrade(registry.avg_score)} score={Math.round(registry.avg_score)} size="lg" />
+    )}
+  </div>
+
+  {stats ? (
+    <>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard label="Total Skills" value={stats.total_skills as number} />
+        <StatCard label="Scanned" value={stats.skills_scanned as number} />
+        <StatCard label="Findings" value={stats.total_findings as number} />
+        <StatCard label="Avg Score" value={`${stats.avg_score}/100`} />
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
+        <h2 class="text-lg font-semibold text-white mb-4">Findings by Severity</h2>
+        <div class="flex flex-wrap gap-6">
+          {[
+            { label: "Critical", key: "critical_count" },
+            { label: "High", key: "high_count" },
+            { label: "Medium", key: "medium_count" },
+            { label: "Low", key: "low_count" },
+          ].map(({ label, key }) => {
+            const count = (stats[key] as number) ?? 0;
+            return (
+              <div class="flex items-center gap-2">
+                <SeverityBadge severity={label.toUpperCase()} />
+                <span class="text-lg font-bold text-white">{count.toLocaleString()}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Grade Distribution</h2>
+        <div class="flex gap-6">
+          {["A", "B", "C", "D", "F"].map((grade) => {
+            const key = `grade_${grade.toLowerCase()}_count`;
+            const count = (stats[key] as number) ?? 0;
+            const total = (stats.skills_scanned as number) || 1;
+            const pct = Math.round((count / total) * 100);
+            return (
+              <div class="flex-1 text-center">
+                <div class="text-2xl font-bold text-white">{grade}</div>
+                <div class="text-sm text-gray-400">{count.toLocaleString()}</div>
+                <div class="h-2 bg-gray-800 rounded-full mt-2 overflow-hidden">
+                  <div class={`h-full ${gradeColors[grade]} rounded-full`} style={`width: ${pct}%`} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  ) : (
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+      <p class="text-gray-400">No data available for this registry yet.</p>
+      <p class="text-gray-500 text-sm mt-2">Data will appear after the first crawl + scan run.</p>
+    </div>
+  )}
+</Base>

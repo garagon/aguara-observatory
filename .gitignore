@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Data (crawled files)
+data/
+bin/
+
+# Database (local dev)
+*.db
+*.db-journal
+
+# Web build output
+web/dist/
+web/node_modules/
+web/public/api/
+web/public/datasets/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local

@@ -1,0 +1,80 @@
+---
+/**
+ * Client-side Chart.js trend chart.
+ * Renders a line chart with weekly data points.
+ *
+ * Pass data as JSON via data attributes — Chart.js runs in the browser.
+ */
+interface Props {
+  id: string;
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    color: string;
+  }[];
+  yLabel?: string;
+  height?: string;
+}
+
+const { id, labels, datasets, yLabel = "", height = "h-72" } = Astro.props;
+---
+
+<div class={height}>
+  <canvas
+    id={id}
+    data-labels={JSON.stringify(labels)}
+    data-datasets={JSON.stringify(datasets)}
+    data-y-label={yLabel}
+  ></canvas>
+</div>
+
+<script>
+  import Chart from "chart.js/auto";
+
+  function initChart(canvas: HTMLCanvasElement) {
+    const labels = JSON.parse(canvas.dataset.labels || "[]");
+    const rawDatasets = JSON.parse(canvas.dataset.datasets || "[]");
+    const yLabel = canvas.dataset.yLabel || "";
+
+    const datasets = rawDatasets.map((ds: { label: string; data: number[]; color: string }) => ({
+      label: ds.label,
+      data: ds.data,
+      borderColor: ds.color,
+      backgroundColor: ds.color + "20",
+      fill: true,
+      tension: 0.3,
+      pointRadius: 0,
+      pointHitRadius: 10,
+      borderWidth: 2,
+    }));
+
+    new Chart(canvas, {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: {
+            labels: { color: "#9ca3af", font: { size: 12 } },
+          },
+        },
+        scales: {
+          x: {
+            ticks: { color: "#6b7280", maxTicksLimit: 12 },
+            grid: { color: "#1f2937" },
+          },
+          y: {
+            title: { display: !!yLabel, text: yLabel, color: "#9ca3af" },
+            ticks: { color: "#6b7280" },
+            grid: { color: "#1f2937" },
+          },
+        },
+      },
+    });
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>("canvas[data-labels]").forEach(initChart);
+</script>

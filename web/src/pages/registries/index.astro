@@ -1,0 +1,33 @@
+---
+import Base from "../../layouts/Base.astro";
+import RegistryCard from "../../components/RegistryCard.astro";
+import { getRegistries } from "../../lib/api";
+
+const registries = getRegistries();
+---
+
+<Base title="Registries">
+  <h1 class="text-3xl font-bold text-white mb-2">Monitored Registries</h1>
+  <p class="text-gray-400 mb-8">
+    Aguara Observatory continuously scans these AI agent skills registries and MCP server directories.
+  </p>
+
+  {registries.length > 0 ? (
+    <div class="grid md:grid-cols-2 gap-6">
+      {registries.map((r) => (
+        <RegistryCard
+          id={r.id}
+          name={r.name}
+          url={r.url}
+          description={r.description}
+          skillCount={r.skill_count}
+          avgScore={r.avg_score}
+        />
+      ))}
+    </div>
+  ) : (
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+      <p class="text-gray-400">No registry data available yet. Run the pipeline to populate.</p>
+    </div>
+  )}
+</Base>

@@ -1,0 +1,1 @@
+"""Aguara Observatory - Scanner integration."""

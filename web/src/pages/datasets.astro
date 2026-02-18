@@ -1,0 +1,100 @@
+---
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL;
+
+const datasets = [
+  {
+    name: "Findings",
+    description: "All latest security findings across every registry. Includes rule ID, severity, category, and skill metadata.",
+    path: `${base}datasets/findings.csv`,
+    format: "CSV",
+  },
+  {
+    name: "Scores",
+    description: "Skill security scores (0-100) and letter grades (A-F) for every scanned skill.",
+    path: `${base}datasets/scores.csv`,
+    format: "CSV",
+  },
+  {
+    name: "Skills",
+    description: "Full catalog of discovered skills and MCP servers across all monitored registries.",
+    path: `${base}datasets/skills.csv`,
+    format: "CSV",
+  },
+  {
+    name: "Static API",
+    description: "JSON API endpoints for programmatic access to stats, registries, trends, and individual skill reports.",
+    path: `${base}api/v1/stats.json`,
+    format: "JSON",
+  },
+];
+---
+
+<Base title="Datasets">
+  <h1 class="text-3xl font-bold text-white mb-2">Open Datasets</h1>
+  <p class="text-gray-400 mb-8">
+    All Observatory data is freely available for download and analysis.
+    Datasets are updated daily after each scan run.
+  </p>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-12">
+    {datasets.map((ds) => (
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-white">{ds.name}</h3>
+          <span class="text-xs font-mono px-2 py-1 bg-gray-800 rounded text-gray-400">{ds.format}</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-4">{ds.description}</p>
+        <a
+          href={ds.path}
+          class="inline-flex items-center gap-2 text-sm text-aguara-400 hover:text-aguara-300 transition-colors"
+          download={ds.format === "CSV" ? true : undefined}
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download
+        </a>
+      </div>
+    ))}
+  </div>
+
+  <!-- API docs -->
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <h2 class="text-xl font-semibold text-white mb-4">Static JSON API</h2>
+    <p class="text-sm text-gray-400 mb-4">
+      All endpoints return static JSON files generated daily. No authentication needed.
+    </p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-800 text-left text-gray-400">
+            <th class="pb-3 pr-4 font-medium">Endpoint</th>
+            <th class="pb-3 font-medium">Description</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800/50">
+          {[
+            { endpoint: "/api/v1/stats.json", desc: "Global statistics" },
+            { endpoint: "/api/v1/registries.json", desc: "Registry list with stats" },
+            { endpoint: "/api/v1/registries/{id}/stats.json", desc: "Per-registry stats" },
+            { endpoint: "/api/v1/skills/{registry}/{slug}.json", desc: "Individual skill report" },
+            { endpoint: "/api/v1/trends/weekly.json", desc: "Weekly trends (52 weeks)" },
+            { endpoint: "/api/v1/categories.json", desc: "Findings by category" },
+            { endpoint: "/api/v1/benchmarks/vendors.json", desc: "Vendor comparison metrics" },
+            { endpoint: "/api/v1/feed/recent.json", desc: "Recent critical findings" },
+            { endpoint: "/api/v1/datasets/manifest.json", desc: "Dataset download links" },
+          ].map(({ endpoint, desc }) => (
+            <tr class="hover:bg-gray-800/50 transition-colors">
+              <td class="py-2.5 pr-4 font-mono text-xs text-aguara-400">{endpoint}</td>
+              <td class="py-2.5 text-gray-400">{desc}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Base>

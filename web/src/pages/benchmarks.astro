@@ -1,0 +1,95 @@
+---
+import Base from "../layouts/Base.astro";
+import { getBenchmarks } from "../lib/api";
+
+const benchmark = getBenchmarks();
+const overall = benchmark?.metrics.overall;
+const perCategory = benchmark?.metrics.per_category ?? {};
+const sortedCategories = Object.entries(perCategory).sort(
+  ([, a], [, b]) => (b.tp + b.fp + b.fn) - (a.tp + a.fp + a.fn)
+);
+
+function pct(n: number): string {
+  return (n * 100).toFixed(1) + "%";
+}
+---
+
+<Base title="Benchmarks">
+  <h1 class="text-3xl font-bold text-white mb-2">Vendor Benchmarks</h1>
+  <p class="text-gray-400 mb-8">
+    How Aguara compares against vendor security audits (Agent Trust Hub, Socket, Snyk) on skills.sh skills.
+  </p>
+
+  {benchmark && overall ? (
+    <>
+      <!-- Overall -->
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
+        <h2 class="text-lg font-semibold text-white mb-4">
+          Overall Metrics ({benchmark.skills_compared.toLocaleString()} skills)
+        </h2>
+        <div class="grid grid-cols-3 md:grid-cols-7 gap-4 text-center">
+          {[
+            { label: "Precision", value: pct(overall.precision), color: "text-blue-400" },
+            { label: "Recall", value: pct(overall.recall), color: "text-green-400" },
+            { label: "F1 Score", value: pct(overall.f1), color: "text-aguara-400" },
+            { label: "TP", value: overall.tp.toString(), color: "text-emerald-400" },
+            { label: "FP", value: overall.fp.toString(), color: "text-yellow-400" },
+            { label: "FN", value: overall.fn.toString(), color: "text-red-400" },
+            { label: "TN", value: overall.tn.toString(), color: "text-gray-400" },
+          ].map(({ label, value, color }) => (
+            <div>
+              <div class={`text-2xl font-bold ${color}`}>{value}</div>
+              <div class="text-xs text-gray-500 mt-1">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Per category -->
+      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-800">
+          <h2 class="text-lg font-semibold text-white">Per-Category Metrics</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-800 text-left text-gray-400">
+                <th class="px-6 py-3 font-medium">Category</th>
+                <th class="px-4 py-3 font-medium text-right">Precision</th>
+                <th class="px-4 py-3 font-medium text-right">Recall</th>
+                <th class="px-4 py-3 font-medium text-right">F1</th>
+                <th class="px-4 py-3 font-medium text-right">TP</th>
+                <th class="px-4 py-3 font-medium text-right">FP</th>
+                <th class="px-4 py-3 font-medium text-right">FN</th>
+                <th class="px-4 py-3 font-medium text-right">TN</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/50">
+              {sortedCategories.map(([cat, m]) => (
+                <tr class="hover:bg-gray-800/50 transition-colors">
+                  <td class="px-6 py-3 text-gray-300">{cat}</td>
+                  <td class="px-4 py-3 text-right text-blue-400">{pct(m.precision)}</td>
+                  <td class="px-4 py-3 text-right text-green-400">{pct(m.recall)}</td>
+                  <td class="px-4 py-3 text-right text-aguara-400 font-medium">{pct(m.f1)}</td>
+                  <td class="px-4 py-3 text-right text-emerald-400">{m.tp}</td>
+                  <td class="px-4 py-3 text-right text-yellow-400">{m.fp}</td>
+                  <td class="px-4 py-3 text-right text-red-400">{m.fn}</td>
+                  <td class="px-4 py-3 text-right text-gray-500">{m.tn}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-500">
+        <p><strong>Methodology:</strong> Each Aguara finding category is mapped to equivalent vendor findings. TP = both agree, FP = Aguara finds but vendors don't, FN = vendors find but Aguara misses, TN = neither finds.</p>
+      </div>
+    </>
+  ) : (
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+      <p class="text-gray-400">No benchmark data available yet.</p>
+      <p class="text-gray-500 text-sm mt-2">Benchmarks require vendor audit data from skills.sh.</p>
+    </div>
+  )}
+</Base>

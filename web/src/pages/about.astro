@@ -1,0 +1,103 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="About">
+  <div class="max-w-3xl">
+    <h1 class="text-3xl font-bold text-white mb-6">About Aguara Observatory</h1>
+
+    <div class="prose prose-invert prose-gray max-w-none space-y-6 text-gray-300">
+      <section>
+        <h2 class="text-xl font-semibold text-white mt-8 mb-3">What is this?</h2>
+        <p>
+          Aguara Observatory is an open source platform that continuously scans every public AI agent
+          skills registry and MCP server directory for security issues. It's the
+          <a href="https://observatory.mozilla.org" class="text-aguara-400 hover:text-aguara-300">Mozilla Observatory</a>
+          for AI agents.
+        </p>
+        <p>
+          Every day, automated crawlers discover and download skill definitions from 5+ registries.
+          These are scanned with <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300">Aguara</a>,
+          a deterministic security scanner designed specifically for AI agent skills. Results are published
+          as open data.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Methodology</h2>
+
+        <h3 class="text-lg font-medium text-white mt-6 mb-2">Scanning</h3>
+        <p>
+          Aguara uses pattern matching and NLP analysis to detect security issues in skill definitions.
+          It checks for prompt injection, data exfiltration, credential leaks, supply chain attacks,
+          SSRF, unicode attacks, and more. It's fully deterministic — no LLM, no cloud APIs, same
+          input always produces same output.
+        </p>
+
+        <h3 class="text-lg font-medium text-white mt-6 mb-2">Scoring</h3>
+        <p>Each skill starts at 100 points. Findings reduce the score:</p>
+        <ul class="list-disc list-inside space-y-1 text-gray-400">
+          <li><span class="text-red-400 font-medium">CRITICAL</span>: -25 points</li>
+          <li><span class="text-orange-400 font-medium">HIGH</span>: -15 points</li>
+          <li><span class="text-yellow-400 font-medium">MEDIUM</span>: -8 points</li>
+          <li><span class="text-blue-400 font-medium">LOW</span>: -3 points</li>
+        </ul>
+        <p class="mt-3">The final score maps to a letter grade:</p>
+        <ul class="list-disc list-inside space-y-1 text-gray-400">
+          <li><span class="text-emerald-400 font-medium">A</span>: 90-100 (minimal issues)</li>
+          <li><span class="text-green-400 font-medium">B</span>: 75-89 (minor issues)</li>
+          <li><span class="text-yellow-400 font-medium">C</span>: 50-74 (moderate issues)</li>
+          <li><span class="text-orange-400 font-medium">D</span>: 25-49 (significant issues)</li>
+          <li><span class="text-red-400 font-medium">F</span>: 0-24 (critical issues)</li>
+        </ul>
+
+        <h3 class="text-lg font-medium text-white mt-6 mb-2">Incremental Scanning</h3>
+        <p>
+          Each skill's content is hashed (SHA-256). On subsequent crawls, only skills with changed
+          content are re-scanned. This makes daily scans of 80,000+ skills feasible within GitHub
+          Actions' 6-hour timeout.
+        </p>
+
+        <h3 class="text-lg font-medium text-white mt-6 mb-2">Vendor Benchmarks</h3>
+        <p>
+          For skills.sh skills, we also scrape vendor audit results from Agent Trust Hub, Socket, and
+          Snyk. This allows us to compute precision, recall, and F1 metrics comparing Aguara findings
+          against vendor consensus.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Monitored Registries</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-400">
+          <li><a href="https://skills.sh" class="text-aguara-400 hover:text-aguara-300">skills.sh</a> — Community AI agent skills marketplace (60,000+ skills)</li>
+          <li><a href="https://clawhub.ai" class="text-aguara-400 hover:text-aguara-300">ClawHub</a> — AI agent skills registry (5,000+ skills)</li>
+          <li><a href="https://www.pulsemcp.com" class="text-aguara-400 hover:text-aguara-300">PulseMCP</a> — MCP server directory (8,600+ servers)</li>
+          <li><a href="https://mcp.so" class="text-aguara-400 hover:text-aguara-300">mcp.so</a> — MCP server discovery platform (17,000+ servers)</li>
+          <li><a href="https://lobehub.com" class="text-aguara-400 hover:text-aguara-300">LobeHub</a> — Plugin marketplace (5,000+ plugins)</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Open Source</h2>
+        <p>
+          Everything is open source under the Apache-2.0 license.
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-gray-400">
+          <li><a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300">Aguara</a> — The security scanner</li>
+          <li><a href="https://github.com/garagon/aguara-observatory" class="text-aguara-400 hover:text-aguara-300">Aguara Observatory</a> — This platform (crawlers, aggregator, dashboard)</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Limitations</h2>
+        <ul class="list-disc list-inside space-y-1 text-gray-400">
+          <li>Aguara uses static analysis only — it cannot detect runtime behavior</li>
+          <li>Findings may include false positives, especially for benign patterns that resemble threats</li>
+          <li>Not all skills in a registry may be crawlable (private repos, rate limits)</li>
+          <li>Vendor audit data is only available for skills.sh</li>
+          <li>MCP server scanning is limited to README/manifest content</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</Base>

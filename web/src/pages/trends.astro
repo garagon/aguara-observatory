@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import TrendChart from "../components/TrendChart.astro";
+import { getWeeklyTrends } from "../lib/api";
+
+const trends = getWeeklyTrends();
+
+// Prepare chart data (reverse so oldest is first)
+const reversed = [...trends].reverse();
+const labels = reversed.map((t) => t.week_start.slice(5)); // MM-DD
+const totalSkills = reversed.map((t) => t.totals.total_skills);
+const totalFindings = reversed.map((t) => t.totals.total_findings);
+const criticalCount = reversed.map((t) => t.totals.critical_count);
+const avgScore = reversed.map((t) => t.totals.avg_score);
+const newSkills = reversed.map((t) => t.totals.new_skills);
+---
+
+<Base title="Trends">
+  <h1 class="text-3xl font-bold text-white mb-2">Trends</h1>
+  <p class="text-gray-400 mb-8">
+    Weekly trends across all monitored registries.
+  </p>
+
+  {trends.length > 0 ? (
+    <div class="space-y-8">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Total Skills Over Time</h2>
+        <TrendChart
+          id="chart-skills"
+          labels={labels}
+          datasets={[{ label: "Total Skills", data: totalSkills, color: "#f08844" }]}
+          yLabel="Skills"
+        />
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Total Findings Over Time</h2>
+        <TrendChart
+          id="chart-findings"
+          labels={labels}
+          datasets={[
+            { label: "All Findings", data: totalFindings, color: "#f59e0b" },
+            { label: "Critical", data: criticalCount, color: "#ef4444" },
+          ]}
+          yLabel="Findings"
+        />
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Average Score Over Time</h2>
+        <TrendChart
+          id="chart-score"
+          labels={labels}
+          datasets={[{ label: "Avg Score", data: avgScore, color: "#10b981" }]}
+          yLabel="Score (0-100)"
+        />
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">New Skills per Week</h2>
+        <TrendChart
+          id="chart-new"
+          labels={labels}
+          datasets={[{ label: "New Skills", data: newSkills, color: "#8b5cf6" }]}
+          yLabel="New Skills"
+        />
+      </div>
+    </div>
+  ) : (
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+      <p class="text-gray-400">No trend data available yet.</p>
+      <p class="text-gray-500 text-sm mt-2">Trends will appear after multiple days of scans.</p>
+    </div>
+  )}
+</Base>

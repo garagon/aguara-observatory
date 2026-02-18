@@ -1,0 +1,65 @@
+name: Crawl skills.sh
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      shard:
+        description: "Shard to crawl (A-F, G-L, M-R, S-Z, or empty for all)"
+        required: false
+
+jobs:
+  crawl:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["A-F", "G-L", "M-R", "S-Z"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up GitHub CLI auth
+        run: echo "${{ secrets.GH_TOKEN }}" | gh auth login --with-token
+
+      - name: Restore crawl cache
+        uses: actions/cache@v4
+        with:
+          path: data/skills-sh/
+          key: skills-sh-${{ matrix.shard }}-${{ github.run_number }}
+          restore-keys: |
+            skills-sh-${{ matrix.shard }}-
+
+      - name: Run crawler
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          SHARD="${{ github.event.inputs.shard || matrix.shard }}"
+          python -m crawlers.skills_sh --shard "$SHARD" --output-dir data/skills-sh/
+
+      - name: Upload crawled files
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-sh-${{ matrix.shard }}
+          path: data/skills-sh/
+          retention-days: 3
+
+  trigger-scan:
+    needs: crawl
+    if: always() && !cancelled()
+    uses: ./.github/workflows/scan.yml
+    with:
+      registry: skills-sh
+    secrets: inherit
