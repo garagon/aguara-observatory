@@ -161,16 +161,21 @@ const gradeColors: Record<string, string> = {
     <div>
       <h2 class="text-2xl font-bold text-white mb-6">Recent Critical Findings</h2>
       <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        {feed.slice(0, 10).map((item, i) => (
-          <div class={`px-6 py-3 ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
-            <div class="flex items-center gap-3">
-              <SeverityBadge severity={item.severity} />
-              <span class="text-sm text-gray-300 font-medium">{item.skill_name || item.skill_id}</span>
-              <span class="text-xs text-gray-500">{item.registry_id}</span>
-            </div>
-            <p class="text-sm text-gray-400 mt-1 ml-20">{item.category} &mdash; {item.rule_id}</p>
-          </div>
-        ))}
+        {feed.slice(0, 10).map((item, i) => {
+          const slug = item.slug || item.skill_id.replace(`${item.registry_id}:`, "");
+          const safeSlug = slug.replace(/\//g, "_").replace(/:/g, "_");
+          const href = `${import.meta.env.BASE_URL}skills/${item.registry_id}/${safeSlug}/`;
+          return (
+            <a href={href} class={`block px-6 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
+              <div class="flex items-center gap-3">
+                <SeverityBadge severity={item.severity} />
+                <span class="text-sm text-gray-300 font-medium">{item.skill_name || item.skill_id}</span>
+                <span class="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded">{item.registry_id}</span>
+              </div>
+              <p class="text-sm text-gray-400 mt-1 ml-20">{item.category} &mdash; {item.rule_id}</p>
+            </a>
+          );
+        })}
       </div>
     </div>
   )}

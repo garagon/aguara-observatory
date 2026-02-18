@@ -37,8 +37,8 @@ RAW_RATE_LIMIT_MS = 100
 class SkillsShCrawler(BaseCrawler):
     registry_id = "skills-sh"
 
-    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None):
-        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard)
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers)
         self._repo_trees: dict[str, dict | None] = {}  # cache
 
     # --- Discovery ---

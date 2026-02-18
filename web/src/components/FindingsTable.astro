@@ -7,6 +7,7 @@ interface Finding {
   category: string;
   subcategory?: string;
   line?: number;
+  matched_text?: string;
   message?: string;
 }
 
@@ -23,33 +24,29 @@ const sorted = [...findings].sort(
 );
 ---
 
-<div class="overflow-x-auto">
-  <table class="w-full text-sm">
-    <thead>
-      <tr class="border-b border-gray-800 text-left text-gray-400">
-        <th class="pb-3 pr-4 font-medium">Severity</th>
-        <th class="pb-3 pr-4 font-medium">Rule</th>
-        <th class="pb-3 pr-4 font-medium">Category</th>
-        {!compact && <th class="pb-3 pr-4 font-medium">Line</th>}
-        {!compact && <th class="pb-3 font-medium">Message</th>}
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-800/50">
-      {sorted.map((f) => (
-        <tr class="hover:bg-gray-900/50 transition-colors">
-          <td class="py-2.5 pr-4">
-            <SeverityBadge severity={f.severity} />
-          </td>
-          <td class="py-2.5 pr-4 font-mono text-xs text-gray-300">{f.rule_id}</td>
-          <td class="py-2.5 pr-4 text-gray-300">{f.category}</td>
-          {!compact && <td class="py-2.5 pr-4 text-gray-500">{f.line ?? "—"}</td>}
-          {!compact && (
-            <td class="py-2.5 text-gray-400 max-w-md truncate">{f.message ?? "—"}</td>
-          )}
-        </tr>
-      ))}
-    </tbody>
-  </table>
+<div class="space-y-3">
+  {sorted.map((f) => (
+    <div class="border border-gray-800 rounded-lg overflow-hidden">
+      <div class="flex items-center gap-3 px-4 py-3 bg-gray-800/30">
+        <SeverityBadge severity={f.severity} />
+        <span class="font-mono text-xs text-gray-300">{f.rule_id}</span>
+        <span class="text-xs text-gray-500">{f.category}</span>
+        {f.line && (
+          <span class="text-xs text-gray-600 ml-auto">Line {f.line}</span>
+        )}
+      </div>
+      {!compact && f.matched_text && (
+        <div class="px-4 py-3 bg-gray-950/50 border-t border-gray-800/50">
+          <pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto"><code>{f.matched_text}</code></pre>
+        </div>
+      )}
+      {!compact && f.message && (
+        <div class="px-4 py-2 border-t border-gray-800/50">
+          <p class="text-xs text-gray-500">{f.message}</p>
+        </div>
+      )}
+    </div>
+  ))}
 </div>
 
 {findings.length === 0 && (

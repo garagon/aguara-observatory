@@ -30,8 +30,8 @@ DOWNLOAD_RATE_LIMIT_MS = 3100  # 20 downloads/min limit
 class ClawHubCrawler(BaseCrawler):
     registry_id = "clawhub"
 
-    def __init__(self, conn, *, output_dir=None, rate_limit_ms=3100, shard=None):
-        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard)
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=3100, shard=None, max_workers=1):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers)
 
     def discover(self) -> list[dict]:
         """Fetch all skills from ClawHub API with pagination."""
@@ -83,15 +83,25 @@ class ClawHubCrawler(BaseCrawler):
         skill_id = f"{self.registry_id}:{slug}"
         url = f"{CLAWHUB_API}/download?slug={slug}&tag=latest"
 
-        self.rate_limiter.wait()
-
-        try:
-            resp = requests.get(url, timeout=30)
-            if resp.status_code == 410:
-                return CrawlResult(skill_id=skill_id, slug=slug, error="soft-deleted (410)")
-            resp.raise_for_status()
-        except requests.RequestException as e:
-            return CrawlResult(skill_id=skill_id, slug=slug, error=str(e))
+        for attempt in range(3):
+            self.rate_limiter.wait()
+            try:
+                resp = requests.get(url, timeout=30)
+                if resp.status_code == 410:
+                    return CrawlResult(skill_id=skill_id, slug=slug, error="soft-deleted (410)")
+                if resp.status_code == 429:
+                    wait = 10 * (attempt + 1)
+                    logger.warning("ClawHub 429 for %s, backing off %ds", slug, wait)
+                    time.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                break
+            except requests.RequestException as e:
+                if attempt == 2:
+                    return CrawlResult(skill_id=skill_id, slug=slug, error=str(e))
+                time.sleep(5)
+        else:
+            return CrawlResult(skill_id=skill_id, slug=slug, error="429 after retries")
 
         # Extract SKILL.md from zip
         try:

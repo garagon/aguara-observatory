@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import threading
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import libsql_experimental as libsql
@@ -31,12 +33,15 @@ class BaseCrawler(ABC):
         output_dir: Path | None = None,
         rate_limit_ms: int = 500,
         shard: str | None = None,
+        max_workers: int = 1,
     ):
         self.conn = conn
         self.output_dir = output_dir or Path(f"data/{self.registry_id}")
         self.rate_limiter = RateLimiter(rate_limit_ms)
         self.shard = shard
+        self.max_workers = max_workers
         self.stats = {"discovered": 0, "downloaded": 0, "skipped": 0, "failed": 0}
+        self._db_lock = threading.Lock()
 
     @property
     @abstractmethod
@@ -66,64 +71,30 @@ class BaseCrawler(ABC):
 
         Returns stats dict.
         """
-        logger.info("[%s] Starting crawl (shard=%s)", self.registry_id, self.shard)
+        logger.info("[%s] Starting crawl (shard=%s, workers=%d)", self.registry_id, self.shard, self.max_workers)
 
         # Phase 1: Discover
         skills = self.discover()
         self.stats["discovered"] = len(skills)
         logger.info("[%s] Discovered %d skills", self.registry_id, len(skills))
 
-        # Phase 2: Download (incremental)
-        for i, skill_info in enumerate(skills, 1):
-            slug = skill_info["slug"]
-            skill_id = f"{self.registry_id}:{slug}"
-
-            if i % 100 == 0:
-                logger.info("[%s] Progress: %d/%d", self.registry_id, i, len(skills))
-
-            # Register the skill in DB (upsert)
+        # Phase 2a: Register all skills in DB (serial, fast)
+        for skill_info in skills:
             upsert_skill(
                 self.conn,
                 self.registry_id,
-                slug,
+                skill_info["slug"],
                 name=skill_info.get("name"),
                 url=skill_info.get("url"),
                 metadata=skill_info.get("metadata"),
             )
+        self.conn.commit()
 
-            # Check if content changed
-            try:
-                kwargs = {k: v for k, v in skill_info.items() if k != "slug"}
-                result = self.download(slug, **kwargs)
-            except Exception as e:
-                logger.warning("[%s] Failed to download %s: %s", self.registry_id, slug, e)
-                self.stats["failed"] += 1
-                continue
-
-            if result.skipped:
-                self.stats["skipped"] += 1
-                continue
-
-            if result.error:
-                logger.warning("[%s] Error for %s: %s", self.registry_id, slug, result.error)
-                self.stats["failed"] += 1
-                continue
-
-            # Update skill with content hash
-            if result.content_hash:
-                upsert_skill(
-                    self.conn,
-                    self.registry_id,
-                    slug,
-                    content_hash=result.content_hash,
-                    content_size=result.content_size,
-                )
-
-            # Save content to disk for scanning
-            if result.content:
-                self._save_content(slug, result.content)
-
-            self.stats["downloaded"] += 1
+        # Phase 2b: Download (concurrent or sequential)
+        if self.max_workers > 1:
+            self._crawl_concurrent(skills)
+        else:
+            self._crawl_sequential(skills)
 
         self.conn.commit()
         logger.info(
@@ -136,6 +107,92 @@ class BaseCrawler(ABC):
         )
         return self.stats
 
+    def _crawl_sequential(self, skills: list[dict]) -> None:
+        """Download skills sequentially (original behavior)."""
+        for i, skill_info in enumerate(skills, 1):
+            slug = skill_info["slug"]
+            if i % 100 == 0:
+                logger.info("[%s] Progress: %d/%d", self.registry_id, i, len(skills))
+
+            self._download_and_process(skill_info)
+
+    def _crawl_concurrent(self, skills: list[dict]) -> None:
+        """Download skills concurrently using ThreadPoolExecutor."""
+        total = len(skills)
+        completed = 0
+
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = {
+                executor.submit(self._download_one, skill_info): skill_info
+                for skill_info in skills
+            }
+
+            for future in as_completed(futures):
+                completed += 1
+                if completed % 200 == 0:
+                    logger.info("[%s] Progress: %d/%d (dl=%d skip=%d fail=%d)",
+                                self.registry_id, completed, total,
+                                self.stats["downloaded"], self.stats["skipped"], self.stats["failed"])
+
+                skill_info = futures[future]
+                try:
+                    result = future.result()
+                except Exception as e:
+                    logger.warning("[%s] Failed %s: %s", self.registry_id, skill_info["slug"], e)
+                    self.stats["failed"] += 1
+                    continue
+
+                # Process result (DB writes + file saves) under lock
+                self._process_result(skill_info["slug"], result)
+
+                # Commit periodically to avoid holding transactions too long
+                if completed % 500 == 0:
+                    with self._db_lock:
+                        self.conn.commit()
+
+    def _download_one(self, skill_info: dict) -> CrawlResult:
+        """Download a single skill (thread-safe, no DB access)."""
+        slug = skill_info["slug"]
+        kwargs = {k: v for k, v in skill_info.items() if k != "slug"}
+        return self.download(slug, **kwargs)
+
+    def _process_result(self, slug: str, result: CrawlResult) -> None:
+        """Process a download result: update DB and save file."""
+        if result.skipped:
+            self.stats["skipped"] += 1
+            return
+
+        if result.error:
+            logger.warning("[%s] Error for %s: %s", self.registry_id, slug, result.error)
+            self.stats["failed"] += 1
+            return
+
+        with self._db_lock:
+            if result.content_hash:
+                upsert_skill(
+                    self.conn,
+                    self.registry_id,
+                    slug,
+                    content_hash=result.content_hash,
+                    content_size=result.content_size,
+                )
+
+        if result.content:
+            self._save_content(slug, result.content)
+
+        self.stats["downloaded"] += 1
+
+    def _download_and_process(self, skill_info: dict) -> None:
+        """Download and process a single skill (sequential mode)."""
+        slug = skill_info["slug"]
+        try:
+            result = self._download_one(skill_info)
+        except Exception as e:
+            logger.warning("[%s] Failed to download %s: %s", self.registry_id, slug, e)
+            self.stats["failed"] += 1
+            return
+        self._process_result(slug, result)
+
     def _save_content(self, slug: str, content: str) -> None:
         """Save skill content to disk."""
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -145,5 +202,6 @@ class BaseCrawler(ABC):
 
     def is_content_changed(self, skill_id: str, new_hash: str) -> bool:
         """Check if content has changed since last crawl."""
-        old_hash = get_skill_hash(self.conn, skill_id)
+        with self._db_lock:
+            old_hash = get_skill_hash(self.conn, skill_id)
         return old_hash != new_hash

@@ -47,6 +47,9 @@ export interface SkillReport {
   slug: string;
   name: string;
   url: string;
+  description?: string;
+  first_seen?: string;
+  last_seen?: string;
   score: number;
   grade: string;
   findings: SkillFinding[];
@@ -64,6 +67,7 @@ export interface SkillFinding {
 
 export interface FeedItem {
   skill_id: string;
+  slug: string;
   rule_id: string;
   severity: string;
   category: string;
@@ -71,6 +75,26 @@ export interface FeedItem {
   updated_at: string;
   skill_name: string;
   registry_id: string;
+}
+
+export interface RegistrySkill {
+  skill_id: string;
+  slug: string;
+  name: string;
+  score: number;
+  grade: string;
+  finding_count: number;
+  critical_count: number;
+  high_count: number;
+}
+
+export interface SearchEntry {
+  slug: string;
+  name: string;
+  registry: string;
+  score: number;
+  grade: string;
+  findings: number;
 }
 
 export interface BenchmarkResult {
@@ -131,6 +155,14 @@ export function getSkillReport(registryId: string, slug: string): SkillReport | 
 
 export function getRegistryStats(registryId: string): Record<string, unknown> | null {
   return loadJson<Record<string, unknown>>(`registries/${registryId}/stats.json`);
+}
+
+export function getRegistrySkills(registryId: string): RegistrySkill[] {
+  return loadJson<RegistrySkill[]>(`registries/${registryId}/skills.json`) ?? [];
+}
+
+export function getSearchIndex(): SearchEntry[] {
+  return loadJson<SearchEntry[]>("search-index.json") ?? [];
 }
 
 /** List all available skill report files for static path generation. */

@@ -1,16 +1,17 @@
 ---
 /**
  * Client-side search using Fuse.js.
- * The search index is embedded as JSON in a data attribute.
+ * Loads search-index.json (all skills) + registries.json for combined search.
  */
 interface Props {
   placeholder?: string;
 }
 
-const { placeholder = "Search skills..." } = Astro.props;
+const { placeholder = "Search skills and registries..." } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
-<div class="relative" id="search-container">
+<div class="relative" id="search-container" data-base={base}>
   <div class="relative">
     <svg
       class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
@@ -39,64 +40,138 @@ const { placeholder = "Search skills..." } = Astro.props;
 <script>
   import Fuse from "fuse.js";
 
-  const base = document.querySelector("base")?.getAttribute("href") ?? "/aguara-observatory/";
+  const container = document.getElementById("search-container");
+  const base = container?.dataset.base ?? "/aguara-observatory/";
+
+  interface SearchItem {
+    type: "skill" | "registry";
+    name: string;
+    slug: string;
+    registry: string;
+    score: number;
+    grade: string;
+    findings: number;
+  }
+
+  const gradeColorMap: Record<string, string> = {
+    A: "bg-emerald-500",
+    B: "bg-green-500",
+    C: "bg-yellow-500",
+    D: "bg-orange-500",
+    F: "bg-red-500",
+  };
 
   async function initSearch() {
     const input = document.getElementById("search-input") as HTMLInputElement;
     const results = document.getElementById("search-results") as HTMLDivElement;
     if (!input || !results) return;
 
-    // Fetch search index (registries as fallback)
-    let items: { name: string; id: string; registry: string; score?: number; grade?: string }[] = [];
+    const items: SearchItem[] = [];
+
+    // Load registries
     try {
       const resp = await fetch(`${base}api/v1/registries.json`);
       if (resp.ok) {
         const registries = await resp.json();
-        items = registries.map((r: { id: string; name: string; skill_count: number; avg_score: number }) => ({
-          name: r.name,
-          id: r.id,
-          registry: r.id,
-          score: Math.round(r.avg_score),
-        }));
+        for (const r of registries) {
+          items.push({
+            type: "registry",
+            name: r.name,
+            slug: r.id,
+            registry: r.id,
+            score: Math.round(r.avg_score),
+            grade: r.avg_score >= 90 ? "A" : r.avg_score >= 75 ? "B" : r.avg_score >= 50 ? "C" : r.avg_score >= 25 ? "D" : "F",
+            findings: 0,
+          });
+        }
       }
-    } catch {
-      // No data yet
-    }
+    } catch (e) { console.warn("Failed to load registries for search:", e); }
+
+    // Load skill search index
+    try {
+      const resp = await fetch(`${base}api/v1/search-index.json`);
+      if (resp.ok) {
+        const skills = await resp.json();
+        for (const s of skills) {
+          items.push({
+            type: "skill",
+            name: s.name,
+            slug: s.slug,
+            registry: s.registry,
+            score: s.score,
+            grade: s.grade,
+            findings: s.findings,
+          });
+        }
+      }
+    } catch (e) { console.warn("Failed to load search index:", e); }
+
+    if (items.length === 0) return;
 
     const fuse = new Fuse(items, {
-      keys: ["name", "id"],
-      threshold: 0.4,
+      keys: [
+        { name: "name", weight: 0.7 },
+        { name: "slug", weight: 0.3 },
+      ],
+      threshold: 0.35,
     });
 
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
     input.addEventListener("input", () => {
-      const query = input.value.trim();
-      if (!query) {
-        results.classList.add("hidden");
-        return;
-      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const query = input.value.trim();
+        if (!query) {
+          results.classList.add("hidden");
+          return;
+        }
 
-      const matches = fuse.search(query, { limit: 10 });
-      if (matches.length === 0) {
-        results.innerHTML = '<p class="p-4 text-sm text-gray-500">No results found.</p>';
+        const matches = fuse.search(query, { limit: 12 });
+        if (matches.length === 0) {
+          results.innerHTML = '<p class="p-4 text-sm text-gray-500">No results found.</p>';
+          results.classList.remove("hidden");
+          return;
+        }
+
+        results.innerHTML = matches
+          .map(({ item }) => {
+            const safeSlug = item.slug.replace(/\//g, "_").replace(/:/g, "_");
+            const href = item.type === "registry"
+              ? `${base}registries/${item.registry}/`
+              : item.findings > 0
+                ? `${base}skills/${item.registry}/${safeSlug}/`
+                : `${base}registries/${item.registry}/`;
+
+            const gradeColor = gradeColorMap[item.grade] ?? "bg-gray-600";
+            const typeLabel = item.type === "registry" ? "Registry" : item.registry;
+
+            return `<a href="${href}" class="flex items-center gap-3 p-3 hover:bg-gray-800 transition-colors border-b border-gray-800/50 last:border-0">
+              <span class="inline-block w-6 text-center text-xs font-bold rounded ${gradeColor} text-white py-0.5">${item.grade}</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm text-gray-200 truncate">${item.name}</div>
+                <div class="text-xs text-gray-500">${typeLabel}${item.findings > 0 ? ` · ${item.findings} findings` : ""}</div>
+              </div>
+              <span class="text-xs text-gray-500 tabular-nums">${item.score}/100</span>
+            </a>`;
+          })
+          .join("");
         results.classList.remove("hidden");
-        return;
-      }
-
-      results.innerHTML = matches
-        .map(({ item }) => {
-          return `<a href="${base}registries/${item.registry}/" class="flex items-center justify-between p-3 hover:bg-gray-800 transition-colors border-b border-gray-800/50 last:border-0">
-            <span class="text-sm text-gray-200">${item.name}</span>
-            ${item.score !== undefined ? `<span class="text-xs text-gray-500">${item.score}/100</span>` : ""}
-          </a>`;
-        })
-        .join("");
-      results.classList.remove("hidden");
+      }, 150);
     });
 
     // Close on outside click
     document.addEventListener("click", (e) => {
       if (!(e.target as HTMLElement).closest("#search-container")) {
         results.classList.add("hidden");
+      }
+    });
+
+    // Close on Escape
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        results.classList.add("hidden");
+        input.blur();
       }
     });
   }

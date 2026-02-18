@@ -83,7 +83,7 @@ def recompute_all_scores(conn) -> dict:
             "SELECT scan_id FROM findings_latest WHERE skill_id = ? LIMIT 1",
             (skill_id,),
         ).fetchone()
-        scan_id = row[0] if row else 0
+        scan_id = row[0] if row else None
 
         upsert_skill_score(conn, skill_score, scan_id)
         grade_dist[grade.value] += 1

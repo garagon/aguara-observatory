@@ -67,6 +67,15 @@ def export_all(conn, output_dir: Path | None = None, datasets_dir: Path | None =
     skill_count = _export_skill_reports(conn, output_dir)
     files["skill_reports"] = skill_count
 
+    # /api/v1/registries/{id}/skills.json — Per-registry skill list
+    for reg in registries:
+        _export_registry_skills(conn, output_dir, reg["id"])
+    files["registry_skills"] = len(registries)
+
+    # /api/v1/search-index.json — Skill search index
+    _export_search_index(conn, output_dir)
+    files["search-index.json"] = True
+
     # /api/v1/datasets/manifest.json
     _export_datasets_manifest(conn, datasets_dir, output_dir)
     files["datasets/manifest.json"] = True
@@ -212,15 +221,19 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
 
     feed = []
     for row in rows:
+        skill_id = row[0]
+        registry_id = row[7]
+        slug = skill_id.removeprefix(f"{registry_id}:")
         feed.append({
-            "skill_id": row[0],
+            "skill_id": skill_id,
+            "slug": slug,
             "rule_id": row[1],
             "severity": row[2],
             "category": row[3],
             "message": row[4],
             "updated_at": row[5],
             "skill_name": row[6],
-            "registry_id": row[7],
+            "registry_id": registry_id,
         })
 
     _write_json(output_dir / "feed" / "recent.json", feed)
@@ -229,14 +242,15 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
 def _export_skill_reports(conn, output_dir: Path) -> int:
     """Generate /api/v1/skills/{registry}/{slug}.json for skills with findings."""
     rows = conn.execute(
-        """SELECT DISTINCT fl.skill_id, s.registry_id, s.slug, s.name, s.url
+        """SELECT DISTINCT fl.skill_id, s.registry_id, s.slug, s.name, s.url,
+                  s.first_seen, s.last_seen, s.metadata
            FROM findings_latest fl
            JOIN skills s ON fl.skill_id = s.id
            WHERE s.deleted = 0"""
     ).fetchall()
 
     count = 0
-    for skill_id, registry_id, slug, name, url in rows:
+    for skill_id, registry_id, slug, name, url, first_seen, last_seen, metadata_json in rows:
         # Get findings
         finding_rows = conn.execute(
             """SELECT rule_id, severity, category, subcategory, line,
@@ -251,12 +265,24 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
             (skill_id,),
         ).fetchone()
 
+        # Extract description from metadata
+        description = None
+        if metadata_json:
+            try:
+                meta = json.loads(metadata_json)
+                description = meta.get("description")
+            except (json.JSONDecodeError, TypeError):
+                pass
+
         report = {
             "skill_id": skill_id,
             "registry_id": registry_id,
             "slug": slug,
             "name": name,
             "url": url,
+            "description": description,
+            "first_seen": first_seen,
+            "last_seen": last_seen,
             "score": score_row[0] if score_row else 100,
             "grade": score_row[1] if score_row else "A",
             "findings": [
@@ -278,6 +304,65 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
         count += 1
 
     return count
+
+
+def _export_registry_skills(conn, output_dir: Path, registry_id: str) -> None:
+    """Generate /api/v1/registries/{id}/skills.json — list of skills with scores."""
+    rows = conn.execute(
+        """SELECT s.id, s.slug, s.name,
+                  COALESCE(ss.score, 100) as score,
+                  COALESCE(ss.grade, 'A') as grade,
+                  COALESCE(ss.finding_count, 0) as finding_count,
+                  COALESCE(ss.critical_count, 0) as critical_count,
+                  COALESCE(ss.high_count, 0) as high_count
+           FROM skills s
+           LEFT JOIN skill_scores ss ON s.id = ss.skill_id
+           WHERE s.registry_id = ? AND s.deleted = 0
+           ORDER BY COALESCE(ss.score, 100) ASC""",
+        (registry_id,),
+    ).fetchall()
+
+    skills = []
+    for skill_id, slug, name, score, grade, fc, cc, hc in rows:
+        skills.append({
+            "skill_id": skill_id,
+            "slug": slug,
+            "name": name or slug,
+            "score": score,
+            "grade": grade,
+            "finding_count": fc,
+            "critical_count": cc,
+            "high_count": hc,
+        })
+
+    _write_json(output_dir / "registries" / registry_id / "skills.json", skills)
+
+
+def _export_search_index(conn, output_dir: Path) -> None:
+    """Generate /api/v1/search-index.json — lightweight skill index for client-side search."""
+    rows = conn.execute(
+        """SELECT s.slug, s.name, s.registry_id,
+                  COALESCE(ss.score, 100) as score,
+                  COALESCE(ss.grade, 'A') as grade,
+                  COALESCE(ss.finding_count, 0) as finding_count
+           FROM skills s
+           LEFT JOIN skill_scores ss ON s.id = ss.skill_id
+           WHERE s.deleted = 0
+           ORDER BY s.registry_id, s.slug"""
+    ).fetchall()
+
+    index = []
+    for slug, name, registry_id, score, grade, fc in rows:
+        index.append({
+            "slug": slug,
+            "name": name or slug,
+            "registry": registry_id,
+            "score": score,
+            "grade": grade,
+            "findings": fc,
+        })
+
+    _write_json(output_dir / "search-index.json", index)
 
 
 def _export_datasets_manifest(conn, datasets_dir: Path, output_dir: Path) -> None:

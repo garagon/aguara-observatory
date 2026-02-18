@@ -3,7 +3,7 @@ import tailwind from "@astrojs/tailwind";
 
 export default defineConfig({
   site: "https://garagon.github.io",
-  base: "/aguara-observatory",
+  base: "/aguara-observatory/",
   integrations: [tailwind()],
   build: {
     assets: "_assets",
