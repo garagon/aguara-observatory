@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:clawtan",
+  "registry_id": "clawhub",
+  "slug": "clawtan",
+  "name": "clawtan",
+  "url": "https://clawhub.ai/skills/clawtan",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 44,
+      "matched_text": "npm install -g c",
+      "message": ""
+    }
+  ]
+}

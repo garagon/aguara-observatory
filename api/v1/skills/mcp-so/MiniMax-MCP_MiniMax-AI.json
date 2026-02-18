@@ -8,7 +8,7 @@
   "grade": "B",
   "findings": [
     {
-      "rule_id": "NLP_AUTHORITY_CLAIM",
+      "rule_id": "NLP_HEADING_MISMATCH",
       "severity": "MEDIUM",
       "category": "prompt-injection",
       "subcategory": null,
@@ -17,7 +17,7 @@
       "message": ""
     },
     {
-      "rule_id": "NLP_HEADING_MISMATCH",
+      "rule_id": "NLP_AUTHORITY_CLAIM",
       "severity": "MEDIUM",
       "category": "prompt-injection",
       "subcategory": null,

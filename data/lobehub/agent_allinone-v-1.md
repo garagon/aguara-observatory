@@ -1,3 +1,0 @@
-# Allinone
-
-Innovation · Future · Excellence

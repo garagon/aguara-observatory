@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:image-to-video",
+  "registry_id": "clawhub",
+  "slug": "image-to-video",
+  "name": "image-to-video",
+  "url": "https://clawhub.ai/skills/image-to-video",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 14,
+      "matched_text": "curl -fsSL https://cli.inference.sh | sh",
+      "message": ""
+    }
+  ]
+}

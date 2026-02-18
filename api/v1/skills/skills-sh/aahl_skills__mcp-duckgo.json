@@ -8,21 +8,21 @@
   "grade": "D",
   "findings": [
     {
-      "rule_id": "MCP_011",
-      "severity": "HIGH",
-      "category": "mcp-attack",
-      "subcategory": null,
-      "line": 10,
-      "matched_text": "call --stdio 'u",
-      "message": ""
-    },
-    {
       "rule_id": "EXTDL_003",
       "severity": "HIGH",
       "category": "external-download",
       "subcategory": null,
       "line": 10,
       "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "MCP_011",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 10,
+      "matched_text": "call --stdio 'u",
       "message": ""
     },
     {

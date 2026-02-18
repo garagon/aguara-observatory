@@ -1,21 +1,21 @@
 {
-  "skills_compared": 158,
+  "skills_compared": 160,
   "metrics": {
     "per_category": {
       "prompt-injection": {
         "tp": 0,
         "fp": 68,
         "fn": 0,
-        "tn": 90,
+        "tn": 92,
         "precision": 0.0,
         "recall": 1.0,
         "f1": 0.0
       },
       "exfiltration": {
         "tp": 0,
-        "fp": 22,
+        "fp": 20,
         "fn": 0,
-        "tn": 136,
+        "tn": 140,
         "precision": 0.0,
         "recall": 1.0,
         "f1": 0.0
@@ -24,7 +24,7 @@
         "tp": 0,
         "fp": 4,
         "fn": 0,
-        "tn": 154,
+        "tn": 156,
         "precision": 0.0,
         "recall": 1.0,
         "f1": 0.0
@@ -33,14 +33,14 @@
         "tp": 0,
         "fp": 12,
         "fn": 0,
-        "tn": 146,
+        "tn": 148,
         "precision": 0.0,
         "recall": 1.0,
         "f1": 0.0
       },
       "external-download": {
         "tp": 0,
-        "fp": 58,
+        "fp": 60,
         "fn": 0,
         "tn": 100,
         "precision": 0.0,
@@ -51,7 +51,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -60,7 +60,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -69,7 +69,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -78,7 +78,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -87,7 +87,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -96,7 +96,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -105,7 +105,7 @@
         "tp": 0,
         "fp": 0,
         "fn": 0,
-        "tn": 158,
+        "tn": 160,
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0
@@ -115,7 +115,7 @@
       "tp": 0,
       "fp": 164,
       "fn": 0,
-      "tn": 1732,
+      "tn": 1756,
       "precision": 0.0,
       "recall": 1.0,
       "f1": 0.0

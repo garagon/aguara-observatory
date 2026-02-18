@@ -1,3 +1,0 @@
-# Programming Maestro
-
-coding assistant

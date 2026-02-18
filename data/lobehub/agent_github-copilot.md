@@ -1,3 +1,0 @@
-# GitHub Copilot
-
-GitHub Copilot

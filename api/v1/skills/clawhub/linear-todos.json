@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:linear-todos",
+  "registry_id": "clawhub",
+  "slug": "linear-todos",
+  "name": "linear-todos",
+  "url": "https://clawhub.ai/skills/linear-todos",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1,
+      "matched_text": "Use a dedicated API key: Create a separate Linear API token with minimal scope for this skill. Revoke it if you uninstall or stop using the skill.",
+      "message": ""
+    }
+  ]
+}

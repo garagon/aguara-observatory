@@ -1,3 +1,0 @@
-# Git Version Control Expert
-
-...

@@ -1,3 +1,0 @@
-# Tech Explorer
-
-Tech Explore

@@ -4,15 +4,15 @@
     "week_end": "2026-02-18",
     "registries": {
       "clawhub": {
-        "total_skills": 24,
-        "skills_scanned": 24,
+        "total_skills": 23,
+        "skills_scanned": 23,
         "total_findings": 9,
-        "critical_count": 0,
-        "high_count": 7,
-        "medium_count": 2,
+        "critical_count": 1,
+        "high_count": 5,
+        "medium_count": 3,
         "low_count": 0,
-        "avg_score": 95.0,
-        "new_skills": 24,
+        "avg_score": 94.6,
+        "new_skills": 23,
         "deleted_skills": 0
       },
       "lobehub": {
@@ -65,12 +65,12 @@
       }
     },
     "totals": {
-      "total_skills": 1405,
+      "total_skills": 1404,
       "total_findings": 326,
-      "critical_count": 38,
-      "high_count": 175,
-      "avg_score": 97.5,
-      "new_skills": 1405
+      "critical_count": 39,
+      "high_count": 173,
+      "avg_score": 97.4,
+      "new_skills": 1404
     }
   }
 ]

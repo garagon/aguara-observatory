@@ -1,20 +1,20 @@
 {
-  "total_skills": 1405,
-  "skills_scanned": 1405,
+  "total_skills": 1404,
+  "skills_scanned": 1404,
   "total_findings": 326,
   "avg_score": 97.0,
   "registries_count": 5,
   "grade_distribution": {
-    "A": 1284,
-    "B": 71,
-    "C": 28,
+    "A": 1282,
+    "B": 74,
+    "C": 26,
     "D": 14,
     "F": 8
   },
   "severity_distribution": {
-    "CRITICAL": 38,
-    "HIGH": 175,
-    "MEDIUM": 113
+    "CRITICAL": 39,
+    "HIGH": 173,
+    "MEDIUM": 114
   },
-  "generated_at": "2026-02-18T20:42:16.343657+00:00"
+  "generated_at": "2026-02-18T21:01:09.833618+00:00"
 }

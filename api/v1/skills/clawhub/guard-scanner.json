@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:guard-scanner",
+  "registry_id": "clawhub",
+  "slug": "guard-scanner",
+  "name": "guard-scanner",
+  "url": "https://clawhub.ai/skills/guard-scanner",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXFIL_004",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 99,
+      "matched_text": "DNS tunnel",
+      "message": ""
+    }
+  ]
+}

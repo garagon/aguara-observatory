@@ -8,15 +8,6 @@
   "grade": "F",
   "findings": [
     {
-      "rule_id": "EXTDL_003",
-      "severity": "HIGH",
-      "category": "external-download",
-      "subcategory": null,
-      "line": 11,
-      "matched_text": "npx -y ",
-      "message": ""
-    },
-    {
       "rule_id": "MCP_011",
       "severity": "HIGH",
       "category": "mcp-attack",
@@ -26,12 +17,12 @@
       "message": ""
     },
     {
-      "rule_id": "MCP_011",
+      "rule_id": "EXTDL_003",
       "severity": "HIGH",
-      "category": "mcp-attack",
+      "category": "external-download",
       "subcategory": null,
-      "line": 12,
-      "matched_text": "call --stdio 'u",
+      "line": 11,
+      "matched_text": "npx -y ",
       "message": ""
     },
     {
@@ -41,6 +32,15 @@
       "subcategory": null,
       "line": 12,
       "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "MCP_011",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 12,
+      "matched_text": "call --stdio 'u",
       "message": ""
     },
     {
@@ -62,21 +62,21 @@
       "message": ""
     },
     {
-      "rule_id": "EXTDL_003",
-      "severity": "HIGH",
-      "category": "external-download",
-      "subcategory": null,
-      "line": 20,
-      "matched_text": "npx -y ",
-      "message": ""
-    },
-    {
       "rule_id": "MCP_011",
       "severity": "HIGH",
       "category": "mcp-attack",
       "subcategory": null,
       "line": 20,
       "matched_text": "call --stdio 'u",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 20,
+      "matched_text": "npx -y ",
       "message": ""
     },
     {

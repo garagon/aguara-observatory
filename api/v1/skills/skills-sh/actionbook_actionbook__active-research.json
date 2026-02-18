@@ -35,21 +35,21 @@
       "message": ""
     },
     {
-      "rule_id": "EXTDL_008",
-      "severity": "MEDIUM",
-      "category": "external-download",
-      "subcategory": null,
-      "line": 540,
-      "matched_text": "npx @actionbookdev/json-ui`",
-      "message": ""
-    },
-    {
       "rule_id": "EXTDL_004",
       "severity": "MEDIUM",
       "category": "external-download",
       "subcategory": null,
       "line": 540,
       "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 540,
+      "matched_text": "npx @actionbookdev/json-ui`",
       "message": ""
     },
     {

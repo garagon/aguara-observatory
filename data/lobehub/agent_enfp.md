@@ -1,3 +1,0 @@
-# ENFP
-
-Happy Puppy~

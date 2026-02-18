@@ -47,8 +47,6 @@ skills-sh:anthropics_claude-code__plugin-structure,skills-sh,anthropics_claude-c
 skills-sh:boshu2_agentops__council,skills-sh,boshu2_agentops__council,council,70,C,2,0,2,0,0
 skills-sh:boshu2_agentops__crank,skills-sh,boshu2_agentops__crank,crank,70,C,2,0,2,0,0
 skills-sh:boshu2_agentops__plan,skills-sh,boshu2_agentops__plan,plan,70,C,2,0,2,0,0
-clawhub:tester,clawhub,tester,tester,70,C,2,0,2,0,0
-clawhub:the-uninscribed,clawhub,the-uninscribed,the-uninscribed,70,C,2,0,2,0,0
 skills-sh:affaan-m_everything-claude-code__docker-patterns,skills-sh,affaan-m_everything-claude-code__docker-patterns,docker-patterns,75,B,1,1,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__aws-ec2-setup,skills-sh,aj-geddes_useful-ai-prompts__aws-ec2-setup,aws-ec2-setup,75,B,1,1,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__cloud-cost-management,skills-sh,aj-geddes_useful-ai-prompts__cloud-cost-management,cloud-cost-management,75,B,1,1,0,0,0
@@ -59,6 +57,7 @@ skills-sh:austintgriffith_ethereum-wingman__ethereum-wingman,skills-sh,austintgr
 skills-sh:azurecosmosdb_cosmosdb-agent-kit__cosmosdb-best-practices,skills-sh,azurecosmosdb_cosmosdb-agent-kit__cosmosdb-best-practices,cosmosdb-best-practices,75,B,1,1,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__docker,skills-sh,bobmatnyc_claude-mpm-skills__docker,docker,75,B,1,1,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__drizzle-migrations,skills-sh,bobmatnyc_claude-mpm-skills__drizzle-migrations,drizzle-migrations,75,B,1,1,0,0,0
+clawhub:image-to-video,clawhub,image-to-video,image-to-video,75,B,1,1,0,0,0
 lobehub:agent_gpt-4-dan-assistant,lobehub,agent_gpt-4-dan-assistant,Jailbreak Assistant DAN,75,B,1,1,0,0,0
 lobehub:plugin_seo_assistant,lobehub,plugin_seo_assistant,SEO Assistant,75,B,1,1,0,0,0
 skills-sh:alinaqi_claude-bootstrap__reddit-api,skills-sh,alinaqi_claude-bootstrap__reddit-api,reddit-api,77,B,2,0,1,1,0
@@ -118,8 +117,10 @@ skills-sh:boshu2_agentops__flywheel,skills-sh,boshu2_agentops__flywheel,flywheel
 skills-sh:boshu2_agentops__quickstart,skills-sh,boshu2_agentops__quickstart,quickstart,85,B,1,0,1,0,0
 skills-sh:boshu2_agentops__rpi,skills-sh,boshu2_agentops__rpi,rpi,85,B,1,0,1,0,0
 skills-sh:boshu2_agentops__shared,skills-sh,boshu2_agentops__shared,shared,85,B,1,0,1,0,0
-clawhub:multi-workplace,clawhub,multi-workplace,multi-workplace,85,B,1,0,1,0,0
-clawhub:stack-scaffold,clawhub,stack-scaffold,stack-scaffold,85,B,1,0,1,0,0
+clawhub:cron-worker-guardrails,clawhub,cron-worker-guardrails,cron-worker-guardrails,85,B,1,0,1,0,0
+clawhub:duckduckgo-search-1-0-0,clawhub,duckduckgo-search-1-0-0,duckduckgo-search-1-0-0,85,B,1,0,1,0,0
+clawhub:guard-scanner,clawhub,guard-scanner,guard-scanner,85,B,1,0,1,0,0
+clawhub:larry,clawhub,larry,larry,85,B,1,0,1,0,0
 skills-sh:affaan-m_everything-claude-code__springboot-security,skills-sh,affaan-m_everything-claude-code__springboot-security,springboot-security,92,A,1,0,0,1,0
 skills-sh:agentmail-to_agentmail-skills__agentmail,skills-sh,agentmail-to_agentmail-skills__agentmail,agentmail,92,A,1,0,0,1,0
 skills-sh:aj-geddes_useful-ai-prompts__csrf-protection,skills-sh,aj-geddes_useful-ai-prompts__csrf-protection,csrf-protection,92,A,1,0,0,1,0
@@ -143,7 +144,8 @@ skills-sh:bobmatnyc_claude-mpm-skills__api-design-patterns,skills-sh,bobmatnyc_c
 skills-sh:bobmatnyc_claude-mpm-skills__sveltekit,skills-sh,bobmatnyc_claude-mpm-skills__sveltekit,sveltekit,92,A,1,0,0,1,0
 skills-sh:bobmatnyc_claude-mpm-skills__wordpress-advanced-architecture,skills-sh,bobmatnyc_claude-mpm-skills__wordpress-advanced-architecture,wordpress-advanced-architecture,92,A,1,0,0,1,0
 skills-sh:boshu2_agentops__swarm,skills-sh,boshu2_agentops__swarm,swarm,92,A,1,0,0,1,0
-clawhub:indexy,clawhub,indexy,indexy,92,A,1,0,0,1,0
+clawhub:clawtan,clawhub,clawtan,clawtan,92,A,1,0,0,1,0
+clawhub:linear-todos,clawhub,linear-todos,linear-todos,92,A,1,0,0,1,0
 lobehub:plugin_google-cse,lobehub,plugin_google-cse,Google CSE,92,A,1,0,0,1,0
 mcp-so:302_sandbox_mcp_302ai,mcp-so,302_sandbox_mcp_302ai,3302_sandbox_mcpCreate a remote sandbox that can execute code/run commands/uploa,92,A,1,0,0,1,0
 mcp-so:Figma-Context-MCP_GLips,mcp-so,Figma-Context-MCP_GLips,FFramelink Figma MCP ServerMCP server to provide Figma layout information to AI ,92,A,1,0,0,1,0
@@ -190,8 +192,8 @@ skills-sh:antfu_skills__vue-router-best-practices,skills-sh,antfu_skills__vue-ro
 skills-sh:brianlovin_claude-config__simplify,skills-sh,brianlovin_claude-config__simplify,simplify,100,A,0,0,0,0,0
 skills-sh:avdlee_swift-concurrency-agent-skill__swift-concurrency,skills-sh,avdlee_swift-concurrency-agent-skill__swift-concurrency,swift-concurrency,100,A,0,0,0,0,0
 skills-sh:antfu_skills__vue-testing-best-practices,skills-sh,antfu_skills__vue-testing-best-practices,vue-testing-best-practices,100,A,0,0,0,0,0
-skills-sh:analogjs_angular-skills__angular-signals,skills-sh,analogjs_angular-skills__angular-signals,angular-signals,100,A,0,0,0,0,0
 skills-sh:boristane_agent-skills__logging-best-practices,skills-sh,boristane_agent-skills__logging-best-practices,logging-best-practices,100,A,0,0,0,0,0
+skills-sh:analogjs_angular-skills__angular-signals,skills-sh,analogjs_angular-skills__angular-signals,angular-signals,100,A,0,0,0,0,0
 skills-sh:addyosmani_web-quality-skills__performance,skills-sh,addyosmani_web-quality-skills__performance,performance,100,A,0,0,0,0,0
 skills-sh:analogjs_angular-skills__angular-forms,skills-sh,analogjs_angular-skills__angular-forms,angular-forms,100,A,0,0,0,0,0
 skills-sh:analogjs_angular-skills__angular-routing,skills-sh,analogjs_angular-skills__angular-routing,angular-routing,100,A,0,0,0,0,0
@@ -208,8 +210,8 @@ skills-sh:anthropics_claude-code__agent-development,skills-sh,anthropics_claude-
 skills-sh:better-auth_skills__email-and-password-best-practices,skills-sh,better-auth_skills__email-and-password-best-practices,email-and-password-best-practices,100,A,0,0,0,0,0
 skills-sh:analogjs_angular-skills__angular-testing,skills-sh,analogjs_angular-skills__angular-testing,angular-testing,100,A,0,0,0,0,0
 skills-sh:bmad-labs_skills__typescript-e2e-testing,skills-sh,bmad-labs_skills__typescript-e2e-testing,typescript-e2e-testing,100,A,0,0,0,0,0
-skills-sh:affaan-m_everything-claude-code__backend-patterns,skills-sh,affaan-m_everything-claude-code__backend-patterns,backend-patterns,100,A,0,0,0,0,0
 skills-sh:answerzhao_agent-skills__web-reader,skills-sh,answerzhao_agent-skills__web-reader,web-reader,100,A,0,0,0,0,0
+skills-sh:affaan-m_everything-claude-code__backend-patterns,skills-sh,affaan-m_everything-claude-code__backend-patterns,backend-patterns,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__coding-standards,skills-sh,affaan-m_everything-claude-code__coding-standards,coding-standards,100,A,0,0,0,0,0
 skills-sh:anthropics_claude-code__mcp-integration,skills-sh,anthropics_claude-code__mcp-integration,mcp-integration,100,A,0,0,0,0,0
 skills-sh:acedergren_oci-agent-skills__monitoring-operations,skills-sh,acedergren_oci-agent-skills__monitoring-operations,monitoring-operations,100,A,0,0,0,0,0
@@ -217,8 +219,8 @@ skills-sh:addyosmani_web-quality-skills__accessibility,skills-sh,addyosmani_web-
 skills-sh:b-mendoza_agent-skills__validate-implementation-plan,skills-sh,b-mendoza_agent-skills__validate-implementation-plan,validate-implementation-plan,100,A,0,0,0,0,0
 skills-sh:bfollington_terma__shadertoy,skills-sh,bfollington_terma__shadertoy,shadertoy,100,A,0,0,0,0,0
 skills-sh:astrolicious_agent-skills__astro,skills-sh,astrolicious_agent-skills__astro,astro,100,A,0,0,0,0,0
-skills-sh:apollographql_skills__rust-best-practices,skills-sh,apollographql_skills__rust-best-practices,rust-best-practices,100,A,0,0,0,0,0
 skills-sh:api_git__agent-memory,skills-sh,api_git__agent-memory,agent-memory,100,A,0,0,0,0,0
+skills-sh:apollographql_skills__rust-best-practices,skills-sh,apollographql_skills__rust-best-practices,rust-best-practices,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__frontend-patterns,skills-sh,affaan-m_everything-claude-code__frontend-patterns,frontend-patterns,100,A,0,0,0,0,0
 skills-sh:better-auth_skills__better-auth-security-best-practices,skills-sh,better-auth_skills__better-auth-security-best-practices,better-auth-security-best-practices,100,A,0,0,0,0,0
 skills-sh:analogjs_angular-skills__angular-ssr,skills-sh,analogjs_angular-skills__angular-ssr,angular-ssr,100,A,0,0,0,0,0
@@ -245,12 +247,12 @@ skills-sh:affaan-m_everything-claude-code__strategic-compact,skills-sh,affaan-m_
 skills-sh:affaan-m_everything-claude-code__springboot-patterns,skills-sh,affaan-m_everything-claude-code__springboot-patterns,springboot-patterns,100,A,0,0,0,0,0
 skills-sh:better-auth_better-icons__better-icons,skills-sh,better-auth_better-icons__better-icons,better-icons,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__drizzle-orm,skills-sh,bobmatnyc_claude-mpm-skills__drizzle-orm,drizzle-orm,100,A,0,0,0,0,0
-skills-sh:affaan-m_everything-claude-code__clickhouse-io,skills-sh,affaan-m_everything-claude-code__clickhouse-io,clickhouse-io,100,A,0,0,0,0,0
 skills-sh:base44_skills__base44-sdk,skills-sh,base44_skills__base44-sdk,base44-sdk,100,A,0,0,0,0,0
+skills-sh:affaan-m_everything-claude-code__clickhouse-io,skills-sh,affaan-m_everything-claude-code__clickhouse-io,clickhouse-io,100,A,0,0,0,0,0
 skills-sh:apollographql_skills__graphql-schema,skills-sh,apollographql_skills__graphql-schema,graphql-schema,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__playwright-e2e-testing,skills-sh,bobmatnyc_claude-mpm-skills__playwright-e2e-testing,playwright-e2e-testing,100,A,0,0,0,0,0
-skills-sh:affaan-m_everything-claude-code__iterative-retrieval,skills-sh,affaan-m_everything-claude-code__iterative-retrieval,iterative-retrieval,100,A,0,0,0,0,0
 skills-sh:apollographql_skills__graphql-operations,skills-sh,apollographql_skills__graphql-operations,graphql-operations,100,A,0,0,0,0,0
+skills-sh:affaan-m_everything-claude-code__iterative-retrieval,skills-sh,affaan-m_everything-claude-code__iterative-retrieval,iterative-retrieval,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__python-testing,skills-sh,affaan-m_everything-claude-code__python-testing,python-testing,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__springboot-tdd,skills-sh,affaan-m_everything-claude-code__springboot-tdd,springboot-tdd,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__eval-harness,skills-sh,affaan-m_everything-claude-code__eval-harness,eval-harness,100,A,0,0,0,0,0
@@ -273,14 +275,14 @@ skills-sh:antonbabenko_terraform-skill__terraform-skill,skills-sh,antonbabenko_t
 skills-sh:asyrafhussin_agent-skills__php-best-practices,skills-sh,asyrafhussin_agent-skills__php-best-practices,php-best-practices,100,A,0,0,0,0,0
 skills-sh:apollographql_skills__apollo-connectors,skills-sh,apollographql_skills__apollo-connectors,apollo-connectors,100,A,0,0,0,0,0
 skills-sh:aj-geddes_claude-code-bmad-skills__business-analyst,skills-sh,aj-geddes_claude-code-bmad-skills__business-analyst,business-analyst,100,A,0,0,0,0,0
-skills-sh:affaan-m_everything-claude-code__django-tdd,skills-sh,affaan-m_everything-claude-code__django-tdd,django-tdd,100,A,0,0,0,0,0
 skills-sh:alinaqi_claude-bootstrap__pwa-development,skills-sh,alinaqi_claude-bootstrap__pwa-development,pwa-development,100,A,0,0,0,0,0
+skills-sh:affaan-m_everything-claude-code__django-tdd,skills-sh,affaan-m_everything-claude-code__django-tdd,django-tdd,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__streaming,skills-sh,assistant-ui_skills__streaming,streaming,100,A,0,0,0,0,0
 skills-sh:ai-native-camp_camp-1__day1-onboarding,skills-sh,ai-native-camp_camp-1__day1-onboarding,day1-onboarding,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__primitives,skills-sh,assistant-ui_skills__primitives,primitives,100,A,0,0,0,0,0
-skills-sh:astronomer_agents__airflow,skills-sh,astronomer_agents__airflow,airflow,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__runtime,skills-sh,assistant-ui_skills__runtime,runtime,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__tools,skills-sh,assistant-ui_skills__tools,tools,100,A,0,0,0,0,0
+skills-sh:astronomer_agents__airflow,skills-sh,astronomer_agents__airflow,airflow,100,A,0,0,0,0,0
 skills-sh:antvis_chart-visualization-skills__chart-visualization,skills-sh,antvis_chart-visualization-skills__chart-visualization,chart-visualization,100,A,0,0,0,0,0
 skills-sh:asyrafhussin_agent-skills__react-vite-best-practices,skills-sh,asyrafhussin_agent-skills__react-vite-best-practices,react-vite-best-practices,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__thread-list,skills-sh,assistant-ui_skills__thread-list,thread-list,100,A,0,0,0,0,0
@@ -288,8 +290,8 @@ skills-sh:avdlee_swift-testing-agent-skill__swift-testing-expert,skills-sh,avdle
 skills-sh:benedictking_exa-search__exa-search,skills-sh,benedictking_exa-search__exa-search,exa-search,100,A,0,0,0,0,0
 skills-sh:bear2u_my-skills__landing-page-guide-v2,skills-sh,bear2u_my-skills__landing-page-guide-v2,landing-page-guide-v2,100,A,0,0,0,0,0
 skills-sh:assistant-ui_skills__setup,skills-sh,assistant-ui_skills__setup,setup,100,A,0,0,0,0,0
-skills-sh:astronomer_agents__authoring-dags,skills-sh,astronomer_agents__authoring-dags,authoring-dags,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__nodejs-express-server,skills-sh,aj-geddes_useful-ai-prompts__nodejs-express-server,nodejs-express-server,100,A,0,0,0,0,0
+skills-sh:astronomer_agents__authoring-dags,skills-sh,astronomer_agents__authoring-dags,authoring-dags,100,A,0,0,0,0,0
 skills-sh:axtonliu_axton-obsidian-visual-skills__mermaid-visualizer,skills-sh,axtonliu_axton-obsidian-visual-skills__mermaid-visualizer,mermaid-visualizer,100,A,0,0,0,0,0
 skills-sh:aj-geddes_claude-code-bmad-skills__product-manager,skills-sh,aj-geddes_claude-code-bmad-skills__product-manager,product-manager,100,A,0,0,0,0,0
 skills-sh:astronomer_agents__analyzing-data,skills-sh,astronomer_agents__analyzing-data,analyzing-data,100,A,0,0,0,0,0
@@ -335,14 +337,14 @@ skills-sh:agno-agi_agno__git-workflow,skills-sh,agno-agi_agno__git-workflow,git-
 skills-sh:aaron-he-zhu_seo-geo-claude-skills__content-refresher,skills-sh,aaron-he-zhu_seo-geo-claude-skills__content-refresher,content-refresher,100,A,0,0,0,0,0
 skills-sh:aaron-he-zhu_seo-geo-claude-skills__rank-tracker,skills-sh,aaron-he-zhu_seo-geo-claude-skills__rank-tracker,rank-tracker,100,A,0,0,0,0,0
 skills-sh:black-forest-labs_skills__flux-best-practices,skills-sh,black-forest-labs_skills__flux-best-practices,flux-best-practices,100,A,0,0,0,0,0
-skills-sh:anthropics_knowledge-work-plugins__interactive-dashboard-builder,skills-sh,anthropics_knowledge-work-plugins__interactive-dashboard-builder,interactive-dashboard-builder,100,A,0,0,0,0,0
 skills-sh:andreev-danila_skills__reanimated-skia-performance,skills-sh,andreev-danila_skills__reanimated-skia-performance,reanimated-skia-performance,100,A,0,0,0,0,0
+skills-sh:anthropics_knowledge-work-plugins__interactive-dashboard-builder,skills-sh,anthropics_knowledge-work-plugins__interactive-dashboard-builder,interactive-dashboard-builder,100,A,0,0,0,0,0
 skills-sh:astronomer_agents__annotating-task-lineage,skills-sh,astronomer_agents__annotating-task-lineage,annotating-task-lineage,100,A,0,0,0,0,0
 skills-sh:aaron-he-zhu_seo-geo-claude-skills__performance-reporter,skills-sh,aaron-he-zhu_seo-geo-claude-skills__performance-reporter,performance-reporter,100,A,0,0,0,0,0
+skills-sh:benjitaylor_agentation__agentation-self-driving,skills-sh,benjitaylor_agentation__agentation-self-driving,agentation-self-driving,100,A,0,0,0,0,0
 skills-sh:aaron-he-zhu_seo-geo-claude-skills__alert-manager,skills-sh,aaron-he-zhu_seo-geo-claude-skills__alert-manager,alert-manager,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__css-architecture,skills-sh,aj-geddes_useful-ai-prompts__css-architecture,css-architecture,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__sqlalchemy-orm,skills-sh,bobmatnyc_claude-mpm-skills__sqlalchemy-orm,sqlalchemy-orm,100,A,0,0,0,0,0
-skills-sh:benjitaylor_agentation__agentation-self-driving,skills-sh,benjitaylor_agentation__agentation-self-driving,agentation-self-driving,100,A,0,0,0,0,0
 skills-sh:bartekmis_wordpress-performance-best-practises__wordpress-performance-best-practices,skills-sh,bartekmis_wordpress-performance-best-practises__wordpress-performance-best-practices,wordpress-performance-best-practices,100,A,0,0,0,0,0
 skills-sh:ailabs-393_ai-labs-claude-skills__travel-planner,skills-sh,ailabs-393_ai-labs-claude-skills__travel-planner,travel-planner,100,A,0,0,0,0,0
 skills-sh:asyrafhussin_agent-skills__laravel-best-practices,skills-sh,asyrafhussin_agent-skills__laravel-best-practices,laravel-best-practices,100,A,0,0,0,0,0
@@ -353,14 +355,14 @@ skills-sh:aj-geddes_claude-code-bmad-skills__ux-designer,skills-sh,aj-geddes_cla
 skills-sh:aj-geddes_useful-ai-prompts__responsive-web-design,skills-sh,aj-geddes_useful-ai-prompts__responsive-web-design,responsive-web-design,100,A,0,0,0,0,0
 skills-sh:aaronontheweb_dotnet-skills__modern-csharp-coding-standards,skills-sh,aaronontheweb_dotnet-skills__modern-csharp-coding-standards,modern-csharp-coding-standards,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__task-management,skills-sh,anthropics_knowledge-work-plugins__task-management,task-management,100,A,0,0,0,0,0
-skills-sh:anthropics_claude-plugins-official__example-skill,skills-sh,anthropics_claude-plugins-official__example-skill,example-skill,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__flutter-development,skills-sh,aj-geddes_useful-ai-prompts__flutter-development,flutter-development,100,A,0,0,0,0,0
+skills-sh:anthropics_claude-plugins-official__example-skill,skills-sh,anthropics_claude-plugins-official__example-skill,example-skill,100,A,0,0,0,0,0
 skills-sh:affaan-m_everything-claude-code__api-design,skills-sh,affaan-m_everything-claude-code__api-design,api-design,100,A,0,0,0,0,0
 skills-sh:brianlovin_claude-config__knip,skills-sh,brianlovin_claude-config__knip,knip,100,A,0,0,0,0,0
+skills-sh:alirezarezvani_claude-skills__tech-stack-evaluator,skills-sh,alirezarezvani_claude-skills__tech-stack-evaluator,tech-stack-evaluator,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__ansible-automation,skills-sh,aj-geddes_useful-ai-prompts__ansible-automation,ansible-automation,100,A,0,0,0,0,0
 skills-sh:aahl_skills__crypto-report,skills-sh,aahl_skills__crypto-report,crypto-report,100,A,0,0,0,0,0
 skills-sh:antvis_chart-visualization-skills__infographic-creator,skills-sh,antvis_chart-visualization-skills__infographic-creator,infographic-creator,100,A,0,0,0,0,0
-skills-sh:alirezarezvani_claude-skills__tech-stack-evaluator,skills-sh,alirezarezvani_claude-skills__tech-stack-evaluator,tech-stack-evaluator,100,A,0,0,0,0,0
 skills-sh:asyrafhussin_agent-skills__clean-code-principles,skills-sh,asyrafhussin_agent-skills__clean-code-principles,clean-code-principles,100,A,0,0,0,0,0
 skills-sh:astronomer_agents__airflow-hitl,skills-sh,astronomer_agents__airflow-hitl,airflow-hitl,100,A,0,0,0,0,0
 skills-sh:alirezarezvani_claude-skills__tdd-guide,skills-sh,alirezarezvani_claude-skills__tdd-guide,tdd-guide,100,A,0,0,0,0,0
@@ -377,12 +379,12 @@ skills-sh:aj-geddes_useful-ai-prompts__api-security-hardening,skills-sh,aj-gedde
 skills-sh:aahl_skills__maishou,skills-sh,aahl_skills__maishou,maishou,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__user-story-writing,skills-sh,aj-geddes_useful-ai-prompts__user-story-writing,user-story-writing,100,A,0,0,0,0,0
 skills-sh:brianlovin_claude-config__rams,skills-sh,brianlovin_claude-config__rams,rams,100,A,0,0,0,0,0
+skills-sh:alinaqi_claude-bootstrap__ui-mobile,skills-sh,alinaqi_claude-bootstrap__ui-mobile,ui-mobile,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__mobile-app-testing,skills-sh,aj-geddes_useful-ai-prompts__mobile-app-testing,mobile-app-testing,100,A,0,0,0,0,0
 skills-sh:axtonliu_axton-obsidian-visual-skills__obsidian-canvas-creator,skills-sh,axtonliu_axton-obsidian-visual-skills__obsidian-canvas-creator,obsidian-canvas-creator,100,A,0,0,0,0,0
-skills-sh:alinaqi_claude-bootstrap__ui-mobile,skills-sh,alinaqi_claude-bootstrap__ui-mobile,ui-mobile,100,A,0,0,0,0,0
+skills-sh:bobmatnyc_claude-mpm-skills__nodejs-backend-typescript,skills-sh,bobmatnyc_claude-mpm-skills__nodejs-backend-typescript,nodejs-backend-typescript,100,A,0,0,0,0,0
 skills-sh:agentmc15_polymarket-trader__polymarket-api,skills-sh,agentmc15_polymarket-trader__polymarket-api,polymarket-api,100,A,0,0,0,0,0
 skills-sh:ailabs-393_ai-labs-claude-skills__codebase-documenter,skills-sh,ailabs-393_ai-labs-claude-skills__codebase-documenter,codebase-documenter,100,A,0,0,0,0,0
-skills-sh:bobmatnyc_claude-mpm-skills__nodejs-backend-typescript,skills-sh,bobmatnyc_claude-mpm-skills__nodejs-backend-typescript,nodejs-backend-typescript,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__aws-lambda-functions,skills-sh,aj-geddes_useful-ai-prompts__aws-lambda-functions,aws-lambda-functions,100,A,0,0,0,0,0
 skills-sh:aktsmm_agent-skills__powerpoint-automation,skills-sh,aktsmm_agent-skills__powerpoint-automation,powerpoint-automation,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__jest-typescript,skills-sh,bobmatnyc_claude-mpm-skills__jest-typescript,jest-typescript,100,A,0,0,0,0,0
@@ -409,9 +411,9 @@ skills-sh:alirezarezvani_claude-skills__capa-officer,skills-sh,alirezarezvani_cl
 skills-sh:aj-geddes_useful-ai-prompts__ruby-rails-application,skills-sh,aj-geddes_useful-ai-prompts__ruby-rails-application,ruby-rails-application,100,A,0,0,0,0,0
 skills-sh:alirezarezvani_claude-skills__risk-management-specialist,skills-sh,alirezarezvani_claude-skills__risk-management-specialist,risk-management-specialist,100,A,0,0,0,0,0
 skills-sh:am-will_codex-skills__planner,skills-sh,am-will_codex-skills__planner,planner,100,A,0,0,0,0,0
+skills-sh:aj-geddes_useful-ai-prompts__jenkins-pipeline,skills-sh,aj-geddes_useful-ai-prompts__jenkins-pipeline,jenkins-pipeline,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__roadmap-management,skills-sh,anthropics_knowledge-work-plugins__roadmap-management,roadmap-management,100,A,0,0,0,0,0
 skills-sh:aviz85_claude-skills-library__presentation-architect,skills-sh,aviz85_claude-skills-library__presentation-architect,presentation-architect,100,A,0,0,0,0,0
-skills-sh:aj-geddes_useful-ai-prompts__jenkins-pipeline,skills-sh,aj-geddes_useful-ai-prompts__jenkins-pipeline,jenkins-pipeline,100,A,0,0,0,0,0
 skills-sh:alirezarezvani_claude-skills__regulatory-affairs-head,skills-sh,alirezarezvani_claude-skills__regulatory-affairs-head,regulatory-affairs-head,100,A,0,0,0,0,0
 skills-sh:alirezarezvani_claude-skills__quality-manager-qms-iso13485,skills-sh,alirezarezvani_claude-skills__quality-manager-qms-iso13485,quality-manager-qms-iso13485,100,A,0,0,0,0,0
 skills-sh:alirezarezvani_claude-skills__mdr-745-specialist,skills-sh,alirezarezvani_claude-skills__mdr-745-specialist,mdr-745-specialist,100,A,0,0,0,0,0
@@ -453,9 +455,9 @@ skills-sh:assafelovic_gpt-researcher__gpt-researcher,skills-sh,assafelovic_gpt-r
 skills-sh:aj-geddes_useful-ai-prompts__color-accessibility,skills-sh,aj-geddes_useful-ai-prompts__color-accessibility,color-accessibility,100,A,0,0,0,0,0
 skills-sh:aj-geddes_claude-code-bmad-skills__bmad-orchestrator,skills-sh,aj-geddes_claude-code-bmad-skills__bmad-orchestrator,bmad-orchestrator,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__golang-testing-strategies,skills-sh,bobmatnyc_claude-mpm-skills__golang-testing-strategies,golang-testing-strategies,100,A,0,0,0,0,0
+skills-sh:aj-geddes_useful-ai-prompts__app-store-deployment,skills-sh,aj-geddes_useful-ai-prompts__app-store-deployment,app-store-deployment,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__financial-statements,skills-sh,anthropics_knowledge-work-plugins__financial-statements,financial-statements,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__push-notification-setup,skills-sh,aj-geddes_useful-ai-prompts__push-notification-setup,push-notification-setup,100,A,0,0,0,0,0
-skills-sh:aj-geddes_useful-ai-prompts__app-store-deployment,skills-sh,aj-geddes_useful-ai-prompts__app-store-deployment,app-store-deployment,100,A,0,0,0,0,0
 skills-sh:automattic_agent-skills__wp-block-themes,skills-sh,automattic_agent-skills__wp-block-themes,wp-block-themes,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__e2e-testing-automation,skills-sh,aj-geddes_useful-ai-prompts__e2e-testing-automation,e2e-testing-automation,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__aws-s3-management,skills-sh,aj-geddes_useful-ai-prompts__aws-s3-management,aws-s3-management,100,A,0,0,0,0,0
@@ -505,11 +507,11 @@ skills-sh:aj-geddes_useful-ai-prompts__angular-module-design,skills-sh,aj-geddes
 skills-sh:boshu2_agentops__complexity,skills-sh,boshu2_agentops__complexity,complexity,100,A,0,0,0,0,0
 skills-sh:alvinunreal_oh-my-opencode-slim__cartography,skills-sh,alvinunreal_oh-my-opencode-slim__cartography,cartography,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__retro,skills-sh,boshu2_agentops__retro,retro,100,A,0,0,0,0,0
+skills-sh:aj-geddes_useful-ai-prompts__funnel-analysis,skills-sh,aj-geddes_useful-ai-prompts__funnel-analysis,funnel-analysis,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__inbox,skills-sh,boshu2_agentops__inbox,inbox,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__handoff,skills-sh,boshu2_agentops__handoff,handoff,100,A,0,0,0,0,0
 skills-sh:agentmc15_polymarket-trader__trader-analysis,skills-sh,agentmc15_polymarket-trader__trader-analysis,trader-analysis,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__knowledge,skills-sh,boshu2_agentops__knowledge,knowledge,100,A,0,0,0,0,0
-skills-sh:aj-geddes_useful-ai-prompts__funnel-analysis,skills-sh,aj-geddes_useful-ai-prompts__funnel-analysis,funnel-analysis,100,A,0,0,0,0,0
 skills-sh:andrelandgraf_fullstackrecipes__stripe-subscriptions,skills-sh,andrelandgraf_fullstackrecipes__stripe-subscriptions,stripe-subscriptions,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__caching-strategy,skills-sh,aj-geddes_useful-ai-prompts__caching-strategy,caching-strategy,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__implement,skills-sh,boshu2_agentops__implement,implement,100,A,0,0,0,0,0
@@ -517,12 +519,12 @@ skills-sh:boshu2_agentops__trace,skills-sh,boshu2_agentops__trace,trace,100,A,0,
 skills-sh:anthropics_knowledge-work-plugins__data-validation,skills-sh,anthropics_knowledge-work-plugins__data-validation,data-validation,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__draft-outreach,skills-sh,anthropics_knowledge-work-plugins__draft-outreach,draft-outreach,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__spring-boot-application,skills-sh,aj-geddes_useful-ai-prompts__spring-boot-application,spring-boot-application,100,A,0,0,0,0,0
+skills-sh:bobmatnyc_claude-mpm-skills__supabase-backend-platform,skills-sh,bobmatnyc_claude-mpm-skills__supabase-backend-platform,supabase-backend-platform,100,A,0,0,0,0,0
 skills-sh:alinaqi_claude-bootstrap__ui-web,skills-sh,alinaqi_claude-bootstrap__ui-web,ui-web,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__agile-sprint-planning,skills-sh,aj-geddes_useful-ai-prompts__agile-sprint-planning,agile-sprint-planning,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__semantic-versioning,skills-sh,aj-geddes_useful-ai-prompts__semantic-versioning,semantic-versioning,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__grpc-service-development,skills-sh,aj-geddes_useful-ai-prompts__grpc-service-development,grpc-service-development,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__accessibility-testing,skills-sh,aj-geddes_useful-ai-prompts__accessibility-testing,accessibility-testing,100,A,0,0,0,0,0
-skills-sh:bobmatnyc_claude-mpm-skills__supabase-backend-platform,skills-sh,bobmatnyc_claude-mpm-skills__supabase-backend-platform,supabase-backend-platform,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__internationalization-i18n,skills-sh,aj-geddes_useful-ai-prompts__internationalization-i18n,internationalization-i18n,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__database-query-optimization,skills-sh,aj-geddes_useful-ai-prompts__database-query-optimization,database-query-optimization,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__application-logging,skills-sh,aj-geddes_useful-ai-prompts__application-logging,application-logging,100,A,0,0,0,0,0
@@ -555,6 +557,7 @@ skills-sh:ailabs-393_ai-labs-claude-skills__csv-data-visualizer,skills-sh,ailabs
 skills-sh:aj-geddes_useful-ai-prompts__database-backup-restore,skills-sh,aj-geddes_useful-ai-prompts__database-backup-restore,database-backup-restore,100,A,0,0,0,0,0
 skills-sh:alentodorov_create-promo-video__create-promo-video,skills-sh,alentodorov_create-promo-video__create-promo-video,create-promo-video,100,A,0,0,0,0,0
 skills-sh:boshu2_agentops__inject,skills-sh,boshu2_agentops__inject,inject,100,A,0,0,0,0,0
+skills-sh:aj-geddes_useful-ai-prompts__payment-gateway-integration,skills-sh,aj-geddes_useful-ai-prompts__payment-gateway-integration,payment-gateway-integration,100,A,0,0,0,0,0
 skills-sh:browserbase_agent-browse__browser,skills-sh,browserbase_agent-browse__browser,browser,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__visual-regression-testing,skills-sh,aj-geddes_useful-ai-prompts__visual-regression-testing,visual-regression-testing,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__data-exploration,skills-sh,anthropics_knowledge-work-plugins__data-exploration,data-exploration,100,A,0,0,0,0,0
@@ -562,7 +565,6 @@ skills-sh:aj-geddes_useful-ai-prompts__project-estimation,skills-sh,aj-geddes_us
 skills-sh:aj-geddes_useful-ai-prompts__memory-optimization,skills-sh,aj-geddes_useful-ai-prompts__memory-optimization,memory-optimization,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__webhook-development,skills-sh,aj-geddes_useful-ai-prompts__webhook-development,webhook-development,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__user-persona-creation,skills-sh,aj-geddes_useful-ai-prompts__user-persona-creation,user-persona-creation,100,A,0,0,0,0,0
-skills-sh:aj-geddes_useful-ai-prompts__payment-gateway-integration,skills-sh,aj-geddes_useful-ai-prompts__payment-gateway-integration,payment-gateway-integration,100,A,0,0,0,0,0
 skills-sh:bobmatnyc_claude-mpm-skills__hono-middleware,skills-sh,bobmatnyc_claude-mpm-skills__hono-middleware,hono-middleware,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__developer-onboarding,skills-sh,aj-geddes_useful-ai-prompts__developer-onboarding,developer-onboarding,100,A,0,0,0,0,0
 skills-sh:aktsmm_agent-skills__ocr-super-surya,skills-sh,aktsmm_agent-skills__ocr-super-surya,ocr-super-surya,100,A,0,0,0,0,0
@@ -788,6 +790,7 @@ skills-sh:anthropics_knowledge-work-plugins__response-drafting,skills-sh,anthrop
 skills-sh:bahayonghang_my-claude-code-settings__tech-design-doc,skills-sh,bahayonghang_my-claude-code-settings__tech-design-doc,tech-design-doc,100,A,0,0,0,0,0
 skills-sh:andrelandgraf_fullstackrecipes__use-fullstackrecipes,skills-sh,andrelandgraf_fullstackrecipes__use-fullstackrecipes,use-fullstackrecipes,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__natural-language-processing,skills-sh,aj-geddes_useful-ai-prompts__natural-language-processing,natural-language-processing,100,A,0,0,0,0,0
+skills-sh:anthemflynn_ccmp__react-three-fiber,skills-sh,anthemflynn_ccmp__react-three-fiber,react-three-fiber,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__variance-analysis,skills-sh,anthropics_knowledge-work-plugins__variance-analysis,variance-analysis,100,A,0,0,0,0,0
 skills-sh:arcblock_idd__intent-critique,skills-sh,arcblock_idd__intent-critique,intent-critique,100,A,0,0,0,0,0
 skills-sh:aj-geddes_useful-ai-prompts__survival-analysis,skills-sh,aj-geddes_useful-ai-prompts__survival-analysis,survival-analysis,100,A,0,0,0,0,0
@@ -798,7 +801,6 @@ skills-sh:alinaqi_claude-bootstrap__ai-models,skills-sh,alinaqi_claude-bootstrap
 skills-sh:aj-geddes_useful-ai-prompts__regression-modeling,skills-sh,aj-geddes_useful-ai-prompts__regression-modeling,regression-modeling,100,A,0,0,0,0,0
 skills-sh:aj-geddes_claude-code-bmad-skills__bmad-master,skills-sh,aj-geddes_claude-code-bmad-skills__bmad-master,bmad-master,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__nda-triage,skills-sh,anthropics_knowledge-work-plugins__nda-triage,nda-triage,100,A,0,0,0,0,0
-skills-sh:anthemflynn_ccmp__react-three-fiber,skills-sh,anthemflynn_ccmp__react-three-fiber,react-three-fiber,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__reconciliation,skills-sh,anthropics_knowledge-work-plugins__reconciliation,reconciliation,100,A,0,0,0,0,0
 skills-sh:alinaqi_claude-bootstrap__project-tooling,skills-sh,alinaqi_claude-bootstrap__project-tooling,project-tooling,100,A,0,0,0,0,0
 skills-sh:alinaqi_claude-bootstrap__team-coordination,skills-sh,alinaqi_claude-bootstrap__team-coordination,team-coordination,100,A,0,0,0,0,0
@@ -808,24 +810,21 @@ skills-sh:balloob_llm-skills__home-assistant,skills-sh,balloob_llm-skills__home-
 skills-sh:anthropics_knowledge-work-plugins__meeting-briefing,skills-sh,anthropics_knowledge-work-plugins__meeting-briefing,meeting-briefing,100,A,0,0,0,0,0
 skills-sh:auth0_agent-skills__auth0-react,skills-sh,auth0_agent-skills__auth0-react,auth0-react,100,A,0,0,0,0,0
 skills-sh:anthropics_knowledge-work-plugins__canned-responses,skills-sh,anthropics_knowledge-work-plugins__canned-responses,canned-responses,100,A,0,0,0,0,0
-clawhub:context-clean-up,clawhub,context-clean-up,context-clean-up,100,A,0,0,0,0,0
+clawhub:clawzone,clawhub,clawzone,clawzone,100,A,0,0,0,0,0
+clawhub:semver-helper,clawhub,semver-helper,semver-helper,100,A,0,0,0,0,0
+clawhub:comms-hub-bridge,clawhub,comms-hub-bridge,comms-hub-bridge,100,A,0,0,0,0,0
+clawhub:dub-links-api,clawhub,dub-links-api,dub-links-api,100,A,0,0,0,0,0
 clawhub:deploy-pilot,clawhub,deploy-pilot,deploy-pilot,100,A,0,0,0,0,0
-clawhub:brw-testimonial-collector,clawhub,brw-testimonial-collector,brw-testimonial-collector,100,A,0,0,0,0,0
-clawhub:supabase-ops,clawhub,supabase-ops,supabase-ops,100,A,0,0,0,0,0
-clawhub:test-sentinel,clawhub,test-sentinel,test-sentinel,100,A,0,0,0,0,0
-clawhub:human-browser,clawhub,human-browser,human-browser,100,A,0,0,0,0,0
-clawhub:firebase-auth-setup,clawhub,firebase-auth-setup,firebase-auth-setup,100,A,0,0,0,0,0
-clawhub:cloudflare-guard,clawhub,cloudflare-guard,cloudflare-guard,100,A,0,0,0,0,0
-clawhub:afrexai-data-engineering,clawhub,afrexai-data-engineering,afrexai-data-engineering,100,A,0,0,0,0,0
 clawhub:total-recall,clawhub,total-recall,total-recall,100,A,0,0,0,0,0
-clawhub:agentmanager,clawhub,agentmanager,agentmanager,100,A,0,0,0,0,0
-clawhub:prior,clawhub,prior,prior,100,A,0,0,0,0,0
-clawhub:markdown-browser-skills-openclaw,clawhub,markdown-browser-skills-openclaw,markdown-browser-skills-openclaw,100,A,0,0,0,0,0
-clawhub:geepers-etymology,clawhub,geepers-etymology,geepers-etymology,100,A,0,0,0,0,0
-clawhub:clawflow,clawhub,clawflow,clawflow,100,A,0,0,0,0,0
-clawhub:removebg-api,clawhub,removebg-api,removebg-api,100,A,0,0,0,0,0
-clawhub:web-pilot,clawhub,web-pilot,web-pilot,100,A,0,0,0,0,0
-clawhub:twitter,clawhub,twitter,twitter,100,A,0,0,0,0,0
+clawhub:excalidraw-creator,clawhub,excalidraw-creator,excalidraw-creator,100,A,0,0,0,0,0
+clawhub:afrexai-devrel-engine,clawhub,afrexai-devrel-engine,afrexai-devrel-engine,100,A,0,0,0,0,0
+clawhub:agent-audit,clawhub,agent-audit,agent-audit,100,A,0,0,0,0,0
+clawhub:ddg-search-privacy,clawhub,ddg-search-privacy,ddg-search-privacy,100,A,0,0,0,0,0
+clawhub:geepers-data,clawhub,geepers-data,geepers-data,100,A,0,0,0,0,0
+clawhub:knowledge-management,clawhub,knowledge-management,knowledge-management,100,A,0,0,0,0,0
+clawhub:glitch-dashboard,clawhub,glitch-dashboard,glitch-dashboard,100,A,0,0,0,0,0
+clawhub:reddit-post-lab,clawhub,reddit-post-lab,reddit-post-lab,100,A,0,0,0,0,0
+clawhub:afrexai-presentation-mastery,clawhub,afrexai-presentation-mastery,afrexai-presentation-mastery,100,A,0,0,0,0,0
 lobehub:plugin_ShoppingTools,lobehub,plugin_ShoppingTools,Shopping tools,100,A,0,0,0,0,0
 lobehub:plugin_VideoCaptions,lobehub,plugin_VideoCaptions,Video Captions,100,A,0,0,0,0,0
 lobehub:plugin_WeatherGPT,lobehub,plugin_WeatherGPT,WeatherGPT,100,A,0,0,0,0,0

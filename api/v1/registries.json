@@ -12,8 +12,8 @@
     "name": "ClawHub",
     "url": "https://clawhub.ai",
     "description": "ClawHub AI agent skills registry",
-    "skill_count": 24,
-    "avg_score": 95.0
+    "skill_count": 23,
+    "avg_score": 94.6
   },
   {
     "id": "mcp-registry",

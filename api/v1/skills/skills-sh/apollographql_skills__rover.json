@@ -8,21 +8,21 @@
   "grade": "D",
   "findings": [
     {
-      "rule_id": "EXTDL_007",
-      "severity": "CRITICAL",
-      "category": "external-download",
-      "subcategory": null,
-      "line": 28,
-      "matched_text": "curl -sSL https://rover.apollo.dev/nix/latest + ./s",
-      "message": ""
-    },
-    {
       "rule_id": "SUPPLY_003",
       "severity": "CRITICAL",
       "category": "external-download",
       "subcategory": null,
       "line": 28,
       "matched_text": "curl -sSL https://rover.apollo.dev/nix/latest | sh",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 28,
+      "matched_text": "curl -sSL https://rover.apollo.dev/nix/latest + ./s",
       "message": ""
     },
     {

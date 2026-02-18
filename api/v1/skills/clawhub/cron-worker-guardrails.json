@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:cron-worker-guardrails",
+  "registry_id": "clawhub",
+  "slug": "cron-worker-guardrails",
+  "name": "cron-worker-guardrails",
+  "url": "https://clawhub.ai/skills/cron-worker-guardrails",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "PROMPT_INJECTION_017",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 7,
+      "matched_text": "isolated agentTurn",
+      "message": ""
+    }
+  ]
+}

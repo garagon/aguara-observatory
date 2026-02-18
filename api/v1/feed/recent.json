@@ -5,7 +5,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "deployment-patterns",
     "registry_id": "skills-sh"
   },
@@ -15,7 +15,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "docker-patterns",
     "registry_id": "skills-sh"
   },
@@ -25,7 +25,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "aws-ec2-setup",
     "registry_id": "skills-sh"
   },
@@ -35,7 +35,7 @@
     "severity": "CRITICAL",
     "category": "credential-leak",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "backup-disaster-recovery",
     "registry_id": "skills-sh"
   },
@@ -45,7 +45,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "cloud-cost-management",
     "registry_id": "skills-sh"
   },
@@ -55,7 +55,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "deployment-documentation",
     "registry_id": "skills-sh"
   },
@@ -65,7 +65,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "gcp-cloud-functions",
     "registry_id": "skills-sh"
   },
@@ -75,7 +75,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "gcp-cloud-functions",
     "registry_id": "skills-sh"
   },
@@ -85,7 +85,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "log-aggregation",
     "registry_id": "skills-sh"
   },
@@ -95,7 +95,7 @@
     "severity": "CRITICAL",
     "category": "credential-leak",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "oauth-implementation",
     "registry_id": "skills-sh"
   },
@@ -105,7 +105,7 @@
     "severity": "CRITICAL",
     "category": "credential-leak",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "ssl-certificate-management",
     "registry_id": "skills-sh"
   },
@@ -115,7 +115,7 @@
     "severity": "CRITICAL",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "vulnerability-scanning",
     "registry_id": "skills-sh"
   },
@@ -125,48 +125,58 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "apify-actor-development",
     "registry_id": "skills-sh"
   },
   {
     "skill_id": "skills-sh:apify_agent-skills__apify-actorization",
-    "rule_id": "SUPPLY_003",
+    "rule_id": "EXTDL_007",
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "apify-actorization",
     "registry_id": "skills-sh"
   },
   {
     "skill_id": "skills-sh:apify_agent-skills__apify-actorization",
-    "rule_id": "EXTDL_007",
+    "rule_id": "SUPPLY_003",
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "apify-actorization",
     "registry_id": "skills-sh"
   },
   {
     "skill_id": "skills-sh:apollographql_skills__apollo-mcp-server",
-    "rule_id": "EXTDL_007",
+    "rule_id": "SUPPLY_003",
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "apollo-mcp-server",
     "registry_id": "skills-sh"
   },
   {
     "skill_id": "skills-sh:apollographql_skills__apollo-mcp-server",
+    "rule_id": "EXTDL_007",
+    "severity": "CRITICAL",
+    "category": "external-download",
+    "message": "",
+    "updated_at": "2026-02-18T21:01:09Z",
+    "skill_name": "apollo-mcp-server",
+    "registry_id": "skills-sh"
+  },
+  {
+    "skill_id": "skills-sh:apollographql_skills__rover",
     "rule_id": "SUPPLY_003",
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
-    "skill_name": "apollo-mcp-server",
+    "updated_at": "2026-02-18T21:01:09Z",
+    "skill_name": "rover",
     "registry_id": "skills-sh"
   },
   {
@@ -175,17 +185,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
-    "skill_name": "rover",
-    "registry_id": "skills-sh"
-  },
-  {
-    "skill_id": "skills-sh:apollographql_skills__rover",
-    "rule_id": "SUPPLY_003",
-    "severity": "CRITICAL",
-    "category": "external-download",
-    "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "rover",
     "registry_id": "skills-sh"
   },
@@ -195,7 +195,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "intent-plan",
     "registry_id": "skills-sh"
   },
@@ -205,7 +205,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "cosmos-dbt-fusion",
     "registry_id": "skills-sh"
   },
@@ -215,7 +215,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "ethereum-wingman",
     "registry_id": "skills-sh"
   },
@@ -225,7 +225,7 @@
     "severity": "CRITICAL",
     "category": "exfiltration",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "axiom-sre",
     "registry_id": "skills-sh"
   },
@@ -235,7 +235,7 @@
     "severity": "CRITICAL",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "cosmosdb-best-practices",
     "registry_id": "skills-sh"
   },
@@ -245,7 +245,7 @@
     "severity": "CRITICAL",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "neynar",
     "registry_id": "skills-sh"
   },
@@ -255,7 +255,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "docker",
     "registry_id": "skills-sh"
   },
@@ -265,17 +265,27 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "drizzle-migrations",
     "registry_id": "skills-sh"
   },
   {
     "skill_id": "skills-sh:browser-use_browser-use__browser-use",
+    "rule_id": "SUPPLY_003",
+    "severity": "CRITICAL",
+    "category": "external-download",
+    "message": "",
+    "updated_at": "2026-02-18T21:01:09Z",
+    "skill_name": "browser-use",
+    "registry_id": "skills-sh"
+  },
+  {
+    "skill_id": "skills-sh:browser-use_browser-use__browser-use",
     "rule_id": "EXTDL_007",
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "browser-use",
     "registry_id": "skills-sh"
   },
@@ -285,7 +295,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "browser-use",
     "registry_id": "skills-sh"
   },
@@ -295,7 +305,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "browser-use",
     "registry_id": "skills-sh"
   },
@@ -305,7 +315,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "browser-use",
     "registry_id": "skills-sh"
   },
@@ -315,17 +325,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
-    "skill_name": "browser-use",
-    "registry_id": "skills-sh"
-  },
-  {
-    "skill_id": "skills-sh:browser-use_browser-use__browser-use",
-    "rule_id": "SUPPLY_003",
-    "severity": "CRITICAL",
-    "category": "external-download",
-    "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "browser-use",
     "registry_id": "skills-sh"
   },
@@ -335,7 +335,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "remote-browser",
     "registry_id": "skills-sh"
   },
@@ -345,7 +345,7 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "remote-browser",
     "registry_id": "skills-sh"
   },
@@ -355,9 +355,19 @@
     "severity": "CRITICAL",
     "category": "external-download",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "remote-browser",
     "registry_id": "skills-sh"
+  },
+  {
+    "skill_id": "clawhub:image-to-video",
+    "rule_id": "SUPPLY_003",
+    "severity": "CRITICAL",
+    "category": "external-download",
+    "message": "",
+    "updated_at": "2026-02-18T21:01:09Z",
+    "skill_name": "image-to-video",
+    "registry_id": "clawhub"
   },
   {
     "skill_id": "lobehub:agent_gpt-4-dan-assistant",
@@ -365,7 +375,7 @@
     "severity": "CRITICAL",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "Jailbreak Assistant DAN",
     "registry_id": "lobehub"
   },
@@ -375,7 +385,7 @@
     "severity": "CRITICAL",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "SEO Assistant",
     "registry_id": "lobehub"
   },
@@ -385,7 +395,7 @@
     "severity": "HIGH",
     "category": "supply-chain",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "deployment-patterns",
     "registry_id": "skills-sh"
   },
@@ -395,7 +405,7 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "backup-disaster-recovery",
     "registry_id": "skills-sh"
   },
@@ -405,7 +415,7 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "backup-disaster-recovery",
     "registry_id": "skills-sh"
   },
@@ -415,7 +425,7 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "backup-disaster-recovery",
     "registry_id": "skills-sh"
   },
@@ -425,7 +435,7 @@
     "severity": "HIGH",
     "category": "credential-leak",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "deployment-documentation",
     "registry_id": "skills-sh"
   },
@@ -435,7 +445,7 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "deployment-documentation",
     "registry_id": "skills-sh"
   },
@@ -445,7 +455,7 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "log-aggregation",
     "registry_id": "skills-sh"
   },
@@ -455,7 +465,7 @@
     "severity": "HIGH",
     "category": "ssrf-cloud",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "log-aggregation",
     "registry_id": "skills-sh"
   },
@@ -465,7 +475,7 @@
     "severity": "HIGH",
     "category": "ssrf-cloud",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "log-aggregation",
     "registry_id": "skills-sh"
   },
@@ -475,7 +485,7 @@
     "severity": "HIGH",
     "category": "ssrf-cloud",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "log-aggregation",
     "registry_id": "skills-sh"
   },
@@ -485,18 +495,8 @@
     "severity": "HIGH",
     "category": "prompt-injection",
     "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
+    "updated_at": "2026-02-18T21:01:09Z",
     "skill_name": "ssl-certificate-management",
-    "registry_id": "skills-sh"
-  },
-  {
-    "skill_id": "skills-sh:astronomer_agents__cosmos-dbt-fusion",
-    "rule_id": "SUPPLY_005",
-    "severity": "HIGH",
-    "category": "supply-chain",
-    "message": "",
-    "updated_at": "2026-02-18T20:42:16Z",
-    "skill_name": "cosmos-dbt-fusion",
     "registry_id": "skills-sh"
   }
 ]

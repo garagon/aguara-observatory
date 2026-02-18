@@ -8,21 +8,21 @@
   "grade": "F",
   "findings": [
     {
-      "rule_id": "EXTDL_007",
-      "severity": "CRITICAL",
-      "category": "external-download",
-      "subcategory": null,
-      "line": 28,
-      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh + chmod +x",
-      "message": ""
-    },
-    {
       "rule_id": "SUPPLY_003",
       "severity": "CRITICAL",
       "category": "external-download",
       "subcategory": null,
       "line": 28,
       "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 28,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh + chmod +x",
       "message": ""
     },
     {
