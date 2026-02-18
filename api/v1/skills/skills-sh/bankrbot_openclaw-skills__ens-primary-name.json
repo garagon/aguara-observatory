@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bankrbot_openclaw-skills__ens-primary-name",
+  "registry_id": "skills-sh",
+  "slug": "bankrbot_openclaw-skills__ens-primary-name",
+  "name": "ens-primary-name",
+  "url": "https://skills.sh/bankrbot/openclaw-skills/ens-primary-name",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 35,
+      "matched_text": "npm install -g v",
+      "message": ""
+    }
+  ]
+}

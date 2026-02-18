@@ -1,0 +1,38 @@
+{
+  "skill_id": "skills-sh:alinaqi_claude-bootstrap__llm-patterns",
+  "registry_id": "skills-sh",
+  "slug": "alinaqi_claude-bootstrap__llm-patterns",
+  "name": "llm-patterns",
+  "url": "https://skills.sh/alinaqi/claude-bootstrap/llm-patterns",
+  "score": 55,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 167,
+      "matched_text": "../../../",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 171,
+      "matched_text": "../../../",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 215,
+      "matched_text": "../../../",
+      "message": ""
+    }
+  ]
+}

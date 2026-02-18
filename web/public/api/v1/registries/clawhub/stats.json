@@ -1,0 +1,20 @@
+{
+  "id": 1,
+  "date": "2026-02-18",
+  "registry_id": "clawhub",
+  "total_skills": 24,
+  "skills_scanned": 24,
+  "total_findings": 9,
+  "critical_count": 0,
+  "high_count": 7,
+  "medium_count": 2,
+  "low_count": 0,
+  "avg_score": 95.0,
+  "grade_a_count": 19,
+  "grade_b_count": 3,
+  "grade_c_count": 2,
+  "grade_d_count": 0,
+  "grade_f_count": 0,
+  "new_skills": 24,
+  "deleted_skills": 0
+}

@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:avivk5498_the-claude-protocol__create-beads-orchestration",
+  "registry_id": "skills-sh",
+  "slug": "avivk5498_the-claude-protocol__create-beads-orchestration",
+  "name": "create-beads-orchestration",
+  "url": "https://skills.sh/avivk5498/the-claude-protocol/create-beads-orchestration",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 98,
+      "matched_text": "npm install -g b",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 107,
+      "matched_text": "npm install -g b",
+      "message": ""
+    }
+  ]
+}

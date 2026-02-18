@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:apify_agent-skills__apify-influencer-discovery",
+  "registry_id": "skills-sh",
+  "slug": "apify_agent-skills__apify-influencer-discovery",
+  "name": "apify-influencer-discovery",
+  "url": "https://skills.sh/apify/agent-skills/apify-influencer-discovery",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 15,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 115,
+      "matched_text": "npm install -g @",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__penetration-testing",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__penetration-testing",
+  "name": "penetration-testing",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/penetration-testing",
+  "score": 47,
+  "grade": "D",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 199,
+      "matched_text": "../../../etc/passwd",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 202,
+      "matched_text": "%2e%2e%",
+      "message": ""
+    },
+    {
+      "rule_id": "SSRF_002",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 358,
+      "matched_text": "http://127.0.0.1:",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_010",
+      "severity": "MEDIUM",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 358,
+      "matched_text": "http://127.0.0.1:1337",
+      "message": ""
+    }
+  ]
+}

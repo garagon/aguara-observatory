@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__anthropic-sdk",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__anthropic-sdk",
+  "name": "anthropic-sdk",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/anthropic-sdk",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "MCP_007",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 51,
+      "matched_text": "Get your API key + Send result",
+      "message": ""
+    }
+  ]
+}

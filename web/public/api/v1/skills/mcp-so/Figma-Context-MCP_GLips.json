@@ -1,0 +1,20 @@
+{
+  "skill_id": "mcp-so:Figma-Context-MCP_GLips",
+  "registry_id": "mcp-so",
+  "slug": "Figma-Context-MCP_GLips",
+  "name": "FFramelink Figma MCP ServerMCP server to provide Figma layout information to AI ",
+  "url": "https://mcp.so/server/Figma-Context-MCP/GLips",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 22,
+      "matched_text": "figma\nMCP server to provide Figma layout information to AI coding agents like Cursor\nOverview\nTools\nComments\nOverview\nWhat is Figma MCP Server?\nFigma MCP Server is a server designed to provide Figma l...",
+      "message": ""
+    }
+  ]
+}

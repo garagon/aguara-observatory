@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__oauth-implementation",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__oauth-implementation",
+  "name": "oauth-implementation",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/oauth-implementation",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "CRED_005",
+      "severity": "CRITICAL",
+      "category": "credential-leak",
+      "subcategory": null,
+      "line": 327,
+      "matched_text": "-----BEGIN RSA PRIVATE KEY-----",
+      "message": ""
+    }
+  ]
+}

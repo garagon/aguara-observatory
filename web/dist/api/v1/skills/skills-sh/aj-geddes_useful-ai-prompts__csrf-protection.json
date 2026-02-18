@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__csrf-protection",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__csrf-protection",
+  "name": "csrf-protection",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/csrf-protection",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXFIL_009",
+      "severity": "MEDIUM",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 74,
+      "matched_text": "Buffer.from + fetch(",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:anthropics_claude-code__plugin-structure",
+  "registry_id": "skills-sh",
+  "slug": "anthropics_claude-code__plugin-structure",
+  "name": "plugin-structure",
+  "url": "https://skills.sh/anthropics/claude-code/plugin-structure",
+  "score": 70,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 217,
+      "matched_text": "{\n  \"PreToolUse\": [{\n    \"matcher\": \"Write|Edit\",\n    \"hooks\": [{\n      \"type\": \"command\",\n      \"command\": \"bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate.sh\",\n      \"timeout\": 30\n    }]\n  }]\n}\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 263,
+      "matched_text": "{\n  \"command\": \"bash ${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\"\n}\n",
+      "message": ""
+    }
+  ]
+}

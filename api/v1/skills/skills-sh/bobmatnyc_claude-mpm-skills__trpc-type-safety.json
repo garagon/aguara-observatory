@@ -1,0 +1,47 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__trpc-type-safety",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__trpc-type-safety",
+  "name": "trpc-type-safety",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/trpc-type-safety",
+  "score": 40,
+  "grade": "D",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 2967,
+      "matched_text": "../../../",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 2974,
+      "matched_text": "../../../",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 4161,
+      "matched_text": "../../../../",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 4168,
+      "matched_text": "../../../../",
+      "message": ""
+    }
+  ]
+}

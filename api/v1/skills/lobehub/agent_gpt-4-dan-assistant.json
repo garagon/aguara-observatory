@@ -1,0 +1,20 @@
+{
+  "skill_id": "lobehub:agent_gpt-4-dan-assistant",
+  "registry_id": "lobehub",
+  "slug": "agent_gpt-4-dan-assistant",
+  "name": "Jailbreak Assistant DAN",
+  "url": "https://lobehub.com/agents/gpt-4-dan-assistant",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "PROMPT_INJECTION_011",
+      "severity": "CRITICAL",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1,
+      "matched_text": "DAN",
+      "message": ""
+    }
+  ]
+}

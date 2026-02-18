@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:apollographql_skills__apollo-mcp-server",
+  "registry_id": "skills-sh",
+  "slug": "apollographql_skills__apollo-mcp-server",
+  "name": "apollo-mcp-server",
+  "url": "https://skills.sh/apollographql/skills/apollo-mcp-server",
+  "score": 50,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 27,
+      "matched_text": "curl -sSL https://mcp.apollo.dev/download/nix/latest + ./s",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 27,
+      "matched_text": "curl -sSL https://mcp.apollo.dev/download/nix/latest | sh",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:alinaqi_claude-bootstrap__supabase",
+  "registry_id": "skills-sh",
+  "slug": "alinaqi_claude-bootstrap__supabase",
+  "name": "supabase",
+  "url": "https://skills.sh/alinaqi/claude-bootstrap/supabase",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 45,
+      "matched_text": "npm install -g s",
+      "message": ""
+    }
+  ]
+}

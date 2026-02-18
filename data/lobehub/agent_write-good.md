@@ -1,0 +1,3 @@
+# Text Rewriting Master
+
+The most powerful AI rewriting prompt in history! Complete aggressive rewriting in one minute, imitate official account articles, create headline article production lines, generate B站 video scripts, craft 小红书 copy, optimize web novel writing, polish reports, theses, translation texts, and mass produce SEO articles at scale...

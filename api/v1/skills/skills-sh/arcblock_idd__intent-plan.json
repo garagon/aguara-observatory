@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:arcblock_idd__intent-plan",
+  "registry_id": "skills-sh",
+  "slug": "arcblock_idd__intent-plan",
+  "name": "intent-plan",
+  "url": "https://skills.sh/arcblock/idd/intent-plan",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 82,
+      "matched_text": "curl -X POST http://localhost:3000/api/resource + ./I",
+      "message": ""
+    }
+  ]
+}

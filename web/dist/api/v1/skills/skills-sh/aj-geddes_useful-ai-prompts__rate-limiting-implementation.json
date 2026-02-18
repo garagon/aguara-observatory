@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__rate-limiting-implementation",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__rate-limiting-implementation",
+  "name": "rate-limiting-implementation",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/rate-limiting-implementation",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "MCP_007",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 402,
+      "matched_text": "get request queue for this key + send = function(data",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:affaan-m_everything-claude-code__docker-patterns",
+  "registry_id": "skills-sh",
+  "slug": "affaan-m_everything-claude-code__docker-patterns",
+  "name": "docker-patterns",
+  "url": "https://skills.sh/affaan-m/everything-claude-code/docker-patterns",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 114,
+      "matched_text": "wget -qO- http://localhost:3000/health + ./s",
+      "message": ""
+    }
+  ]
+}

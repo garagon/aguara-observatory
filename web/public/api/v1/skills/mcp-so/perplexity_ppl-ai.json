@@ -1,0 +1,20 @@
+{
+  "skill_id": "mcp-so:perplexity_ppl-ai",
+  "registry_id": "mcp-so",
+  "slug": "perplexity_ppl-ai",
+  "name": "PPerplexity Ask MCP ServerA Model Context Protocol Server connector for Perplexi",
+  "url": "https://mcp.so/server/perplexity/ppl-ai",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 18,
+      "matched_text": "math-assistant\nA Model Context Protocol Server connector for Perplexity API, to enable web search without leaving the MCP ecosystem.\nOverview\nTools\nComments\nOverview\nwhat is Perplexity Ask MCP Server?...",
+      "message": ""
+    }
+  ]
+}

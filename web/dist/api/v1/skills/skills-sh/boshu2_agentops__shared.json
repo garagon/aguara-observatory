@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:boshu2_agentops__shared",
+  "registry_id": "skills-sh",
+  "slug": "boshu2_agentops__shared",
+  "name": "shared",
+  "url": "https://skills.sh/boshu2/agentops/shared",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "PROMPT_INJECTION_017",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 56,
+      "matched_text": "Spawn subagent",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "skill_id": "skills-sh:base44_skills__base44-cli",
+  "registry_id": "skills-sh",
+  "slug": "base44_skills__base44-cli",
+  "name": "base44-cli",
+  "url": "https://skills.sh/base44/skills/base44-cli",
+  "score": 32,
+  "grade": "D",
+  "findings": [
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 400,
+      "matched_text": "npx base44 deploy -y",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 409,
+      "matched_text": "npx base44 site deploy -y",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 437,
+      "matched_text": "npx base44 deploy -y",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 466,
+      "matched_text": "npx base44 site deploy -y",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 495,
+      "matched_text": "npm install -g b",
+      "message": ""
+    }
+  ]
+}

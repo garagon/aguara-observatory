@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-02-18T20:42:16.368234+00:00",
+  "datasets": [
+    {
+      "name": "findings",
+      "description": "All latest findings across registries",
+      "format": "csv",
+      "path": "/datasets/findings.csv"
+    },
+    {
+      "name": "scores",
+      "description": "Skill scores and grades",
+      "format": "csv",
+      "path": "/datasets/scores.csv"
+    },
+    {
+      "name": "skills",
+      "description": "All discovered skills metadata",
+      "format": "csv",
+      "path": "/datasets/skills.csv"
+    }
+  ]
+}

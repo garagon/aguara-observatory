@@ -1,0 +1,101 @@
+{
+  "skill_id": "skills-sh:aahl_skills__mcp-hass",
+  "registry_id": "skills-sh",
+  "slug": "aahl_skills__mcp-hass",
+  "name": "mcp-hass",
+  "url": "https://skills.sh/aahl/skills/mcp-hass",
+  "score": 0,
+  "grade": "F",
+  "findings": [
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 20,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 29,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 32,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 33,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 36,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 37,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 42,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 46,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 50,
+      "matched_text": "npx -y ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_003",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 53,
+      "matched_text": "npx -y ",
+      "message": ""
+    }
+  ]
+}

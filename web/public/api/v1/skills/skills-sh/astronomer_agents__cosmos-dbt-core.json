@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:astronomer_agents__cosmos-dbt-core",
+  "registry_id": "skills-sh",
+  "slug": "astronomer_agents__cosmos-dbt-core",
+  "name": "cosmos-dbt-core",
+  "url": "https://skills.sh/astronomer/agents/cosmos-dbt-core",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_005",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 32,
+      "matched_text": "if deps precomputed in CI\n + SUBPROCESS",
+      "message": ""
+    }
+  ]
+}

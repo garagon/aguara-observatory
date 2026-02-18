@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:boshu2_agentops__swarm",
+  "registry_id": "skills-sh",
+  "slug": "boshu2_agentops__swarm",
+  "name": "swarm",
+  "url": "https://skills.sh/boshu2/agentops/swarm",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 488,
+      "matched_text": "Cause: codex CLI not installed or API key not configured.\nSolution: Run which codex to verify installation. Check ~/.codex/config.toml for API credentials.",
+      "message": ""
+    }
+  ]
+}

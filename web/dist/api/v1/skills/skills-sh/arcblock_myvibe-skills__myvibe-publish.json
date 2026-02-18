@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:arcblock_myvibe-skills__myvibe-publish",
+  "registry_id": "skills-sh",
+  "slug": "arcblock_myvibe-skills__myvibe-publish",
+  "name": "myvibe-publish",
+  "url": "https://skills.sh/arcblock/myvibe-skills/myvibe-publish",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 86,
+      "matched_text": "npm install -g a",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 261,
+      "matched_text": "npm install -g a",
+      "message": ""
+    }
+  ]
+}

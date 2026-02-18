@@ -1,0 +1,42 @@
+[
+  {
+    "id": "skills-sh",
+    "name": "Skills.sh",
+    "url": "https://skills.sh",
+    "description": "Community AI agent skills marketplace",
+    "skill_count": 786,
+    "avg_score": 95.1
+  },
+  {
+    "id": "clawhub",
+    "name": "ClawHub",
+    "url": "https://clawhub.ai",
+    "description": "ClawHub AI agent skills registry",
+    "skill_count": 24,
+    "avg_score": 95.0
+  },
+  {
+    "id": "mcp-registry",
+    "name": "PulseMCP",
+    "url": "https://www.pulsemcp.com",
+    "description": "PulseMCP MCP server directory",
+    "skill_count": 0,
+    "avg_score": 100.0
+  },
+  {
+    "id": "mcp-so",
+    "name": "mcp.so",
+    "url": "https://mcp.so",
+    "description": "MCP server discovery platform",
+    "skill_count": 50,
+    "avg_score": 97.4
+  },
+  {
+    "id": "lobehub",
+    "name": "LobeHub",
+    "url": "https://lobehub.com",
+    "description": "LobeHub plugin marketplace",
+    "skill_count": 545,
+    "avg_score": 99.9
+  }
+]

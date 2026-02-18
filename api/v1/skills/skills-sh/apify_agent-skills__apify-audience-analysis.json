@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:apify_agent-skills__apify-audience-analysis",
+  "registry_id": "skills-sh",
+  "slug": "apify_agent-skills__apify-audience-analysis",
+  "name": "apify-audience-analysis",
+  "url": "https://skills.sh/apify/agent-skills/apify-audience-analysis",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 15,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 118,
+      "matched_text": "npm install -g @",
+      "message": ""
+    }
+  ]
+}

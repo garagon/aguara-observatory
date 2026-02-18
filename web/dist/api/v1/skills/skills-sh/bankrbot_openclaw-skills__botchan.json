@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bankrbot_openclaw-skills__botchan",
+  "registry_id": "skills-sh",
+  "slug": "bankrbot_openclaw-skills__botchan",
+  "name": "botchan",
+  "url": "https://skills.sh/bankrbot/openclaw-skills/botchan",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 27,
+      "matched_text": "npm install -g b",
+      "message": ""
+    }
+  ]
+}

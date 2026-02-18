@@ -1,0 +1,20 @@
+{
+  "skill_id": "lobehub:plugin_seo_assistant",
+  "registry_id": "lobehub",
+  "slug": "plugin_seo_assistant",
+  "name": "SEO Assistant",
+  "url": "https://lobehub.com/plugins/seo_assistant",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "PROMPT_INJECTION_011",
+      "severity": "CRITICAL",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 10,
+      "matched_text": "dan",
+      "message": ""
+    }
+  ]
+}

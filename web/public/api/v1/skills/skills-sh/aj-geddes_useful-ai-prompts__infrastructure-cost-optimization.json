@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__infrastructure-cost-optimization",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__infrastructure-cost-optimization",
+  "name": "infrastructure-cost-optimization",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/infrastructure-cost-optimization",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 27,
+      "matched_text": "# cost-optimization-setup.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: cost-optimization-scripts\n  namespace: operations\ndata:\n  analyze-costs.sh: |\n    #!/bin/bash\n    set -euo pipefail\n\n   ...",
+      "message": ""
+    }
+  ]
+}

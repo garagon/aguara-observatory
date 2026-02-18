@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:astronomer_agents__cosmos-dbt-fusion",
+  "registry_id": "skills-sh",
+  "slug": "astronomer_agents__cosmos-dbt-fusion",
+  "name": "cosmos-dbt-fusion",
+  "url": "https://skills.sh/astronomer/agents/cosmos-dbt-fusion",
+  "score": 60,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 52,
+      "matched_text": "curl\nENV SHELL=/bin/bash\nRUN curl -fsSL https://public.cdn.getdbt.com/fs/install/install.sh | sh",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_005",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 134,
+      "matched_text": "if deps precomputed in CI\n + SUBPROCESS",
+      "message": ""
+    }
+  ]
+}

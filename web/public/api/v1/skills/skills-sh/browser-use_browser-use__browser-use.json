@@ -1,0 +1,65 @@
+{
+  "skill_id": "skills-sh:browser-use_browser-use__browser-use",
+  "registry_id": "skills-sh",
+  "slug": "browser-use_browser-use__browser-use",
+  "name": "browser-use",
+  "url": "https://skills.sh/browser-use/browser-use/browser-use",
+  "score": 0,
+  "grade": "F",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 28,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh + chmod +x",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 28,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 35,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 36,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 37,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_003",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 50,
+      "matched_text": "curl -fsSL https://browser-use.com/cli/install.sh | bash",
+      "message": ""
+    }
+  ]
+}

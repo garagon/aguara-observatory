@@ -1,0 +1,20 @@
+{
+  "skill_id": "mcp-so:aws-kb-retrieval-server_modelcontextprotocol",
+  "registry_id": "mcp-so",
+  "slug": "aws-kb-retrieval-server_modelcontextprotocol",
+  "name": "AAws Kb Retrieval ServerAn MCP server implementation for retrieving information ",
+  "url": "https://mcp.so/server/aws-kb-retrieval-server/modelcontextprotocol",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 18,
+      "matched_text": "knowledge-base\nAn MCP server implementation for retrieving information from the AWS Knowledge Base using the Bedrock Agent Runtime.\nOverview\nTools\nComments\nOverview\nwhat is AWS Knowledge Base Retrieva...",
+      "message": ""
+    }
+  ]
+}

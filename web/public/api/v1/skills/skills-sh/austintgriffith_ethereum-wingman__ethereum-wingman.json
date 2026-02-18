@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:austintgriffith_ethereum-wingman__ethereum-wingman",
+  "registry_id": "skills-sh",
+  "slug": "austintgriffith_ethereum-wingman__ethereum-wingman",
+  "name": "ethereum-wingman",
+  "url": "https://skills.sh/austintgriffith/ethereum-wingman/ethereum-wingman",
+  "score": 75,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 446,
+      "matched_text": "curl -X PATCH \"https://api.vercel.com/v9/projects/PROJECT_ID\" + ./p",
+      "message": ""
+    }
+  ]
+}

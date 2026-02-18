@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:multi-workplace",
+  "registry_id": "clawhub",
+  "slug": "multi-workplace",
+  "name": "multi-workplace",
+  "url": "https://clawhub.ai/skills/multi-workplace",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXFIL_011",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 154,
+      "matched_text": "Sync workplace context to external",
+      "message": ""
+    }
+  ]
+}

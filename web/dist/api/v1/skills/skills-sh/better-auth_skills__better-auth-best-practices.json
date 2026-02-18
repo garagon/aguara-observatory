@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:better-auth_skills__better-auth-best-practices",
+  "registry_id": "skills-sh",
+  "slug": "better-auth_skills__better-auth-best-practices",
+  "name": "better-auth-best-practices",
+  "url": "https://skills.sh/better-auth/skills/better-auth-best-practices",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 50,
+      "matched_text": "npx @better-auth/cli ",
+      "message": ""
+    }
+  ]
+}

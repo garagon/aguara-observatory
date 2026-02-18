@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__api-gateway-configuration",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__api-gateway-configuration",
+  "name": "api-gateway-configuration",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/api-gateway-configuration",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SSRF_005",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 304,
+      "matched_text": "/var/run/docker.sock",
+      "message": ""
+    }
+  ]
+}

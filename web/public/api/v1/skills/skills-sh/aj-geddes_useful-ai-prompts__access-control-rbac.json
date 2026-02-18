@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__access-control-rbac",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__access-control-rbac",
+  "name": "access-control-rbac",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/access-control-rbac",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "MCP_002",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 271,
+      "matched_text": "name=\"admin_all_access\"",
+      "message": ""
+    }
+  ]
+}

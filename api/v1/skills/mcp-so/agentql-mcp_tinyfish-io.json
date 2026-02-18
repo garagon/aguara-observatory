@@ -1,0 +1,20 @@
+{
+  "skill_id": "mcp-so:agentql-mcp_tinyfish-io",
+  "registry_id": "mcp-so",
+  "slug": "agentql-mcp_tinyfish-io",
+  "name": "AAgentQL MCP ServerModel Context Protocol server that integrates AgentQL's data ",
+  "url": "https://mcp.so/server/agentql-mcp/tinyfish-io",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 24,
+      "matched_text": "web-scraping\nModel Context Protocol server that integrates AgentQL's data extraction capabilities.\nOverview\nTools\nComments\nOverview\nWhat is AgentQL MCP Server?\nAgentQL MCP Server is a Model Context Pr...",
+      "message": ""
+    }
+  ]
+}

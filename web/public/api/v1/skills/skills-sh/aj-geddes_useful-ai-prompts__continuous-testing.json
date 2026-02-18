@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__continuous-testing",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__continuous-testing",
+  "name": "continuous-testing",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/continuous-testing",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_005",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 82,
+      "matched_text": "${{ secrets.GITHUB_TOKEN + child_process",
+      "message": ""
+    }
+  ]
+}

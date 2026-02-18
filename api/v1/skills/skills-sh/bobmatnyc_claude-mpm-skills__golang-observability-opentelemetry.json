@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__golang-observability-opentelemetry",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__golang-observability-opentelemetry",
+  "name": "golang-observability-opentelemetry",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/golang-observability-opentelemetry",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "NLP_AUTHORITY_CLAIM",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1784,
+      "matched_text": "\"ready\"\n{\nw\n.\nWriteHeader\n(\nhttp\n.\nStatusOK\n)\n}\njson\n.\nNewEncoder\n(\nw\n)\n.\nEncode\n(\nstatus\n)\n}\nGraceful Shutdown\nimport\n(\n\"context\"\n\"net/http\"\n\"os\"\n\"os/signal\"\n\"syscall\"\n\"time\"\n)\nfunc\nmain\n(\n)\n{\n// Ini...",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1784,
+      "matched_text": "\"ready\"\n{\nw\n.\nWriteHeader\n(\nhttp\n.\nStatusOK\n)\n}\njson\n.\nNewEncoder\n(\nw\n)\n.\nEncode\n(\nstatus\n)\n}\nGraceful Shutdown\nimport\n(\n\"context\"\n\"net/http\"\n\"os\"\n\"os/signal\"\n\"syscall\"\n\"time\"\n)\nfunc\nmain\n(\n)\n{\n// Ini...",
+      "message": ""
+    }
+  ]
+}

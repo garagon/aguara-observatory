@@ -1,0 +1,38 @@
+{
+  "skill_id": "skills-sh:anthropics_skills__mcp-builder",
+  "registry_id": "skills-sh",
+  "slug": "anthropics_skills__mcp-builder",
+  "name": "mcp-builder",
+  "url": "https://skills.sh/anthropics/skills/mcp-builder",
+  "score": 69,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "EXTDL_001",
+      "severity": "HIGH",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 61,
+      "matched_text": "WebFetch to load `https://raw.githubusercontent.com + prompt",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_002",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 61,
+      "matched_text": "WebFetch to load  + https://modelcontextprotocol.io/specification/draft.md",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 141,
+      "matched_text": "npx @modelcontextprotocol/inspector`",
+      "message": ""
+    }
+  ]
+}

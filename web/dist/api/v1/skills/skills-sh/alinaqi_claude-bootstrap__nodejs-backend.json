@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:alinaqi_claude-bootstrap__nodejs-backend",
+  "registry_id": "skills-sh",
+  "slug": "alinaqi_claude-bootstrap__nodejs-backend",
+  "name": "nodejs-backend",
+  "url": "https://skills.sh/alinaqi/claude-bootstrap/nodejs-backend",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SUPPLY_009",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 240,
+      "matched_text": "../../../",
+      "message": ""
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:apify_agent-skills__apify-lead-generation",
+  "registry_id": "skills-sh",
+  "slug": "apify_agent-skills__apify-lead-generation",
+  "name": "apify-lead-generation",
+  "url": "https://skills.sh/apify/agent-skills/apify-lead-generation",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 15,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 117,
+      "matched_text": "npm install -g @",
+      "message": ""
+    }
+  ]
+}

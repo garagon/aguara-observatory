@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:anthropics_skills__pptx",
+  "registry_id": "skills-sh",
+  "slug": "anthropics_skills__pptx",
+  "name": "pptx",
+  "url": "https://skills.sh/anthropics/skills/pptx",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 230,
+      "matched_text": "npm install -g p",
+      "message": ""
+    }
+  ]
+}

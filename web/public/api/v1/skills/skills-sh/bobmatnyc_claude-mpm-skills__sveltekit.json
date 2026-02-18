@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__sveltekit",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__sveltekit",
+  "name": "sveltekit",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/sveltekit",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 1211,
+      "matched_text": "npm install -g v",
+      "message": ""
+    }
+  ]
+}

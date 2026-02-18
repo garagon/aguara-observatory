@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__deployment-automation",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__deployment-automation",
+  "name": "deployment-automation",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/deployment-automation",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "SSRF_003",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 156,
+      "matched_text": "kubernetes.default.svc",
+      "message": ""
+    }
+  ]
+}

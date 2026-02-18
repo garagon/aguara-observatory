@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:better-auth_skills__organization-best-practices",
+  "registry_id": "skills-sh",
+  "slug": "better-auth_skills__organization-best-practices",
+  "name": "organization-best-practices",
+  "url": "https://skills.sh/better-auth/skills/organization-best-practices",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 67,
+      "matched_text": "npx @better-auth/cli ",
+      "message": ""
+    }
+  ]
+}

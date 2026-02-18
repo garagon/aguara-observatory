@@ -1,0 +1,20 @@
+{
+  "skill_id": "clawhub:stack-scaffold",
+  "registry_id": "clawhub",
+  "slug": "stack-scaffold",
+  "name": "stack-scaffold",
+  "url": "https://clawhub.ai/skills/stack-scaffold",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 138,
+      "matched_text": "process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SEND",
+      "message": ""
+    }
+  ]
+}

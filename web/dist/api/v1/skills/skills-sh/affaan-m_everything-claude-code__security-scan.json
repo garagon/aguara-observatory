@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:affaan-m_everything-claude-code__security-scan",
+  "registry_id": "skills-sh",
+  "slug": "affaan-m_everything-claude-code__security-scan",
+  "name": "security-scan",
+  "url": "https://skills.sh/affaan-m/everything-claude-code/security-scan",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1,
+      "matched_text": "Hardcoded API keys or tokens in config files",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 37,
+      "matched_text": "npm install -g e",
+      "message": ""
+    }
+  ]
+}

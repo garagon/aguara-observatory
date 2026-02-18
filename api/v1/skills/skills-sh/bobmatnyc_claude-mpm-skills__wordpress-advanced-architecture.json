@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__wordpress-advanced-architecture",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__wordpress-advanced-architecture",
+  "name": "wordpress-advanced-architecture",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/wordpress-advanced-architecture",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "NLP_AUTHORITY_CLAIM",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 1471,
+      "matched_text": "<?php\nnamespace\nMyPlugin\n\\\nAPI\n;\nclass\nBooks_Controller\nextends\n\\\nWP_REST_Controller\n{\nprotected\n$namespace\n=\n'myplugin/v1'\n;\nprotected\n$rest_base\n=\n'books'\n;\npublic\nfunction\nregister_routes\n(\n)\n{\nreg...",
+      "message": ""
+    }
+  ]
+}

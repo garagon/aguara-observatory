@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:alinaqi_claude-bootstrap__supabase-python",
+  "registry_id": "skills-sh",
+  "slug": "alinaqi_claude-bootstrap__supabase-python",
+  "name": "supabase-python",
+  "url": "https://skills.sh/alinaqi/claude-bootstrap/supabase-python",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "MCP_007",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 233,
+      "matched_text": "Get Supabase client with anon key + post\n\n\n@router.get(\"/{post_id}\", response",
+      "message": ""
+    }
+  ]
+}

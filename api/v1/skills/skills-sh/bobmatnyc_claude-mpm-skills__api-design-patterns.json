@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__api-design-patterns",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__api-design-patterns",
+  "name": "api-design-patterns",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/api-design-patterns",
+  "score": 92,
+  "grade": "A",
+  "findings": [
+    {
+      "rule_id": "EXFIL_009",
+      "severity": "MEDIUM",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 694,
+      "matched_text": "Buffer.from + webhook",
+      "message": ""
+    }
+  ]
+}

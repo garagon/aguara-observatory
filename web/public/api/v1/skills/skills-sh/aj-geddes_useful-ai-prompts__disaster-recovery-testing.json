@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__disaster-recovery-testing",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__disaster-recovery-testing",
+  "name": "disaster-recovery-testing",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/disaster-recovery-testing",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 27,
+      "matched_text": "# dr-test-plan.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: dr-test-procedures\n  namespace: operations\ndata:\n  dr-test-plan.md: |\n    # Disaster Recovery Test Plan\n\n    ## Test Objectives\n   ...",
+      "message": ""
+    }
+  ]
+}

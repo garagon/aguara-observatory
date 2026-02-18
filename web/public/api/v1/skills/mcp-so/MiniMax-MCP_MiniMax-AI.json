@@ -1,0 +1,29 @@
+{
+  "skill_id": "mcp-so:MiniMax-MCP_MiniMax-AI",
+  "registry_id": "mcp-so",
+  "slug": "MiniMax-MCP_MiniMax-AI",
+  "name": "MMiniMax MCPOfficial MiniMax Model Context Protocol (MCP) server that enables in",
+  "url": "https://mcp.so/server/MiniMax-MCP/MiniMax-AI",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "NLP_AUTHORITY_CLAIM",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 24,
+      "matched_text": "image-to-video\nOfficial MiniMax Model Context Protocol (MCP) server that enables interaction with powerful Text to Speech, image generation and video generation APIs.\nOverview\nTools\nComments\nOverview\n...",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HEADING_MISMATCH",
+      "severity": "MEDIUM",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 24,
+      "matched_text": "image-to-video\nOfficial MiniMax Model Context Protocol (MCP) server that enables interaction with powerful Text to Speech, image generation and video generation APIs.\nOverview\nTools\nComments\nOverview\n...",
+      "message": ""
+    }
+  ]
+}

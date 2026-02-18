@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:apify_agent-skills__apify-trend-analysis",
+  "registry_id": "skills-sh",
+  "slug": "apify_agent-skills__apify-trend-analysis",
+  "name": "apify-trend-analysis",
+  "url": "https://skills.sh/apify/agent-skills/apify-trend-analysis",
+  "score": 84,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 15,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 119,
+      "matched_text": "npm install -g @",
+      "message": ""
+    }
+  ]
+}

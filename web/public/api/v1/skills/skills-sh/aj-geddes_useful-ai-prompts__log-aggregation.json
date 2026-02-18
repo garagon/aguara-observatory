@@ -1,0 +1,56 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__log-aggregation",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__log-aggregation",
+  "name": "log-aggregation",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/log-aggregation",
+  "score": 15,
+  "grade": "F",
+  "findings": [
+    {
+      "rule_id": "EXTDL_007",
+      "severity": "CRITICAL",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 43,
+      "matched_text": "curl -s http://localhost:9200 + ./l",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 28,
+      "matched_text": "# docker-compose.yml - ELK Stack setup\nversion: '3.8'\n\nservices:\n  elasticsearch:\n    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0\n    environment:\n      - discovery.type=single-node\n   ...",
+      "message": ""
+    },
+    {
+      "rule_id": "SSRF_005",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 74,
+      "matched_text": "/var/run/docker.sock",
+      "message": ""
+    },
+    {
+      "rule_id": "SSRF_003",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 108,
+      "matched_text": "/var/run/secrets/kubernetes.io",
+      "message": ""
+    },
+    {
+      "rule_id": "SSRF_005",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 207,
+      "matched_text": "/var/run/docker.sock",
+      "message": ""
+    }
+  ]
+}

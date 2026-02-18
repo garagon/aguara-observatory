@@ -1,0 +1,20 @@
+{
+  "id": 5,
+  "date": "2026-02-18",
+  "registry_id": "skills-sh",
+  "total_skills": 786,
+  "skills_scanned": 786,
+  "total_findings": 298,
+  "critical_count": 36,
+  "high_count": 168,
+  "medium_count": 94,
+  "low_count": 0,
+  "avg_score": 95.1,
+  "grade_a_count": 674,
+  "grade_b_count": 64,
+  "grade_c_count": 26,
+  "grade_d_count": 14,
+  "grade_f_count": 8,
+  "new_skills": 786,
+  "deleted_skills": 0
+}

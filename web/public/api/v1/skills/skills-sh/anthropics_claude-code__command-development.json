@@ -1,0 +1,47 @@
+{
+  "skill_id": "skills-sh:anthropics_claude-code__command-development",
+  "registry_id": "skills-sh",
+  "slug": "anthropics_claude-code__command-development",
+  "name": "command-development",
+  "url": "https://skills.sh/anthropics/claude-code/command-development",
+  "score": 40,
+  "grade": "D",
+  "findings": [
+    {
+      "rule_id": "MCP_009",
+      "severity": "HIGH",
+      "category": "mcp-attack",
+      "subcategory": null,
+      "line": 64,
+      "matched_text": "Scope: Available in all",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 555,
+      "matched_text": "# Execute plugin script\n!`bash ${CLAUDE_PLUGIN_ROOT}/scripts/script.sh`\n\n# Load plugin configuration\n@${CLAUDE_PLUGIN_ROOT}/config/settings.json\n\n# Use plugin template\n@${CLAUDE_PLUGIN_ROOT}/templates...",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 633,
+      "matched_text": "---\ndescription: Complete build workflow\nallowed-tools: Bash(*)\n---\n\nBuild: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/build.sh`\nTest: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/test.sh`\nPackage: !`bash ${CLAUDE_...",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 809,
+      "matched_text": "---\ndescription: Build with error handling\nallowed-tools: Bash(*)\n---\n\nExecute build: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/build.sh 2>&1 || echo \"BUILD_FAILED\"`\n\nIf build succeeded:\n  Report success a...",
+      "message": ""
+    }
+  ]
+}

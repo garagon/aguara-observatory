@@ -1,0 +1,29 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__ssl-certificate-management",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__ssl-certificate-management",
+  "name": "ssl-certificate-management",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/ssl-certificate-management",
+  "score": 60,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "CRED_002",
+      "severity": "CRITICAL",
+      "category": "credential-leak",
+      "subcategory": null,
+      "line": 53,
+      "matched_text": "AKIAIOSFODNN7EXAMPLE",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_CODE_MISMATCH",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 241,
+      "matched_text": "# certificate-renewal-cronjob.yaml\napiVersion: batch/v1\nkind: CronJob\nmetadata:\n  name: certificate-renewal\n  namespace: operations\nspec:\n  schedule: \"0 2 * * 0\"  # Weekly at 2 AM Sunday\n  jobTemplate...",
+      "message": ""
+    }
+  ]
+}

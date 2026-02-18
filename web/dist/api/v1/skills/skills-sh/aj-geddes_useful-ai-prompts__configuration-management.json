@@ -1,0 +1,20 @@
+{
+  "skill_id": "skills-sh:aj-geddes_useful-ai-prompts__configuration-management",
+  "registry_id": "skills-sh",
+  "slug": "aj-geddes_useful-ai-prompts__configuration-management",
+  "name": "configuration-management",
+  "url": "https://skills.sh/aj-geddes/useful-ai-prompts/configuration-management",
+  "score": 85,
+  "grade": "B",
+  "findings": [
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 606,
+      "matched_text": "process.env.SEND",
+      "message": ""
+    }
+  ]
+}

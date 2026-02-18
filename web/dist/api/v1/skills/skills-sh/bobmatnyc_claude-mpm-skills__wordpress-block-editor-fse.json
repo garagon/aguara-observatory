@@ -1,0 +1,173 @@
+{
+  "skill_id": "skills-sh:bobmatnyc_claude-mpm-skills__wordpress-block-editor-fse",
+  "registry_id": "skills-sh",
+  "slug": "bobmatnyc_claude-mpm-skills__wordpress-block-editor-fse",
+  "name": "wordpress-block-editor-fse",
+  "url": "https://skills.sh/bobmatnyc/claude-mpm-skills/wordpress-block-editor-fse",
+  "score": 0,
+  "grade": "F",
+  "findings": [
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 583,
+      "matched_text": "<!-- wp:post-title {\"level\":1} /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 584,
+      "matched_text": "<!-- wp:post-featured-image /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 585,
+      "matched_text": "<!-- wp:post-content /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 586,
+      "matched_text": "<!-- wp:post-date /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 603,
+      "matched_text": "<!-- wp:query {\"queryId\":1,\"query\":{\"perPage\":10,\"postType\":\"post\"}} -->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 612,
+      "matched_text": "<!-- wp:post-template {\"layout\":{\"type\":\"grid\",\"columnCount\":3}} -->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 613,
+      "matched_text": "<!-- wp:post-featured-image {\"isLink\":true} /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 614,
+      "matched_text": "<!-- wp:post-title {\"isLink\":true} /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 615,
+      "matched_text": "<!-- wp:post-excerpt /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 616,
+      "matched_text": "<!-- /wp:post-template -->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 2245,
+      "matched_text": "<!-- wp:post-title /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 2247,
+      "matched_text": "<!-- wp:post-content /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 2249,
+      "matched_text": "<!-- wp:post-featured-image /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "NLP_HIDDEN_INSTRUCTION",
+      "severity": "HIGH",
+      "category": "prompt-injection",
+      "subcategory": null,
+      "line": 2251,
+      "matched_text": "<!-- wp:post-date /-->\n",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 2234,
+      "matched_text": "npx @wordpress/env ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_010",
+      "severity": "MEDIUM",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 2235,
+      "matched_text": "http://localhost:8888",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 2237,
+      "matched_text": "npx @wordpress/env ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 2238,
+      "matched_text": "npx @wordpress/env ",
+      "message": ""
+    }
+  ]
+}

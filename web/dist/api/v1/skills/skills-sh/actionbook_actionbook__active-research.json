@@ -1,0 +1,65 @@
+{
+  "skill_id": "skills-sh:actionbook_actionbook__active-research",
+  "registry_id": "skills-sh",
+  "slug": "actionbook_actionbook__active-research",
+  "name": "active-research",
+  "url": "https://skills.sh/actionbook/actionbook/active-research",
+  "score": 52,
+  "grade": "C",
+  "findings": [
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 294,
+      "matched_text": "npx @actionbookdev/json-ui ",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 296,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 305,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_008",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 540,
+      "matched_text": "npx @actionbookdev/json-ui`",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 540,
+      "matched_text": "npm install -g @",
+      "message": ""
+    },
+    {
+      "rule_id": "EXTDL_004",
+      "severity": "MEDIUM",
+      "category": "external-download",
+      "subcategory": null,
+      "line": 542,
+      "matched_text": "npm install -g @",
+      "message": ""
+    }
+  ]
+}

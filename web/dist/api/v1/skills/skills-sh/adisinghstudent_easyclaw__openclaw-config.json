@@ -1,0 +1,56 @@
+{
+  "skill_id": "skills-sh:adisinghstudent_easyclaw__openclaw-config",
+  "registry_id": "skills-sh",
+  "slug": "adisinghstudent_easyclaw__openclaw-config",
+  "name": "openclaw-config",
+  "url": "https://skills.sh/adisinghstudent/easyclaw/openclaw-config",
+  "score": 25,
+  "grade": "D",
+  "findings": [
+    {
+      "rule_id": "SSRF_002",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 246,
+      "matched_text": "http://127.0.0.1:",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_012",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 255,
+      "matched_text": "send message due to r",
+      "message": ""
+    },
+    {
+      "rule_id": "SSRF_002",
+      "severity": "HIGH",
+      "category": "ssrf-cloud",
+      "subcategory": null,
+      "line": 557,
+      "matched_text": "http://127.0.0.1:",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_012",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 574,
+      "matched_text": "send message due to r",
+      "message": ""
+    },
+    {
+      "rule_id": "SUPPLY_011",
+      "severity": "HIGH",
+      "category": "supply-chain",
+      "subcategory": null,
+      "line": 620,
+      "matched_text": "update --all",
+      "message": ""
+    }
+  ]
+}

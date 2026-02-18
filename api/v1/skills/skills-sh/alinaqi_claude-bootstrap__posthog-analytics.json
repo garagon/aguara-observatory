@@ -1,0 +1,74 @@
+{
+  "skill_id": "skills-sh:alinaqi_claude-bootstrap__posthog-analytics",
+  "registry_id": "skills-sh",
+  "slug": "alinaqi_claude-bootstrap__posthog-analytics",
+  "name": "posthog-analytics",
+  "url": "https://skills.sh/alinaqi/claude-bootstrap/posthog-analytics",
+  "score": 0,
+  "grade": "F",
+  "findings": [
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 44,
+      "matched_text": "process.env.NEXT_PUBLIC_POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 45,
+      "matched_text": "process.env.NEXT_PUBLIC_POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 149,
+      "matched_text": "os.environ[\"POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 150,
+      "matched_text": "os.environ.get(\"POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 178,
+      "matched_text": "process.env.POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 179,
+      "matched_text": "process.env.POST",
+      "message": ""
+    },
+    {
+      "rule_id": "EXFIL_007",
+      "severity": "HIGH",
+      "category": "exfiltration",
+      "subcategory": null,
+      "line": 497,
+      "matched_text": "process.env.POST",
+      "message": ""
+    }
+  ]
+}
