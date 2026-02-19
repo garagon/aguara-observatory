@@ -2,39 +2,33 @@
 import Base from "../layouts/Base.astro";
 ---
 
-<Base title="About" description="Methodology, scoring, and technical details of the Aguara Observatory security scanning platform.">
+<Base title="About" description="How Aguara Observatory works: scanning methodology, scoring model, and monitored registries.">
   <div class="max-w-3xl">
     <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">About Aguara Observatory</h1>
-    <p class="text-gray-400 mb-10">Methodology, scoring, and technical details.</p>
+    <p class="text-gray-400 mb-10">How it works, scoring, and monitored registries.</p>
 
     <div class="space-y-10 text-gray-300 text-[15px] leading-relaxed">
       <section>
         <h2 class="text-lg font-semibold text-white mb-3">What is this?</h2>
         <p>
-          Aguara Observatory is an open source platform that continuously scans every public AI agent
-          skills registry and MCP server directory for security issues. It's the
-          <a href="https://observatory.mozilla.org" class="text-aguara-400 hover:text-aguara-300 transition-colors">Mozilla Observatory</a>
-          for AI agents.
+          Aguara Observatory scans every public AI agent skill registry and MCP server directory
+          for security issues &mdash; every day, automatically.
         </p>
         <p class="mt-3">
-          Every day, automated crawlers discover and download skill definitions from 5+ registries.
-          These are scanned with <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300 transition-colors">Aguara</a>,
-          a deterministic security scanner designed specifically for AI agent skills. Results are published
-          as open data.
+          Crawlers discover skills from 5+ registries. Each is analyzed with
+          <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300 transition-colors">Aguara</a>,
+          a security scanner built specifically for AI agent skills. All results are published as open data.
         </p>
       </section>
 
       <section>
-        <h2 class="text-lg font-semibold text-white mb-3">Scanning</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">How scanning works</h2>
         <p>
-          Aguara uses multi-layer static analysis to detect security issues in skill definitions:
-          pattern matching (regex + contains), NLP-based markdown structure analysis, toxic flow detection,
-          and rug-pull analysis. It checks for prompt injection, data exfiltration, credential leaks,
-          supply chain attacks, SSRF, unicode attacks, and more.
+          Aguara uses static analysis to detect security issues: prompt injection, data exfiltration,
+          credential leaks, supply chain attacks, SSRF, and more. It runs 138+ rules across 15 categories.
         </p>
         <p class="mt-3">
-          It's fully deterministic &mdash; no LLM, no cloud APIs, same input always produces same output.
-          138+ rules across 15 categories.
+          Fully deterministic &mdash; no LLM, no cloud APIs. Same input always produces the same output.
         </p>
       </section>
 
@@ -67,15 +61,6 @@ import Base from "../layouts/Base.astro";
             </div>
           ))}
         </div>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-white mb-3">Incremental Scanning</h2>
-        <p>
-          Each skill's content is hashed (SHA-256). On subsequent crawls, only skills with changed
-          content are re-scanned. This makes daily scans of 80,000+ skills feasible within GitHub
-          Actions' 6-hour timeout.
-        </p>
       </section>
 
       <section>
