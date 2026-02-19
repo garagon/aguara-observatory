@@ -5,102 +5,131 @@ import RegistryCard from "../components/RegistryCard.astro";
 import SeverityBadge from "../components/SeverityBadge.astro";
 import SearchBar from "../components/SearchBar.astro";
 import { getStats, getRegistries, getCategories, getRecentFeed } from "../lib/api";
+import { scoreToGrade, gradeBarColors, gradeOrder, categoryDescriptions } from "../lib/constants";
 
 const stats = getStats();
 const registries = getRegistries();
 const categories = getCategories();
 const feed = getRecentFeed();
-
-function scoreToGrade(score: number): string {
-  if (score >= 90) return "A";
-  if (score >= 75) return "B";
-  if (score >= 50) return "C";
-  if (score >= 25) return "D";
-  return "F";
-}
-
-const gradeColors: Record<string, string> = {
-  A: "bg-emerald-500",
-  B: "bg-green-500",
-  C: "bg-yellow-500",
-  D: "bg-orange-500",
-  F: "bg-red-500",
-};
+const base = import.meta.env.BASE_URL;
 ---
 
 <Base title="Ecosystem Overview">
   <!-- Hero -->
-  <div class="text-center mb-12">
-    <h1 class="text-4xl font-bold text-white mb-4">
-      AI Agent Security Observatory
-    </h1>
-    <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
-      Continuous security scanning of every public AI agent skills registry and MCP server directory. Open data for a safer AI ecosystem.
-    </p>
-    <div class="max-w-lg mx-auto">
-      <SearchBar />
+  <div class="relative -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12 overflow-hidden">
+    <!-- Gradient background -->
+    <div class="absolute inset-0 bg-gradient-to-b from-aguara-950/40 via-gray-950 to-gray-950"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-aguara-500/8 rounded-full blur-3xl"></div>
+
+    <div class="relative text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Scanning {stats ? stats.registries_count : 5} registries daily
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+        AI Agent Security<br />Observatory
+      </h1>
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+        Continuous security scanning of every public AI agent skills registry and MCP server directory. Open data for a safer AI ecosystem.
+      </p>
+      <div class="max-w-xl mx-auto">
+        <SearchBar />
+      </div>
     </div>
   </div>
 
   {stats ? (
     <>
-      <!-- Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        <StatCard label="Total Skills" value={stats.total_skills} sublabel="Across all registries" />
-        <StatCard label="Skills Scanned" value={stats.skills_scanned} sublabel="With Aguara" />
-        <StatCard label="Total Findings" value={stats.total_findings} sublabel="Security issues found" />
+      <!-- Key metrics -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 animate-fade-in">
+        <StatCard
+          label="Skills Monitored"
+          value={stats.total_skills}
+          icon="skills"
+        />
+        <StatCard
+          label="Security Findings"
+          value={stats.total_findings}
+          sublabel={`of ${stats.total_findings_all?.toLocaleString() ?? stats.total_findings} total`}
+          icon="findings"
+        />
         <StatCard
           label="Average Score"
-          value={`${stats.avg_score}/100`}
+          value={`${stats.avg_score}`}
           sublabel={`Grade ${scoreToGrade(stats.avg_score)}`}
+          icon="score"
+        />
+        <StatCard
+          label="Ecosystem Health"
+          value={`${Math.round(((stats.grade_distribution?.A ?? 0) / (stats.skills_scanned || 1)) * 100)}%`}
+          sublabel="Grade A skills"
+          icon="health"
         />
       </div>
 
-      <!-- Severity distribution -->
-      {stats.severity_distribution && Object.keys(stats.severity_distribution).length > 0 && (
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-12">
-          <h2 class="text-lg font-semibold text-white mb-4">Findings by Severity</h2>
-          <div class="flex flex-wrap gap-4">
-            {["CRITICAL", "HIGH", "MEDIUM"].map((sev) => {
-              const count = stats.severity_distribution[sev] ?? 0;
-              if (count === 0) return null;
-              return (
-                <div class="flex items-center gap-2">
-                  <SeverityBadge severity={sev} />
-                  <span class="text-xl font-bold text-white">{count.toLocaleString()}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <!-- Grade distribution -->
-      {stats.grade_distribution && Object.keys(stats.grade_distribution).length > 0 && (
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-12">
-          <h2 class="text-lg font-semibold text-white mb-4">Grade Distribution</h2>
-          <div class="flex gap-6">
-            {["A", "B", "C", "D", "F"].map((grade) => {
-              const count = stats.grade_distribution[grade] ?? 0;
-              const total = stats.skills_scanned || 1;
-              const pct = Math.round((count / total) * 100);
-              return (
-                <a href={`${import.meta.env.BASE_URL}grades/${grade}/`} class="flex-1 text-center group hover:opacity-80 transition-opacity">
-                  <div class="text-2xl font-bold text-white group-hover:text-aguara-400 transition-colors">{grade}</div>
-                  <div class="text-sm text-gray-400">{count.toLocaleString()}</div>
-                  <div class="h-2 bg-gray-800 rounded-full mt-2 overflow-hidden">
-                    <div class={`h-full ${gradeColors[grade]} rounded-full`} style={`width: ${pct}%`} />
+      <!-- Severity + Grade side by side -->
+      <div class="grid lg:grid-cols-2 gap-6 mb-12">
+        <!-- Severity distribution -->
+        {stats.severity_distribution && Object.keys(stats.severity_distribution).length > 0 && (
+          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Findings by Severity</h2>
+            <div class="space-y-4">
+              {["CRITICAL", "HIGH", "MEDIUM"].map((sev) => {
+                const count = stats.severity_distribution[sev] ?? 0;
+                const total = stats.total_findings || 1;
+                const pct = Math.round((count / total) * 100);
+                const barColor = sev === "CRITICAL" ? "bg-red-500" : sev === "HIGH" ? "bg-orange-500" : "bg-yellow-500";
+                if (count === 0) return null;
+                return (
+                  <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <SeverityBadge severity={sev} />
+                      <span class="text-sm font-mono text-gray-300">{count.toLocaleString()}</span>
+                    </div>
+                    <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                      <div class={`h-full ${barColor} rounded-full transition-all`} style={`width: ${pct}%`} />
+                    </div>
                   </div>
-                  <div class="text-xs text-gray-500 mt-1">{pct}%</div>
-                </a>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        <!-- Grade distribution -->
+        {stats.grade_distribution && Object.keys(stats.grade_distribution).length > 0 && (
+          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Grade Distribution</h2>
+            <div class="space-y-3">
+              {gradeOrder.map((grade) => {
+                const count = stats.grade_distribution[grade] ?? 0;
+                const total = stats.skills_scanned || 1;
+                const pct = Math.round((count / total) * 100);
+                const displayPct = grade === "A" ? Math.min(pct, 100) : pct;
+                return (
+                  <a href={`${base}grades/${grade}/`} class="flex items-center gap-3 group">
+                    <span class={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold border ${gradeBarColors[grade].replace("bg-", "bg-").replace("500", "500/20")} ${gradeBarColors[grade].replace("bg-", "text-").replace("500", "400")} ${gradeBarColors[grade].replace("bg-", "border-").replace("500", "500/30")}`}>
+                      {grade}
+                    </span>
+                    <div class="flex-1">
+                      <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div class={`h-full ${gradeBarColors[grade]} rounded-full`} style={`width: ${displayPct}%`} />
+                      </div>
+                    </div>
+                    <span class="w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
+                      {count.toLocaleString()}
+                    </span>
+                    <span class="w-10 text-right text-xs text-gray-500">{pct}%</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </>
   ) : (
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center mb-12">
+    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center mb-12">
       <p class="text-gray-400 text-lg">No scan data available yet.</p>
       <p class="text-gray-500 text-sm mt-2">Run the crawl and scan pipeline to populate data.</p>
     </div>
@@ -108,9 +137,14 @@ const gradeColors: Record<string, string> = {
 
   <!-- Registries -->
   <div class="mb-12">
-    <h2 class="text-2xl font-bold text-white mb-6">Monitored Registries</h2>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-white">Monitored Registries</h2>
+      <a href={`${base}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
+        View all &rarr;
+      </a>
+    </div>
     {registries.length > 0 ? (
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {registries.map((r) => (
           <RegistryCard
             id={r.id}
@@ -123,68 +157,66 @@ const gradeColors: Record<string, string> = {
         ))}
       </div>
     ) : (
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { name: "Skills.sh", desc: "Community AI agent skills", count: "60,000+" },
-          { name: "ClawHub", desc: "AI agent skills registry", count: "5,000+" },
-          { name: "PulseMCP", desc: "MCP server directory", count: "8,600+" },
-          { name: "mcp.so", desc: "MCP server discovery", count: "17,000+" },
-          { name: "LobeHub", desc: "Plugin marketplace", count: "5,000+" },
-        ].map((r) => (
-          <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <h3 class="text-lg font-semibold text-white">{r.name}</h3>
-            <p class="text-sm text-gray-500 mt-1">{r.desc}</p>
-            <p class="text-sm text-gray-400 mt-3">{r.count} entries</p>
-          </div>
-        ))}
+      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center">
+        <p class="text-gray-400">No registry data available yet.</p>
       </div>
     )}
   </div>
 
-  <!-- Top categories -->
-  {categories.length > 0 && (
-    <div class="mb-12">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-white">Top Finding Categories</h2>
-        <a href={`${import.meta.env.BASE_URL}categories/`} class="text-sm text-aguara-400 hover:text-aguara-300 transition-colors">
-          View all {categories.length} categories &rarr;
-        </a>
-      </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        {categories.slice(0, 10).map((cat, i) => (
-          <a
-            href={`${import.meta.env.BASE_URL}categories/${cat.category}/`}
-            class={`flex items-center justify-between px-6 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}
-          >
-            <span class="text-gray-300 hover:text-white transition-colors">{cat.category}</span>
-            <span class="text-sm font-mono text-aguara-400 bg-aguara-500/10 px-2 py-0.5 rounded-full">{cat.count.toLocaleString()}</span>
+  <!-- Categories + Recent findings side by side -->
+  <div class="grid lg:grid-cols-2 gap-6">
+    <!-- Top categories -->
+    {categories.length > 0 && (
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-white">Top Categories</h2>
+          <a href={`${base}categories/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
+            All {categories.length} &rarr;
           </a>
-        ))}
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          {categories.slice(0, 8).map((cat, i) => {
+            const maxCount = categories[0]?.count || 1;
+            const pct = Math.round((cat.count / maxCount) * 100);
+            return (
+              <a
+                href={`${base}categories/${cat.category}/`}
+                class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group ${i > 0 ? "border-t border-gray-800/50" : ""}`}
+              >
+                <span class="flex-1 text-sm text-gray-300 group-hover:text-white transition-colors">{cat.category}</span>
+                <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
+                  <div class="h-full bg-aguara-500/50 rounded-full" style={`width: ${pct}%`} />
+                </div>
+                <span class="text-xs font-mono text-gray-500 w-12 text-right">{cat.count}</span>
+              </a>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  )}
+    )}
 
-  <!-- Recent feed -->
-  {feed.length > 0 && (
-    <div>
-      <h2 class="text-2xl font-bold text-white mb-6">Recent Critical Findings</h2>
-      <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        {feed.slice(0, 10).map((item, i) => {
-          const slug = item.slug || item.skill_id.replace(`${item.registry_id}:`, "");
-          const safeSlug = slug.replace(/\//g, "_").replace(/:/g, "_");
-          const href = `${import.meta.env.BASE_URL}skills/${item.registry_id}/${safeSlug}/`;
-          return (
-            <a href={href} class={`block px-6 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
-              <div class="flex items-center gap-3">
-                <SeverityBadge severity={item.severity} />
-                <span class="text-sm text-gray-300 font-medium">{item.skill_name || item.skill_id}</span>
-                <span class="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded">{item.registry_id}</span>
-              </div>
-              <p class="text-sm text-gray-400 mt-1 ml-20">{item.category} &mdash; {item.rule_id}</p>
-            </a>
-          );
-        })}
+    <!-- Recent findings -->
+    {feed.length > 0 && (
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-4">Recent Findings</h2>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          {feed.slice(0, 8).map((item, i) => {
+            const slug = item.slug || item.skill_id.replace(`${item.registry_id}:`, "");
+            const safeSlug = slug.replace(/\//g, "_").replace(/:/g, "_");
+            const href = `${base}skills/${item.registry_id}/${safeSlug}/`;
+            return (
+              <a href={href} class={`block px-5 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
+                <div class="flex items-center gap-2">
+                  <SeverityBadge severity={item.severity} />
+                  <span class="text-sm text-gray-300 truncate flex-1">{item.skill_name || item.skill_id}</span>
+                  <span class="text-xs text-gray-600 shrink-0">{item.registry_id}</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 pl-[4.5rem]">{item.rule_id}</p>
+              </a>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  )}
+    )}
+  </div>
 </Base>

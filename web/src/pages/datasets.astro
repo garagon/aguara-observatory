@@ -9,49 +9,76 @@ const datasets = [
     description: "All latest security findings across every registry. Includes rule ID, severity, category, and skill metadata.",
     path: `${base}datasets/findings.csv`,
     format: "CSV",
+    icon: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
   },
   {
     name: "Scores",
     description: "Skill security scores (0-100) and letter grades (A-F) for every scanned skill.",
     path: `${base}datasets/scores.csv`,
     format: "CSV",
+    icon: "M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z",
   },
   {
     name: "Skills",
     description: "Full catalog of discovered skills and MCP servers across all monitored registries.",
     path: `${base}datasets/skills.csv`,
     format: "CSV",
+    icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
   },
   {
     name: "Static API",
     description: "JSON API endpoints for programmatic access to stats, registries, trends, and individual skill reports.",
     path: `${base}api/v1/stats.json`,
     format: "JSON",
+    icon: "M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5",
   },
+];
+
+const apiEndpoints = [
+  { endpoint: "/api/v1/stats.json", desc: "Global statistics" },
+  { endpoint: "/api/v1/registries.json", desc: "Registry list with stats" },
+  { endpoint: "/api/v1/registries/{id}/stats.json", desc: "Per-registry stats" },
+  { endpoint: "/api/v1/skills/{registry}/{slug}.json", desc: "Individual skill report" },
+  { endpoint: "/api/v1/trends/weekly.json", desc: "Weekly trends (52 weeks)" },
+  { endpoint: "/api/v1/categories.json", desc: "Findings by category" },
+  { endpoint: "/api/v1/benchmarks/vendors.json", desc: "Vendor comparison metrics" },
+  { endpoint: "/api/v1/feed/recent.json", desc: "Recent critical findings" },
+  { endpoint: "/api/v1/search-index.json", desc: "Full skill search index" },
+  { endpoint: "/api/v1/datasets/manifest.json", desc: "Dataset download links" },
 ];
 ---
 
-<Base title="Datasets">
-  <h1 class="text-3xl font-bold text-white mb-2">Open Datasets</h1>
-  <p class="text-gray-400 mb-8">
-    All Observatory data is freely available for download and analysis.
-    Datasets are updated daily after each scan run.
-  </p>
+<Base title="Datasets" description="Open datasets and API for AI agent security research.">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Open Datasets</h1>
+    <p class="text-gray-400">
+      All Observatory data is freely available for download and analysis. Updated daily after each scan run.
+    </p>
+  </div>
 
-  <div class="grid md:grid-cols-2 gap-6 mb-12">
+  <div class="grid sm:grid-cols-2 gap-4 mb-12">
     {datasets.map((ds) => (
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-white">{ds.name}</h3>
-          <span class="text-xs font-mono px-2 py-1 bg-gray-800 rounded text-gray-400">{ds.format}</span>
+      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5 group hover:border-gray-700 transition-colors">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center shrink-0">
+            <svg class="w-4.5 h-4.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d={ds.icon} />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-semibold text-white">{ds.name}</h3>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 bg-gray-800 rounded text-gray-500 uppercase">{ds.format}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-1">{ds.description}</p>
+          </div>
         </div>
-        <p class="text-sm text-gray-400 mb-4">{ds.description}</p>
         <a
           href={ds.path}
-          class="inline-flex items-center gap-2 text-sm text-aguara-400 hover:text-aguara-300 transition-colors"
+          class="inline-flex items-center gap-1.5 text-sm text-aguara-400 hover:text-aguara-300 transition-colors ml-12"
           download={ds.format === "CSV" ? true : undefined}
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
@@ -63,34 +90,26 @@ const datasets = [
   </div>
 
   <!-- API docs -->
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-    <h2 class="text-xl font-semibold text-white mb-4">Static JSON API</h2>
-    <p class="text-sm text-gray-400 mb-4">
-      All endpoints return static JSON files generated daily. No authentication needed.
-    </p>
+  <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-800">
+      <h2 class="text-base font-semibold text-white">Static JSON API</h2>
+      <p class="text-sm text-gray-500 mt-0.5">
+        All endpoints return static JSON files generated daily. No authentication needed.
+      </p>
+    </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-gray-800 text-left text-gray-400">
-            <th class="pb-3 pr-4 font-medium">Endpoint</th>
-            <th class="pb-3 font-medium">Description</th>
+          <tr class="border-b border-gray-800 text-left text-gray-400 text-xs uppercase tracking-wider">
+            <th class="px-5 py-3 font-medium">Endpoint</th>
+            <th class="px-5 py-3 font-medium">Description</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-800/50">
-          {[
-            { endpoint: "/api/v1/stats.json", desc: "Global statistics" },
-            { endpoint: "/api/v1/registries.json", desc: "Registry list with stats" },
-            { endpoint: "/api/v1/registries/{id}/stats.json", desc: "Per-registry stats" },
-            { endpoint: "/api/v1/skills/{registry}/{slug}.json", desc: "Individual skill report" },
-            { endpoint: "/api/v1/trends/weekly.json", desc: "Weekly trends (52 weeks)" },
-            { endpoint: "/api/v1/categories.json", desc: "Findings by category" },
-            { endpoint: "/api/v1/benchmarks/vendors.json", desc: "Vendor comparison metrics" },
-            { endpoint: "/api/v1/feed/recent.json", desc: "Recent critical findings" },
-            { endpoint: "/api/v1/datasets/manifest.json", desc: "Dataset download links" },
-          ].map(({ endpoint, desc }) => (
-            <tr class="hover:bg-gray-800/50 transition-colors">
-              <td class="py-2.5 pr-4 font-mono text-xs text-aguara-400">{endpoint}</td>
-              <td class="py-2.5 text-gray-400">{desc}</td>
+        <tbody class="divide-y divide-gray-800/30">
+          {apiEndpoints.map(({ endpoint, desc }) => (
+            <tr class="hover:bg-gray-800/30 transition-colors">
+              <td class="px-5 py-2.5 font-mono text-xs text-aguara-400">{endpoint}</td>
+              <td class="px-5 py-2.5 text-gray-400">{desc}</td>
             </tr>
           ))}
         </tbody>

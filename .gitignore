@@ -34,6 +34,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Private docs
+DOCS/
+
 # Env
 .env
 .env.local

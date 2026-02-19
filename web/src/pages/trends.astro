@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import TrendChart from "../components/TrendChart.astro";
 import { getWeeklyTrends, getStats } from "../lib/api";
+import { registryNames } from "../lib/constants";
 
 const trends = getWeeklyTrends();
 const stats = getStats();
@@ -17,13 +18,6 @@ const newSkills = reversed.map((t) => t.totals.new_skills);
 
 // Per-registry breakdown from latest week
 const latest = trends[0];
-const registryNames: Record<string, string> = {
-  "skills-sh": "Skills.sh",
-  "clawhub": "ClawHub",
-  "mcp-registry": "PulseMCP",
-  "mcp-so": "mcp.so",
-  "lobehub": "LobeHub",
-};
 
 // Pre-process registry data for the template (avoid type assertions in JSX)
 const registryRows = latest

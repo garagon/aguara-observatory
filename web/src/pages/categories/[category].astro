@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import ScoreGrade from "../../components/ScoreGrade.astro";
 import { listCategoryPages, getCategorySkills } from "../../lib/api";
+import { gradeBarColors, registryNames } from "../../lib/constants";
 
 export function getStaticPaths() {
   const categories = listCategoryPages();
@@ -11,18 +12,6 @@ export function getStaticPaths() {
 const { category } = Astro.params;
 const data = getCategorySkills(category!);
 const base = import.meta.env.BASE_URL;
-
-const gradeColors: Record<string, string> = {
-  A: "bg-emerald-500", B: "bg-green-500", C: "bg-yellow-500", D: "bg-orange-500", F: "bg-red-500",
-};
-
-const registryNames: Record<string, string> = {
-  "skills-sh": "Skills.sh",
-  clawhub: "ClawHub",
-  "mcp-registry": "PulseMCP",
-  "mcp-so": "mcp.so",
-  lobehub: "LobeHub",
-};
 ---
 
 <Base title={`${category} findings`}>
@@ -85,17 +74,17 @@ const registryNames: Record<string, string> = {
                     </a>
                   </td>
                   <td class="px-4 py-2.5 text-center">
-                    <span class={`inline-block w-7 text-center font-bold text-sm rounded ${gradeColors[skill.grade]} text-white`}>
+                    <span class={`inline-block w-7 text-center font-bold text-sm rounded ${gradeBarColors[skill.grade]} text-white`}>
                       {skill.grade}
                     </span>
                   </td>
                   <td class="px-4 py-2.5 text-right text-gray-300 font-mono">{skill.score}</td>
-                  <td class="px-4 py-2.5 text-right text-gray-400">{skill.finding_count || "—"}</td>
+                  <td class="px-4 py-2.5 text-right text-gray-400">{skill.finding_count || "\u2014"}</td>
                   <td class="px-4 py-2.5 text-right">
                     {skill.critical_count > 0 ? (
                       <span class="text-red-400 font-medium">{skill.critical_count}</span>
                     ) : (
-                      <span class="text-gray-600">—</span>
+                      <span class="text-gray-600">&mdash;</span>
                     )}
                   </td>
                 </tr>

@@ -1,4 +1,6 @@
 ---
+import { gradeColors } from "../lib/constants";
+
 interface Props {
   grade: string;
   score?: number;
@@ -7,21 +9,13 @@ interface Props {
 
 const { grade, score, size = "md" } = Astro.props;
 
-const gradeColors: Record<string, string> = {
-  A: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
-  B: "bg-green-500/20 text-green-400 border-green-500/40",
-  C: "bg-yellow-500/20 text-yellow-400 border-yellow-500/40",
-  D: "bg-orange-500/20 text-orange-400 border-orange-500/40",
-  F: "bg-red-500/20 text-red-400 border-red-500/40",
-};
-
 const sizeClasses: Record<string, string> = {
   sm: "w-8 h-8 text-sm",
   md: "w-12 h-12 text-xl",
   lg: "w-16 h-16 text-3xl",
 };
 
-const colorClass = gradeColors[grade] ?? gradeColors.C;
+const colorClass = gradeColors[grade]?.css ?? gradeColors.C.css;
 const sizeClass = sizeClasses[size];
 ---
 

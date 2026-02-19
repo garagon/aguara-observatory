@@ -1,49 +1,69 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { getCategories } from "../../lib/api";
+import { categoryDescriptions } from "../../lib/constants";
 
 const categories = getCategories();
 const base = import.meta.env.BASE_URL;
+const maxCount = categories[0]?.count || 1;
 
-const categoryDescriptions: Record<string, string> = {
-  "external-download": "Skills that download or reference external files, URLs, or resources",
-  "command-execution": "Skills that execute shell commands, system calls, or subprocess operations",
-  "prompt-injection": "Skills with patterns that could enable prompt injection attacks",
-  "mcp-config": "MCP server configuration issues or insecure defaults",
-  "third-party-content": "Skills that load or embed untrusted third-party content",
-  "ssrf-cloud": "Server-side request forgery risks targeting cloud metadata or internal services",
-  "exfiltration": "Skills with patterns that could leak sensitive data to external endpoints",
-  "supply-chain": "Supply chain risks: typosquatting, dependency confusion, or untrusted packages",
-  "credential-leak": "Skills that handle, expose, or hardcode credentials and secrets",
-  "mcp-attack": "MCP protocol abuse: tool poisoning, rug pulls, or cross-origin attacks",
-  "unicode-attack": "Unicode/homoglyph tricks used to obfuscate malicious content",
-  "indirect-injection": "Indirect prompt injection via external data sources",
-  "toxic-flow": "Multi-step flows that combine benign tools into dangerous chains",
+const categoryIcons: Record<string, string> = {
+  "external-download": "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3",
+  "command-execution": "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+  "prompt-injection": "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
+  "mcp-config": "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
+  "ssrf-cloud": "M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z",
+  "exfiltration": "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5",
+  "supply-chain": "M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.07-9.07l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757",
+  "credential-leak": "M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z",
+  "mcp-attack": "M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286zM12 15.75h.007v.008H12v-.008z",
+  "unicode-attack": "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z",
+  "indirect-injection": "M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3",
+  "third-party-content": "M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25",
+  "toxic-flow": "M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5",
 };
 ---
 
-<Base title="Finding Categories">
-  <h1 class="text-3xl font-bold text-white mb-2">Finding Categories</h1>
-  <p class="text-gray-400 mb-8">
-    Security findings are organized into {categories.length} categories. Click any category to see affected skills.
-  </p>
+<Base title="Finding Categories" description="Security finding categories detected across AI agent skills and MCP servers.">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Finding Categories</h1>
+    <p class="text-gray-400">
+      Security findings organized into {categories.length} categories. Click any category to see affected skills.
+    </p>
+  </div>
 
-  <div class="grid md:grid-cols-2 gap-4">
-    {categories.map((cat) => (
-      <a
-        href={`${base}categories/${cat.category}/`}
-        class="block bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/50 hover:bg-gray-900/80 transition-all"
-      >
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="text-lg font-semibold text-white">{cat.category}</h2>
-          <span class="text-sm font-mono text-aguara-400 bg-aguara-500/10 px-2.5 py-1 rounded-full">
-            {cat.count.toLocaleString()}
-          </span>
-        </div>
-        {categoryDescriptions[cat.category] && (
-          <p class="text-sm text-gray-500">{categoryDescriptions[cat.category]}</p>
-        )}
-      </a>
-    ))}
+  <div class="grid sm:grid-cols-2 gap-4">
+    {categories.map((cat) => {
+      const pct = Math.round((cat.count / maxCount) * 100);
+      const iconPath = categoryIcons[cat.category];
+      return (
+        <a
+          href={`${base}categories/${cat.category}/`}
+          class="block bg-gray-900/50 border border-gray-800 rounded-2xl p-5 hover:border-aguara-500/40 hover:bg-gray-800/30 transition-all group"
+        >
+          <div class="flex items-start gap-3">
+            {iconPath && (
+              <div class="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center shrink-0 group-hover:border-aguara-500/40 transition-colors">
+                <svg class="w-4.5 h-4.5 text-gray-400 group-hover:text-aguara-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d={iconPath} />
+                </svg>
+              </div>
+            )}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <h2 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors">{cat.category}</h2>
+                <span class="text-sm font-mono text-aguara-400 shrink-0">{cat.count.toLocaleString()}</span>
+              </div>
+              {categoryDescriptions[cat.category] && (
+                <p class="text-xs text-gray-500 mb-3 line-clamp-1">{categoryDescriptions[cat.category]}</p>
+              )}
+              <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div class="h-full bg-aguara-500/40 rounded-full" style={`width: ${pct}%`} />
+              </div>
+            </div>
+          </div>
+        </a>
+      );
+    })}
   </div>
 </Base>

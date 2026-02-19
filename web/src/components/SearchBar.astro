@@ -1,20 +1,20 @@
 ---
-/**
- * Client-side search using Fuse.js.
- * Loads search-index.json (all skills) + registries.json for combined search.
- */
 interface Props {
   placeholder?: string;
+  size?: "default" | "large";
 }
 
-const { placeholder = "Search skills and registries..." } = Astro.props;
+const { placeholder = "Search skills and registries...", size = "default" } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const inputClass = size === "large"
+  ? "w-full pl-11 pr-4 py-3.5 bg-gray-900/80 border border-gray-700/50 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all backdrop-blur-sm"
+  : "w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all";
 ---
 
 <div class="relative" id="search-container" data-base={base}>
   <div class="relative">
     <svg
-      class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+      class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -27,12 +27,16 @@ const base = import.meta.env.BASE_URL;
       type="text"
       id="search-input"
       placeholder={placeholder}
-      class="w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/50 transition-colors"
+      class={inputClass}
+      autocomplete="off"
     />
+    <kbd class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-gray-600 bg-gray-800 rounded border border-gray-700">
+      esc
+    </kbd>
   </div>
   <div
     id="search-results"
-    class="absolute top-full mt-2 left-0 right-0 bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-80 overflow-y-auto hidden z-50"
+    class="absolute top-full mt-2 left-0 right-0 bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl shadow-black/40 max-h-80 overflow-y-auto hidden z-50"
   >
   </div>
 </div>
@@ -68,7 +72,6 @@ const base = import.meta.env.BASE_URL;
 
     const items: SearchItem[] = [];
 
-    // Load registries
     try {
       const resp = await fetch(`${base}api/v1/registries.json`);
       if (resp.ok) {
@@ -87,7 +90,6 @@ const base = import.meta.env.BASE_URL;
       }
     } catch (e) { console.warn("Failed to load registries for search:", e); }
 
-    // Load skill search index
     try {
       const resp = await fetch(`${base}api/v1/search-index.json`);
       if (resp.ok) {
@@ -127,32 +129,48 @@ const base = import.meta.env.BASE_URL;
           return;
         }
 
-        const matches = fuse.search(query, { limit: 12 });
+        const matches = fuse.search(query, { limit: 10 });
         if (matches.length === 0) {
-          results.innerHTML = '<p class="p-4 text-sm text-gray-500">No results found.</p>';
+          results.innerHTML = '<p class="p-4 text-sm text-gray-500 text-center">No results found.</p>';
           results.classList.remove("hidden");
           return;
         }
 
-        results.innerHTML = matches
+        // Sort: skills with findings first, then by score descending
+        const sorted = matches.sort((a, b) => {
+          if (a.item.findings > 0 && b.item.findings === 0) return -1;
+          if (a.item.findings === 0 && b.item.findings > 0) return 1;
+          return b.item.score - a.item.score;
+        });
+
+        results.innerHTML = sorted
           .map(({ item }) => {
             const safeSlug = item.slug.replace(/\//g, "_").replace(/:/g, "_");
+            const hasReport = item.findings > 0;
             const href = item.type === "registry"
               ? `${base}registries/${item.registry}/`
-              : item.findings > 0
+              : hasReport
                 ? `${base}skills/${item.registry}/${safeSlug}/`
                 : `${base}registries/${item.registry}/`;
 
             const gradeColor = gradeColorMap[item.grade] ?? "bg-gray-600";
-            const typeLabel = item.type === "registry" ? "Registry" : item.registry;
+            const findingsLabel = item.type === "registry"
+              ? "Registry"
+              : hasReport
+                ? `${item.registry} · ${item.findings} findings`
+                : `${item.registry} · No findings`;
+            const nameClass = hasReport ? "text-gray-200" : "text-gray-400";
+            const statusIcon = item.type !== "registry" && !hasReport
+              ? '<span class="text-emerald-500 text-[10px]">&#10003;</span>'
+              : "";
 
-            return `<a href="${href}" class="flex items-center gap-3 p-3 hover:bg-gray-800 transition-colors border-b border-gray-800/50 last:border-0">
-              <span class="inline-block w-6 text-center text-xs font-bold rounded ${gradeColor} text-white py-0.5">${item.grade}</span>
+            return `<a href="${href}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-800/70 transition-colors border-b border-gray-800/30 last:border-0">
+              <span class="inline-block w-6 h-6 text-center text-[11px] font-bold rounded-md ${gradeColor} text-white leading-6">${item.grade}</span>
               <div class="flex-1 min-w-0">
-                <div class="text-sm text-gray-200 truncate">${item.name}</div>
-                <div class="text-xs text-gray-500">${typeLabel}${item.findings > 0 ? ` · ${item.findings} findings` : ""}</div>
+                <div class="text-sm ${nameClass} truncate">${item.name}</div>
+                <div class="text-[11px] text-gray-500 flex items-center gap-1">${statusIcon}${findingsLabel}</div>
               </div>
-              <span class="text-xs text-gray-500 tabular-nums">${item.score}/100</span>
+              <span class="text-xs text-gray-500 font-mono tabular-nums">${item.score}</span>
             </a>`;
           })
           .join("");
@@ -160,14 +178,12 @@ const base = import.meta.env.BASE_URL;
       }, 150);
     });
 
-    // Close on outside click
     document.addEventListener("click", (e) => {
       if (!(e.target as HTMLElement).closest("#search-container")) {
         results.classList.add("hidden");
       }
     });
 
-    // Close on Escape
     input.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         results.classList.add("hidden");

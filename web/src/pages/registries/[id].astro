@@ -4,11 +4,11 @@ import StatCard from "../../components/StatCard.astro";
 import ScoreGrade from "../../components/ScoreGrade.astro";
 import SeverityBadge from "../../components/SeverityBadge.astro";
 import { getRegistries, getRegistryStats, getRegistrySkills } from "../../lib/api";
+import { scoreToGrade, gradeBarColors, registryNames, gradeOrder } from "../../lib/constants";
 
 export function getStaticPaths() {
   const registries = getRegistries();
   if (registries.length === 0) {
-    // Fallback: generate pages for known registry IDs
     return ["skills-sh", "clawhub", "mcp-registry", "mcp-so", "lobehub"].map((id) => ({
       params: { id },
     }));
@@ -23,44 +23,28 @@ const stats = getRegistryStats(id!);
 const skills = getRegistrySkills(id!);
 const base = import.meta.env.BASE_URL;
 
-function scoreToGrade(score: number): string {
-  if (score >= 90) return "A";
-  if (score >= 75) return "B";
-  if (score >= 50) return "C";
-  if (score >= 25) return "D";
-  return "F";
-}
-
-const names: Record<string, string> = {
-  "skills-sh": "Skills.sh",
-  clawhub: "ClawHub",
-  "mcp-registry": "PulseMCP",
-  "mcp-so": "mcp.so",
-  lobehub: "LobeHub",
-};
-const displayName = registry?.name ?? names[id!] ?? id;
-
-const gradeColors: Record<string, string> = {
-  A: "bg-emerald-500", B: "bg-green-500", C: "bg-yellow-500", D: "bg-orange-500", F: "bg-red-500",
-};
+const displayName = registry?.name ?? registryNames[id!] ?? id;
 ---
 
-<Base title={displayName!}>
-  <div class="mb-8">
-    <a href={`${import.meta.env.BASE_URL}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
-      &larr; All Registries
-    </a>
-  </div>
+<Base title={displayName!} description={`Security scan results for ${displayName} registry.`}>
+  <!-- Breadcrumb -->
+  <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+    <a href={`${base}registries/`} class="hover:text-aguara-400 transition-colors">Registries</a>
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+    <span class="text-gray-300">{displayName}</span>
+  </nav>
 
+  <!-- Header -->
   <div class="flex items-start justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-white">{displayName}</h1>
-      {registry && (
+      <h1 class="text-3xl font-bold text-white tracking-tight">{displayName}</h1>
+      {registry?.description && (
         <p class="text-gray-400 mt-2">{registry.description}</p>
       )}
-      {registry && (
-        <a href={registry.url} class="text-sm text-aguara-400 hover:text-aguara-300 mt-1 inline-block" target="_blank" rel="noopener noreferrer">
-          {registry.url} &nearr;
+      {registry?.url && (
+        <a href={registry.url} class="inline-flex items-center gap-1 text-sm text-aguara-400 hover:text-aguara-300 mt-1.5 transition-colors" target="_blank" rel="noopener noreferrer">
+          {registry.url.replace("https://", "")}
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
         </a>
       )}
     </div>
@@ -71,86 +55,91 @@ const gradeColors: Record<string, string> = {
 
   {stats ? (
     <>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total Skills" value={stats.total_skills as number} />
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard label="Total Skills" value={stats.total_skills as number} icon="skills" />
         <StatCard label="Scanned" value={stats.skills_scanned as number} />
-        <StatCard label="Findings" value={stats.total_findings as number} />
-        <StatCard label="Avg Score" value={`${stats.avg_score}/100`} />
+        <StatCard label="Findings" value={stats.total_findings as number} icon="findings" />
+        <StatCard label="Avg Score" value={`${stats.avg_score}`} icon="score" />
       </div>
 
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-        <h2 class="text-lg font-semibold text-white mb-4">Findings by Severity</h2>
-        <div class="flex flex-wrap gap-6">
-          {[
-            { label: "Critical", key: "critical_count" },
-            { label: "High", key: "high_count" },
-            { label: "Medium", key: "medium_count" },
-            { label: "Low", key: "low_count" },
-          ].map(({ label, key }) => {
-            const count = (stats[key] as number) ?? 0;
-            return (
-              <div class="flex items-center gap-2">
-                <SeverityBadge severity={label.toUpperCase()} />
-                <span class="text-lg font-bold text-white">{count.toLocaleString()}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-        <h2 class="text-lg font-semibold text-white mb-4">Grade Distribution</h2>
-        <div class="flex gap-6">
-          {["A", "B", "C", "D", "F"].map((grade) => {
-            const key = `grade_${grade.toLowerCase()}_count`;
-            const count = (stats[key] as number) ?? 0;
-            const total = (stats.skills_scanned as number) || 1;
-            const pct = Math.round((count / total) * 100);
-            return (
-              <div class="flex-1 text-center">
-                <div class="text-2xl font-bold text-white">{grade}</div>
-                <div class="text-sm text-gray-400">{count.toLocaleString()}</div>
-                <div class="h-2 bg-gray-800 rounded-full mt-2 overflow-hidden">
-                  <div class={`h-full ${gradeColors[grade]} rounded-full`} style={`width: ${pct}%`} />
+      <!-- Severity + Grade side by side -->
+      <div class="grid lg:grid-cols-2 gap-4 mb-8">
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
+          <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Severity Breakdown</h2>
+          <div class="flex flex-wrap gap-4">
+            {[
+              { label: "Critical", key: "critical_count" },
+              { label: "High", key: "high_count" },
+              { label: "Medium", key: "medium_count" },
+              { label: "Low", key: "low_count" },
+            ].map(({ label, key }) => {
+              const count = (stats[key] as number) ?? 0;
+              return (
+                <div class="flex items-center gap-2">
+                  <SeverityBadge severity={label.toUpperCase()} />
+                  <span class="text-base font-bold text-white">{count.toLocaleString()}</span>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
+          <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Grades</h2>
+          <div class="flex gap-4">
+            {gradeOrder.map((grade) => {
+              const key = `grade_${grade.toLowerCase()}_count`;
+              const count = (stats[key] as number) ?? 0;
+              const total = (stats.skills_scanned as number) || 1;
+              const pct = Math.round((count / total) * 100);
+              return (
+                <div class="flex-1 text-center">
+                  <div class={`text-lg font-bold ${gradeBarColors[grade].replace("bg-", "text-").replace("500", "400")}`}>{grade}</div>
+                  <div class="text-sm text-gray-400 font-mono">{count.toLocaleString()}</div>
+                  <div class="h-1.5 bg-gray-800 rounded-full mt-2 overflow-hidden">
+                    <div class={`h-full ${gradeBarColors[grade]} rounded-full`} style={`width: ${pct}%`} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
+      <!-- Skills table -->
       {skills.length > 0 && (
-        <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">
-              Skills ({skills.length.toLocaleString()})
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+            <h2 class="text-base font-semibold text-white">
+              Skills <span class="text-gray-500 font-normal">({skills.length.toLocaleString()})</span>
             </h2>
             <input
               type="text"
               id="skill-filter"
-              placeholder="Filter skills..."
-              class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500"
+              placeholder="Filter..."
+              class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 w-48"
             />
           </div>
           <div class="overflow-x-auto max-h-[600px] overflow-y-auto" id="skills-table-container">
             <table class="w-full text-sm">
-              <thead class="sticky top-0 bg-gray-900">
-                <tr class="border-b border-gray-800 text-left text-gray-400">
-                  <th class="px-6 py-3 font-medium">Skill</th>
-                  <th class="px-4 py-3 font-medium text-center">Grade</th>
-                  <th class="px-4 py-3 font-medium text-right">Score</th>
-                  <th class="px-4 py-3 font-medium text-right">Findings</th>
-                  <th class="px-4 py-3 font-medium text-right">Critical</th>
-                  <th class="px-4 py-3 font-medium text-right">High</th>
+              <thead class="sticky top-0 bg-gray-900 z-10">
+                <tr class="border-b border-gray-800 text-left text-gray-400 text-xs uppercase tracking-wider">
+                  <th class="px-5 py-3 font-medium">Skill</th>
+                  <th class="px-4 py-3 font-medium text-center w-16">Grade</th>
+                  <th class="px-4 py-3 font-medium text-right w-16">Score</th>
+                  <th class="px-4 py-3 font-medium text-right w-20">Findings</th>
+                  <th class="px-4 py-3 font-medium text-right w-16">Crit</th>
+                  <th class="px-4 py-3 font-medium text-right w-16">High</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-800/50" id="skills-tbody">
+              <tbody class="divide-y divide-gray-800/30" id="skills-tbody">
                 {skills.map((skill) => {
                   const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
                   const hasReport = skill.finding_count > 0;
                   return (
-                    <tr class="hover:bg-gray-800/50 transition-colors skill-row" data-name={(skill.name || skill.slug).toLowerCase()}>
-                      <td class="px-6 py-2.5">
+                    <tr class="hover:bg-gray-800/30 transition-colors skill-row" data-name={(skill.name || skill.slug).toLowerCase()}>
+                      <td class="px-5 py-2.5">
                         {hasReport ? (
                           <a href={`${base}skills/${id}/${safeSlug}/`} class="text-aguara-400 hover:text-aguara-300 transition-colors">
                             {skill.name || skill.slug}
@@ -160,24 +149,24 @@ const gradeColors: Record<string, string> = {
                         )}
                       </td>
                       <td class="px-4 py-2.5 text-center">
-                        <span class={`inline-block w-7 text-center font-bold text-sm rounded ${gradeColors[skill.grade]} text-white`}>
+                        <span class={`inline-block w-7 text-center font-bold text-xs rounded-md ${gradeBarColors[skill.grade]} text-white py-0.5`}>
                           {skill.grade}
                         </span>
                       </td>
-                      <td class="px-4 py-2.5 text-right text-gray-300 font-mono">{skill.score}</td>
-                      <td class="px-4 py-2.5 text-right text-gray-400">{skill.finding_count || "—"}</td>
+                      <td class="px-4 py-2.5 text-right text-gray-300 font-mono text-xs">{skill.score}</td>
+                      <td class="px-4 py-2.5 text-right text-gray-400">{skill.finding_count || "\u2014"}</td>
                       <td class="px-4 py-2.5 text-right">
                         {skill.critical_count > 0 ? (
                           <span class="text-red-400 font-medium">{skill.critical_count}</span>
                         ) : (
-                          <span class="text-gray-600">—</span>
+                          <span class="text-gray-700">&mdash;</span>
                         )}
                       </td>
                       <td class="px-4 py-2.5 text-right">
                         {skill.high_count > 0 ? (
                           <span class="text-orange-400 font-medium">{skill.high_count}</span>
                         ) : (
-                          <span class="text-gray-600">—</span>
+                          <span class="text-gray-700">&mdash;</span>
                         )}
                       </td>
                     </tr>
@@ -203,7 +192,7 @@ const gradeColors: Record<string, string> = {
       </script>
     </>
   ) : (
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center">
       <p class="text-gray-400">No data available for this registry yet.</p>
       <p class="text-gray-500 text-sm mt-2">Data will appear after the first crawl + scan run.</p>
     </div>

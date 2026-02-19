@@ -1,14 +1,87 @@
 ---
 const year = new Date().getFullYear();
+const base = import.meta.env.BASE_URL;
 ---
 
-<footer class="border-t border-gray-800 mt-16">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-      <p>
-        Powered by <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300">Aguara</a> &mdash; deterministic security scanner for AI agents.
-      </p>
-      <p>&copy; {year} Aguara Contributors. Apache-2.0 License.</p>
+<footer class="border-t border-gray-800 mt-16 bg-gray-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- 3-column grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
+      <!-- Product -->
+      <div>
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Product</h3>
+        <ul class="space-y-3">
+          <li><a href={base} class="text-sm text-gray-400 hover:text-white transition-colors">Overview</a></li>
+          <li><a href={`${base}registries/`} class="text-sm text-gray-400 hover:text-white transition-colors">Registries</a></li>
+          <li><a href={`${base}categories/`} class="text-sm text-gray-400 hover:text-white transition-colors">Categories</a></li>
+          <li><a href={`${base}trends/`} class="text-sm text-gray-400 hover:text-white transition-colors">Trends</a></li>
+          <li><a href={`${base}benchmarks/`} class="text-sm text-gray-400 hover:text-white transition-colors">Benchmarks</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div>
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Resources</h3>
+        <ul class="space-y-3">
+          <li><a href={`${base}datasets/`} class="text-sm text-gray-400 hover:text-white transition-colors">Datasets</a></li>
+          <li><a href={`${base}about/`} class="text-sm text-gray-400 hover:text-white transition-colors">About</a></li>
+          <li><a href={`${base}api/v1/stats.json`} class="text-sm text-gray-400 hover:text-white transition-colors">JSON API</a></li>
+        </ul>
+      </div>
+
+      <!-- Open Source -->
+      <div class="col-span-2 md:col-span-1">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">Open Source</h3>
+        <ul class="space-y-3">
+          <li>
+            <a href="https://github.com/garagon/aguara" class="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center gap-1.5" target="_blank" rel="noopener noreferrer">
+              Aguara Scanner
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/garagon/aguara-observatory" class="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center gap-1.5" target="_blank" rel="noopener noreferrer">
+              Observatory Platform
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/garagon/aguara/issues" class="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center gap-1.5" target="_blank" rel="noopener noreferrer">
+              Report an Issue
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-sm text-gray-500">
+        <svg class="w-5 h-5 text-aguara-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
+        </svg>
+        <span>
+          Powered by <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300 transition-colors">Aguara</a>
+          &mdash; deterministic security scanner for AI agents.
+        </span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a
+          href="https://github.com/garagon/aguara-observatory"
+          class="text-gray-500 hover:text-white transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+        </a>
+        <p class="text-sm text-gray-600">&copy; {year} Aguara Contributors. Apache-2.0 License.</p>
+      </div>
     </div>
   </div>
 </footer>

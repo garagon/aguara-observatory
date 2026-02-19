@@ -7,8 +7,12 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Continuous security scanning of AI agent skill registries" } = Astro.props;
+const { title, description = "Continuous security scanning of AI agent skill registries and MCP server directories. Open data for a safer AI ecosystem." } = Astro.props;
 const base = import.meta.env.BASE_URL;
+
+const siteUrl = Astro.site ? new URL(base, Astro.site).href.replace(/\/$/, "") : "";
+const canonicalUrl = siteUrl ? new URL(Astro.url.pathname, Astro.site).href : "";
+const fullTitle = `${title} | Aguara Observatory`;
 ---
 
 <!doctype html>
@@ -17,8 +21,33 @@ const base = import.meta.env.BASE_URL;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <title>{title} | Aguara Observatory</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="icon" type="image/png" sizes="32x32" href={`${base}favicon-32x32.png`} />
+    <link rel="icon" type="image/png" sizes="16x16" href={`${base}favicon-16x16.png`} />
+
+    <!-- Canonical URL -->
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:site_name" content="Aguara Observatory" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <title>{fullTitle}</title>
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />

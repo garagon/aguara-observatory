@@ -1,5 +1,6 @@
 ---
 import ScoreGrade from "./ScoreGrade.astro";
+import { scoreToGrade } from "../lib/constants";
 
 interface Props {
   id: string;
@@ -12,44 +13,37 @@ interface Props {
 
 const { id, name, url, description, skillCount, avgScore } = Astro.props;
 const base = import.meta.env.BASE_URL;
-
-function scoreToGrade(score: number): string {
-  if (score >= 90) return "A";
-  if (score >= 75) return "B";
-  if (score >= 50) return "C";
-  if (score >= 25) return "D";
-  return "F";
-}
-
 const grade = scoreToGrade(avgScore);
+
+const registryIcons: Record<string, string> = {
+  "skills-sh": "S",
+  clawhub: "C",
+  "mcp-registry": "P",
+  "mcp-so": "M",
+  lobehub: "L",
+};
 ---
 
 <a
   href={`${base}registries/${id}/`}
-  class="block bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-aguara-500/50 hover:bg-gray-900/80 transition-all group"
+  class="block bg-gray-900/50 border border-gray-800 rounded-2xl p-5 hover:border-aguara-500/40 hover:bg-gray-800/30 transition-all group"
 >
-  <div class="flex items-start justify-between mb-4">
-    <div>
-      <h3 class="text-lg font-semibold text-white group-hover:text-aguara-400 transition-colors">
-        {name}
-      </h3>
-      <p class="text-sm text-gray-500 mt-1">{description}</p>
+  <div class="flex items-start gap-4">
+    <div class="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-gray-300 shrink-0 group-hover:border-aguara-500/40 group-hover:text-aguara-400 transition-colors">
+      {registryIcons[id] ?? id[0]?.toUpperCase()}
     </div>
-    <ScoreGrade grade={grade} score={Math.round(avgScore)} size="sm" />
-  </div>
-  <div class="flex items-center gap-4 text-sm text-gray-400">
-    <span class="flex items-center gap-1">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-      </svg>
-      {skillCount.toLocaleString()} skills
-    </span>
-    <span class="flex items-center gap-1">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
-        <path d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.102 1.101" />
-      </svg>
-      <span class="truncate max-w-[150px]">{url.replace("https://", "")}</span>
-    </span>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-start justify-between gap-2">
+        <h3 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors">
+          {name}
+        </h3>
+        <ScoreGrade grade={grade} size="sm" />
+      </div>
+      <p class="text-sm text-gray-500 mt-0.5 line-clamp-1">{description}</p>
+      <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+        <span class="font-mono">{skillCount.toLocaleString()} skills</span>
+        <span class="font-mono">{Math.round(avgScore)}/100</span>
+      </div>
+    </div>
   </div>
 </a>

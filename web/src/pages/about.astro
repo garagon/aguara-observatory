@@ -2,100 +2,138 @@
 import Base from "../layouts/Base.astro";
 ---
 
-<Base title="About">
+<Base title="About" description="Methodology, scoring, and technical details of the Aguara Observatory security scanning platform.">
   <div class="max-w-3xl">
-    <h1 class="text-3xl font-bold text-white mb-6">About Aguara Observatory</h1>
+    <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">About Aguara Observatory</h1>
+    <p class="text-gray-400 mb-10">Methodology, scoring, and technical details.</p>
 
-    <div class="prose prose-invert prose-gray max-w-none space-y-6 text-gray-300">
+    <div class="space-y-10 text-gray-300 text-[15px] leading-relaxed">
       <section>
-        <h2 class="text-xl font-semibold text-white mt-8 mb-3">What is this?</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">What is this?</h2>
         <p>
           Aguara Observatory is an open source platform that continuously scans every public AI agent
           skills registry and MCP server directory for security issues. It's the
-          <a href="https://observatory.mozilla.org" class="text-aguara-400 hover:text-aguara-300">Mozilla Observatory</a>
+          <a href="https://observatory.mozilla.org" class="text-aguara-400 hover:text-aguara-300 transition-colors">Mozilla Observatory</a>
           for AI agents.
         </p>
-        <p>
+        <p class="mt-3">
           Every day, automated crawlers discover and download skill definitions from 5+ registries.
-          These are scanned with <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300">Aguara</a>,
+          These are scanned with <a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300 transition-colors">Aguara</a>,
           a deterministic security scanner designed specifically for AI agent skills. Results are published
           as open data.
         </p>
       </section>
 
       <section>
-        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Methodology</h2>
-
-        <h3 class="text-lg font-medium text-white mt-6 mb-2">Scanning</h3>
+        <h2 class="text-lg font-semibold text-white mb-3">Scanning</h2>
         <p>
-          Aguara uses pattern matching and NLP analysis to detect security issues in skill definitions.
-          It checks for prompt injection, data exfiltration, credential leaks, supply chain attacks,
-          SSRF, unicode attacks, and more. It's fully deterministic — no LLM, no cloud APIs, same
-          input always produces same output.
+          Aguara uses multi-layer static analysis to detect security issues in skill definitions:
+          pattern matching (regex + contains), NLP-based markdown structure analysis, toxic flow detection,
+          and rug-pull analysis. It checks for prompt injection, data exfiltration, credential leaks,
+          supply chain attacks, SSRF, unicode attacks, and more.
         </p>
+        <p class="mt-3">
+          It's fully deterministic &mdash; no LLM, no cloud APIs, same input always produces same output.
+          138+ rules across 15 categories.
+        </p>
+      </section>
 
-        <h3 class="text-lg font-medium text-white mt-6 mb-2">Scoring</h3>
-        <p>Each skill starts at 100 points. Findings reduce the score:</p>
-        <ul class="list-disc list-inside space-y-1 text-gray-400">
-          <li><span class="text-red-400 font-medium">CRITICAL</span>: -25 points</li>
-          <li><span class="text-orange-400 font-medium">HIGH</span>: -15 points</li>
-          <li><span class="text-yellow-400 font-medium">MEDIUM</span>: -8 points</li>
-          <li><span class="text-blue-400 font-medium">LOW</span>: -3 points</li>
-        </ul>
-        <p class="mt-3">The final score maps to a letter grade:</p>
-        <ul class="list-disc list-inside space-y-1 text-gray-400">
-          <li><span class="text-emerald-400 font-medium">A</span>: 90-100 (minimal issues)</li>
-          <li><span class="text-green-400 font-medium">B</span>: 75-89 (minor issues)</li>
-          <li><span class="text-yellow-400 font-medium">C</span>: 50-74 (moderate issues)</li>
-          <li><span class="text-orange-400 font-medium">D</span>: 25-49 (significant issues)</li>
-          <li><span class="text-red-400 font-medium">F</span>: 0-24 (critical issues)</li>
-        </ul>
+      <section>
+        <h2 class="text-lg font-semibold text-white mb-3">Scoring</h2>
+        <p class="mb-3">Each skill starts at 100 points. Findings reduce the score:</p>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-800/50">
+              <tr><td class="px-4 py-2.5 text-red-400 font-medium w-24">CRITICAL</td><td class="px-4 py-2.5 text-gray-400">-25 points</td></tr>
+              <tr><td class="px-4 py-2.5 text-orange-400 font-medium">HIGH</td><td class="px-4 py-2.5 text-gray-400">-15 points</td></tr>
+              <tr><td class="px-4 py-2.5 text-yellow-400 font-medium">MEDIUM</td><td class="px-4 py-2.5 text-gray-400">-8 points</td></tr>
+              <tr><td class="px-4 py-2.5 text-blue-400 font-medium">LOW</td><td class="px-4 py-2.5 text-gray-400">Informational (no score impact)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-4 mb-3">The final score maps to a letter grade:</p>
+        <div class="flex gap-3">
+          {[
+            { grade: "A", range: "90-100", color: "emerald", desc: "Minimal issues" },
+            { grade: "B", range: "75-89", color: "green", desc: "Minor issues" },
+            { grade: "C", range: "50-74", color: "yellow", desc: "Moderate" },
+            { grade: "D", range: "25-49", color: "orange", desc: "Significant" },
+            { grade: "F", range: "0-24", color: "red", desc: "Critical" },
+          ].map(({ grade, range, color, desc }) => (
+            <div class="flex-1 text-center bg-gray-900/50 border border-gray-800 rounded-xl p-3">
+              <div class={`text-xl font-bold text-${color}-400`}>{grade}</div>
+              <div class="text-xs text-gray-500 mt-0.5">{range}</div>
+              <div class="text-[11px] text-gray-600 mt-0.5">{desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        <h3 class="text-lg font-medium text-white mt-6 mb-2">Incremental Scanning</h3>
+      <section>
+        <h2 class="text-lg font-semibold text-white mb-3">Incremental Scanning</h2>
         <p>
           Each skill's content is hashed (SHA-256). On subsequent crawls, only skills with changed
           content are re-scanned. This makes daily scans of 80,000+ skills feasible within GitHub
           Actions' 6-hour timeout.
         </p>
-
-        <h3 class="text-lg font-medium text-white mt-6 mb-2">Vendor Benchmarks</h3>
-        <p>
-          For skills.sh skills, we also scrape vendor audit results from Agent Trust Hub, Socket, and
-          Snyk. This allows us to compute precision, recall, and F1 metrics comparing Aguara findings
-          against vendor consensus.
-        </p>
       </section>
 
       <section>
-        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Monitored Registries</h2>
-        <ul class="list-disc list-inside space-y-2 text-gray-400">
-          <li><a href="https://skills.sh" class="text-aguara-400 hover:text-aguara-300">skills.sh</a> — Community AI agent skills marketplace (60,000+ skills)</li>
-          <li><a href="https://clawhub.ai" class="text-aguara-400 hover:text-aguara-300">ClawHub</a> — AI agent skills registry (5,000+ skills)</li>
-          <li><a href="https://www.pulsemcp.com" class="text-aguara-400 hover:text-aguara-300">PulseMCP</a> — MCP server directory (8,600+ servers)</li>
-          <li><a href="https://mcp.so" class="text-aguara-400 hover:text-aguara-300">mcp.so</a> — MCP server discovery platform (17,000+ servers)</li>
-          <li><a href="https://lobehub.com" class="text-aguara-400 hover:text-aguara-300">LobeHub</a> — Plugin marketplace (5,000+ plugins)</li>
-        </ul>
+        <h2 class="text-lg font-semibold text-white mb-3">Monitored Registries</h2>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+          {[
+            { name: "skills.sh", url: "https://skills.sh", desc: "Community AI agent skills marketplace" },
+            { name: "ClawHub", url: "https://clawhub.ai", desc: "AI agent skills registry" },
+            { name: "PulseMCP", url: "https://www.pulsemcp.com", desc: "MCP server directory" },
+            { name: "mcp.so", url: "https://mcp.so", desc: "MCP server discovery platform" },
+            { name: "LobeHub", url: "https://lobehub.com", desc: "Plugin marketplace" },
+          ].map((r, i) => (
+            <div class={`flex items-center justify-between px-4 py-3 ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
+              <div>
+                <a href={r.url} class="text-sm text-aguara-400 hover:text-aguara-300 transition-colors font-medium" target="_blank" rel="noopener noreferrer">{r.name}</a>
+                <p class="text-xs text-gray-500 mt-0.5">{r.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section>
-        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Open Source</h2>
+        <h2 class="text-lg font-semibold text-white mb-3">Open Source</h2>
         <p>
           Everything is open source under the Apache-2.0 license.
         </p>
-        <ul class="list-disc list-inside space-y-1 text-gray-400">
-          <li><a href="https://github.com/garagon/aguara" class="text-aguara-400 hover:text-aguara-300">Aguara</a> — The security scanner</li>
-          <li><a href="https://github.com/garagon/aguara-observatory" class="text-aguara-400 hover:text-aguara-300">Aguara Observatory</a> — This platform (crawlers, aggregator, dashboard)</li>
-        </ul>
+        <div class="flex gap-3 mt-3">
+          <a href="https://github.com/garagon/aguara" class="flex-1 bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-aguara-500/40 transition-colors group" target="_blank" rel="noopener noreferrer">
+            <div class="text-sm font-medium text-white group-hover:text-aguara-400 transition-colors">Aguara Scanner</div>
+            <p class="text-xs text-gray-500 mt-0.5">Go binary, 138+ rules</p>
+          </a>
+          <a href="https://github.com/garagon/aguara-observatory" class="flex-1 bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-aguara-500/40 transition-colors group" target="_blank" rel="noopener noreferrer">
+            <div class="text-sm font-medium text-white group-hover:text-aguara-400 transition-colors">Observatory Platform</div>
+            <p class="text-xs text-gray-500 mt-0.5">Crawlers, aggregator, dashboard</p>
+          </a>
+        </div>
       </section>
 
       <section>
-        <h2 class="text-xl font-semibold text-white mt-8 mb-3">Limitations</h2>
-        <ul class="list-disc list-inside space-y-1 text-gray-400">
-          <li>Aguara uses static analysis only — it cannot detect runtime behavior</li>
-          <li>Findings may include false positives, especially for benign patterns that resemble threats</li>
-          <li>Not all skills in a registry may be crawlable (private repos, rate limits)</li>
-          <li>Vendor audit data is only available for skills.sh</li>
-          <li>MCP server scanning is limited to README/manifest content</li>
+        <h2 class="text-lg font-semibold text-white mb-3">Limitations</h2>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li class="flex items-start gap-2">
+            <span class="text-gray-600 mt-0.5">&#8226;</span>
+            Aguara uses static analysis only &mdash; it cannot detect runtime behavior
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-gray-600 mt-0.5">&#8226;</span>
+            Findings may include false positives, especially for benign patterns that resemble threats
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-gray-600 mt-0.5">&#8226;</span>
+            Not all skills in a registry may be crawlable (private repos, rate limits)
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-gray-600 mt-0.5">&#8226;</span>
+            MCP server scanning is limited to README/manifest content
+          </li>
         </ul>
       </section>
     </div>

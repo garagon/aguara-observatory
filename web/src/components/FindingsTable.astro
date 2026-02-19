@@ -1,5 +1,6 @@
 ---
 import SeverityBadge from "./SeverityBadge.astro";
+import { severityRank } from "../lib/constants";
 
 interface Finding {
   rule_id: string;
@@ -18,30 +19,29 @@ interface Props {
 
 const { findings, compact = false } = Astro.props;
 
-const severityOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, INFO: 4 };
 const sorted = [...findings].sort(
-  (a, b) => (severityOrder[a.severity] ?? 5) - (severityOrder[b.severity] ?? 5)
+  (a, b) => (severityRank[a.severity] ?? 5) - (severityRank[b.severity] ?? 5)
 );
 ---
 
-<div class="space-y-3">
+<div class="space-y-2">
   {sorted.map((f) => (
-    <div class="border border-gray-800 rounded-lg overflow-hidden">
-      <div class="flex items-center gap-3 px-4 py-3 bg-gray-800/30">
+    <div class="border border-gray-800/50 rounded-xl overflow-hidden hover:border-gray-700/50 transition-colors">
+      <div class="flex items-center gap-3 px-4 py-2.5 bg-gray-800/20">
         <SeverityBadge severity={f.severity} />
         <span class="font-mono text-xs text-gray-300">{f.rule_id}</span>
-        <span class="text-xs text-gray-500">{f.category}</span>
+        <span class="text-xs text-gray-600 hidden sm:inline">{f.category}</span>
         {f.line && (
-          <span class="text-xs text-gray-600 ml-auto">Line {f.line}</span>
+          <span class="text-xs text-gray-600 ml-auto font-mono">L{f.line}</span>
         )}
       </div>
       {!compact && f.matched_text && (
-        <div class="px-4 py-3 bg-gray-950/50 border-t border-gray-800/50">
-          <pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto"><code>{f.matched_text}</code></pre>
+        <div class="px-4 py-2.5 bg-gray-950/30 border-t border-gray-800/30">
+          <pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto leading-relaxed"><code>{f.matched_text}</code></pre>
         </div>
       )}
       {!compact && f.message && (
-        <div class="px-4 py-2 border-t border-gray-800/50">
+        <div class="px-4 py-2 border-t border-gray-800/30">
           <p class="text-xs text-gray-500">{f.message}</p>
         </div>
       )}
@@ -50,5 +50,10 @@ const sorted = [...findings].sort(
 </div>
 
 {findings.length === 0 && (
-  <p class="text-gray-500 text-center py-8">No findings.</p>
+  <div class="text-center py-12">
+    <svg class="w-8 h-8 text-gray-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p class="text-gray-500 text-sm">No findings detected.</p>
+  </div>
 )}
