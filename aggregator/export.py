@@ -51,6 +51,14 @@ def export_all(conn, output_dir: Path | None = None, datasets_dir: Path | None =
     _export_categories(conn, output_dir)
     files["categories.json"] = True
 
+    # /api/v1/categories/{category}.json — Skills per category
+    cat_count = _export_category_skills(conn, output_dir)
+    files["category_pages"] = cat_count
+
+    # /api/v1/grades/{grade}.json — Skills per grade
+    grade_count = _export_grade_skills(conn, output_dir)
+    files["grade_pages"] = grade_count
+
     # /api/v1/trends/weekly.json
     _export_weekly_trends(conn, output_dir)
     files["trends/weekly.json"] = True
@@ -188,6 +196,96 @@ def _export_categories(conn, output_dir: Path) -> None:
 
     categories = [{"category": cat, "count": count} for cat, count in rows]
     _write_json(output_dir / "categories.json", categories)
+
+
+def _export_category_skills(conn, output_dir: Path) -> int:
+    """Generate /api/v1/categories/{category}.json — skills list per category."""
+    cats = conn.execute(
+        "SELECT DISTINCT category FROM findings_latest"
+    ).fetchall()
+
+    count = 0
+    for (category,) in cats:
+        rows = conn.execute(
+            """SELECT DISTINCT s.id, s.slug, s.name, s.registry_id,
+                      COALESCE(ss.score, 100) as score,
+                      COALESCE(ss.grade, 'A') as grade,
+                      COALESCE(ss.finding_count, 0) as finding_count,
+                      COALESCE(ss.critical_count, 0) as critical_count,
+                      COALESCE(ss.high_count, 0) as high_count
+               FROM findings_latest fl
+               JOIN skills s ON fl.skill_id = s.id
+               LEFT JOIN skill_scores ss ON s.id = ss.skill_id
+               WHERE fl.category = ? AND s.deleted = 0
+               ORDER BY COALESCE(ss.score, 100) ASC""",
+            (category,),
+        ).fetchall()
+
+        skills = []
+        for skill_id, slug, name, reg_id, score, grade, fc, cc, hc in rows:
+            skills.append({
+                "skill_id": skill_id,
+                "slug": slug,
+                "name": name or slug,
+                "registry_id": reg_id,
+                "score": score,
+                "grade": grade,
+                "finding_count": fc,
+                "critical_count": cc,
+                "high_count": hc,
+            })
+
+        _write_json(output_dir / "categories" / f"{category}.json", {
+            "category": category,
+            "skill_count": len(skills),
+            "skills": skills,
+        })
+        count += 1
+
+    return count
+
+
+def _export_grade_skills(conn, output_dir: Path) -> int:
+    """Generate /api/v1/grades/{grade}.json — skills list per grade."""
+    grades = conn.execute(
+        "SELECT DISTINCT grade FROM skill_scores"
+    ).fetchall()
+
+    count = 0
+    for (grade,) in grades:
+        rows = conn.execute(
+            """SELECT ss.skill_id, s.slug, s.name, s.registry_id,
+                      ss.score, ss.grade, ss.finding_count,
+                      ss.critical_count, ss.high_count
+               FROM skill_scores ss
+               JOIN skills s ON ss.skill_id = s.id
+               WHERE ss.grade = ? AND s.deleted = 0
+               ORDER BY ss.score ASC""",
+            (grade,),
+        ).fetchall()
+
+        skills = []
+        for skill_id, slug, name, reg_id, score, g, fc, cc, hc in rows:
+            skills.append({
+                "skill_id": skill_id,
+                "slug": slug,
+                "name": name or slug,
+                "registry_id": reg_id,
+                "score": score,
+                "grade": g,
+                "finding_count": fc,
+                "critical_count": cc,
+                "high_count": hc,
+            })
+
+        _write_json(output_dir / "grades" / f"{grade}.json", {
+            "grade": grade,
+            "skill_count": len(skills),
+            "skills": skills,
+        })
+        count += 1
+
+    return count
 
 
 def _export_weekly_trends(conn, output_dir: Path) -> None:

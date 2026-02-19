@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCategories } from "../../lib/api";
+
+const categories = getCategories();
+const base = import.meta.env.BASE_URL;
+
+const categoryDescriptions: Record<string, string> = {
+  "external-download": "Skills that download or reference external files, URLs, or resources",
+  "command-execution": "Skills that execute shell commands, system calls, or subprocess operations",
+  "prompt-injection": "Skills with patterns that could enable prompt injection attacks",
+  "mcp-config": "MCP server configuration issues or insecure defaults",
+  "third-party-content": "Skills that load or embed untrusted third-party content",
+  "ssrf-cloud": "Server-side request forgery risks targeting cloud metadata or internal services",
+  "exfiltration": "Skills with patterns that could leak sensitive data to external endpoints",
+  "supply-chain": "Supply chain risks: typosquatting, dependency confusion, or untrusted packages",
+  "credential-leak": "Skills that handle, expose, or hardcode credentials and secrets",
+  "mcp-attack": "MCP protocol abuse: tool poisoning, rug pulls, or cross-origin attacks",
+  "unicode-attack": "Unicode/homoglyph tricks used to obfuscate malicious content",
+  "indirect-injection": "Indirect prompt injection via external data sources",
+  "toxic-flow": "Multi-step flows that combine benign tools into dangerous chains",
+};
+---
+
+<Base title="Finding Categories">
+  <h1 class="text-3xl font-bold text-white mb-2">Finding Categories</h1>
+  <p class="text-gray-400 mb-8">
+    Security findings are organized into {categories.length} categories. Click any category to see affected skills.
+  </p>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    {categories.map((cat) => (
+      <a
+        href={`${base}categories/${cat.category}/`}
+        class="block bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/50 hover:bg-gray-900/80 transition-all"
+      >
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-lg font-semibold text-white">{cat.category}</h2>
+          <span class="text-sm font-mono text-aguara-400 bg-aguara-500/10 px-2.5 py-1 rounded-full">
+            {cat.count.toLocaleString()}
+          </span>
+        </div>
+        {categoryDescriptions[cat.category] && (
+          <p class="text-sm text-gray-500">{categoryDescriptions[cat.category]}</p>
+        )}
+      </a>
+    ))}
+  </div>
+</Base>

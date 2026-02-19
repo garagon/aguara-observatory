@@ -122,6 +122,18 @@ export interface WeeklyTrend {
   registries: Record<string, Record<string, number>>;
 }
 
+export interface CategoryPage {
+  category: string;
+  skill_count: number;
+  skills: RegistrySkill[];
+}
+
+export interface GradePage {
+  grade: string;
+  skill_count: number;
+  skills: RegistrySkill[];
+}
+
 // --- Loaders ---
 
 export function getStats(): GlobalStats | null {
@@ -146,6 +158,26 @@ export function getBenchmarks(): BenchmarkResult | null {
 
 export function getWeeklyTrends(): WeeklyTrend[] {
   return loadJson<WeeklyTrend[]>("trends/weekly.json") ?? [];
+}
+
+export function getCategorySkills(category: string): CategoryPage | null {
+  return loadJson<CategoryPage>(`categories/${category}.json`);
+}
+
+export function getGradeSkills(grade: string): GradePage | null {
+  return loadJson<GradePage>(`grades/${grade}.json`);
+}
+
+export function listCategoryPages(): string[] {
+  const dir = path.join(API_DIR, "categories");
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => f.replace(".json", ""));
+}
+
+export function listGradePages(): string[] {
+  const dir = path.join(API_DIR, "grades");
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => f.replace(".json", ""));
 }
 
 export function getSkillReport(registryId: string, slug: string): SkillReport | null {
