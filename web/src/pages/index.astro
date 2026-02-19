@@ -61,7 +61,7 @@ const gradeColors: Record<string, string> = {
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-12">
           <h2 class="text-lg font-semibold text-white mb-4">Findings by Severity</h2>
           <div class="flex flex-wrap gap-4">
-            {["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((sev) => {
+            {["CRITICAL", "HIGH", "MEDIUM"].map((sev) => {
               const count = stats.severity_distribution[sev] ?? 0;
               if (count === 0) return null;
               return (

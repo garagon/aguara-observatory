@@ -47,7 +47,7 @@ SEVERITY_SCORE_IMPACT = {
     Severity.CRITICAL: 25,
     Severity.HIGH: 15,
     Severity.MEDIUM: 8,
-    Severity.LOW: 3,
+    Severity.LOW: 0,   # Informational — stored but doesn't affect score
     Severity.INFO: 0,
 }
 

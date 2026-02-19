@@ -111,8 +111,10 @@ def _export_global_stats(conn, output_dir: Path) -> dict:
     row = conn.execute("SELECT COUNT(*) FROM skill_scores").fetchone()
     stats["skills_scanned"] = row[0]
 
-    row = conn.execute("SELECT COUNT(*) FROM findings_latest").fetchone()
+    row = conn.execute("SELECT COUNT(*) FROM findings_latest WHERE severity != 'LOW'").fetchone()
     stats["total_findings"] = row[0]
+    row = conn.execute("SELECT COUNT(*) FROM findings_latest").fetchone()
+    stats["total_findings_all"] = row[0]
 
     row = conn.execute("SELECT AVG(score) FROM skill_scores").fetchone()
     stats["avg_score"] = round(row[0], 1) if row[0] else 100.0
@@ -189,9 +191,9 @@ def _export_registry_stats(conn, output_dir: Path, registry_id: str) -> None:
 
 
 def _export_categories(conn, output_dir: Path) -> None:
-    """Generate /api/v1/categories.json."""
+    """Generate /api/v1/categories.json (excludes LOW/INFO findings)."""
     rows = conn.execute(
-        "SELECT category, COUNT(*) as count FROM findings_latest GROUP BY category ORDER BY count DESC"
+        "SELECT category, COUNT(*) as count FROM findings_latest WHERE severity NOT IN ('LOW', 'INFO') GROUP BY category ORDER BY count DESC"
     ).fetchall()
 
     categories = [{"category": cat, "count": count} for cat, count in rows]
@@ -201,7 +203,7 @@ def _export_categories(conn, output_dir: Path) -> None:
 def _export_category_skills(conn, output_dir: Path) -> int:
     """Generate /api/v1/categories/{category}.json — skills list per category."""
     cats = conn.execute(
-        "SELECT DISTINCT category FROM findings_latest"
+        "SELECT DISTINCT category FROM findings_latest WHERE severity NOT IN ('LOW', 'INFO')"
     ).fetchall()
 
     count = 0
@@ -216,7 +218,7 @@ def _export_category_skills(conn, output_dir: Path) -> int:
                FROM findings_latest fl
                JOIN skills s ON fl.skill_id = s.id
                LEFT JOIN skill_scores ss ON s.id = ss.skill_id
-               WHERE fl.category = ? AND s.deleted = 0
+               WHERE fl.category = ? AND fl.severity NOT IN ('LOW', 'INFO') AND s.deleted = 0
                ORDER BY COALESCE(ss.score, 100) ASC""",
             (category,),
         ).fetchall()
