@@ -55,6 +55,9 @@ def resume_registry(conn, registry_id: str, rate_limit_ms: int = 3000, max_worke
     elif registry_id == "skills-sh":
         from crawlers.skills_sh import SkillsShCrawler
         crawler = SkillsShCrawler(conn, rate_limit_ms=rate_limit_ms, max_workers=max_workers)
+    elif registry_id == "mcp-registry":
+        from crawlers.pulsemcp_scraper import PulseMCPScraper
+        crawler = PulseMCPScraper(conn, rate_limit_ms=rate_limit_ms, max_workers=max_workers)
     else:
         logger.error("Unknown registry: %s", registry_id)
         return {"error": f"Unknown registry: {registry_id}"}

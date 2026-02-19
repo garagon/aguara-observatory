@@ -136,7 +136,7 @@ def group_by_skill(scan_result: dict) -> dict[str, dict]:
     by_skill = {}
     severity_order = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "INFO": 0}
 
-    for finding in scan_result.get("findings", []):
+    for finding in (scan_result.get("findings") or []):
         filepath = finding.get("file_path", "")
         fname = Path(filepath).name
         if fname not in by_skill:
@@ -200,7 +200,7 @@ def main():
     logger.info(
         "Scan complete: %d files, %d findings, %d skills with findings",
         scan_result.get("files_scanned", 0),
-        len(scan_result.get("findings", [])),
+        len(scan_result.get("findings") or []),
         len(by_skill),
     )
 

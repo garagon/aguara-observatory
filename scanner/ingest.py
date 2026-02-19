@@ -136,7 +136,8 @@ def ingest_scan_results(
 
     # Group findings by file
     by_file: dict[str, list[dict]] = {}
-    for finding in scan_result.get("findings", []):
+    raw_findings = scan_result.get("findings") or scan_result.get("raw_findings") or []
+    for finding in raw_findings:
         filepath = finding.get("file_path", "")
         fname = Path(filepath).name
         by_file.setdefault(fname, []).append(finding)
