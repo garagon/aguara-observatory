@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://aguara-observatory.netlify.app/sitemap-index.xml
+Sitemap: https://watch.aguarascan.com/sitemap-index.xml
