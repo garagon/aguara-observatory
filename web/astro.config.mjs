@@ -2,7 +2,7 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 
 export default defineConfig({
-  site: "https://aguara-observatory.pages.dev",
+  site: "https://aguara-observatory.netlify.app",
   base: "/",
   integrations: [tailwind()],
   build: {
