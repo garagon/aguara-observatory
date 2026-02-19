@@ -340,31 +340,50 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
 
 
 def _export_skill_reports(conn, output_dir: Path) -> int:
-    """Generate /api/v1/skills/{registry}/{slug}.json for ALL skills (not just those with findings)."""
-    rows = conn.execute(
+    """Generate /api/v1/skills/{registry}/{slug}.json for ALL skills.
+
+    Uses 3 bulk queries instead of N+1 to avoid slow round-trips to remote Turso.
+    """
+    # 1. Fetch all skills
+    skill_rows = conn.execute(
         """SELECT s.id, s.registry_id, s.slug, s.name, s.url,
                   s.first_seen, s.last_seen, s.metadata
            FROM skills s
            WHERE s.deleted = 0"""
     ).fetchall()
 
+    # 2. Fetch ALL findings in one query, group by skill_id in Python
+    finding_rows = conn.execute(
+        """SELECT skill_id, rule_id, severity, category, subcategory, line,
+                  matched_text, message
+           FROM findings_latest
+           ORDER BY skill_id"""
+    ).fetchall()
+
+    findings_by_skill: dict[str, list] = {}
+    for row in finding_rows:
+        sid = row[0]
+        if sid not in findings_by_skill:
+            findings_by_skill[sid] = []
+        findings_by_skill[sid].append({
+            "rule_id": row[1],
+            "severity": row[2],
+            "category": row[3],
+            "subcategory": row[4],
+            "line": row[5],
+            "matched_text": row[6],
+            "message": row[7],
+        })
+
+    # 3. Fetch ALL scores in one query
+    score_rows = conn.execute(
+        "SELECT skill_id, score, grade FROM skill_scores"
+    ).fetchall()
+    scores_by_skill = {row[0]: (row[1], row[2]) for row in score_rows}
+
+    # Write JSON files (no more DB queries)
     count = 0
-    for skill_id, registry_id, slug, name, url, first_seen, last_seen, metadata_json in rows:
-        # Get findings (may be empty for clean skills)
-        finding_rows = conn.execute(
-            """SELECT rule_id, severity, category, subcategory, line,
-                      matched_text, message
-               FROM findings_latest WHERE skill_id = ?""",
-            (skill_id,),
-        ).fetchall()
-
-        # Get score
-        score_row = conn.execute(
-            "SELECT score, grade FROM skill_scores WHERE skill_id = ?",
-            (skill_id,),
-        ).fetchone()
-
-        # Extract description from metadata
+    for skill_id, registry_id, slug, name, url, first_seen, last_seen, metadata_json in skill_rows:
         description = None
         if metadata_json:
             try:
@@ -373,6 +392,7 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
             except (json.JSONDecodeError, TypeError):
                 pass
 
+        score_data = scores_by_skill.get(skill_id)
         report = {
             "skill_id": skill_id,
             "registry_id": registry_id,
@@ -382,20 +402,9 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
             "description": description,
             "first_seen": first_seen,
             "last_seen": last_seen,
-            "score": score_row[0] if score_row else 100,
-            "grade": score_row[1] if score_row else "A",
-            "findings": [
-                {
-                    "rule_id": r[0],
-                    "severity": r[1],
-                    "category": r[2],
-                    "subcategory": r[3],
-                    "line": r[4],
-                    "matched_text": r[5],
-                    "message": r[6],
-                }
-                for r in finding_rows
-            ],
+            "score": score_data[0] if score_data else 100,
+            "grade": score_data[1] if score_data else "A",
+            "findings": findings_by_skill.get(skill_id, []),
         }
 
         safe_slug = slug.replace("/", "_").replace(":", "_")

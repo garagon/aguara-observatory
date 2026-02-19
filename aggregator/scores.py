@@ -18,83 +18,87 @@ logger = logging.getLogger("observatory.scores")
 def recompute_all_scores(conn) -> dict:
     """Recompute scores for all skills based on findings_latest.
 
+    Uses batch SQL to avoid N+1 queries against remote Turso.
     Returns summary stats.
     """
-    # Get all skills with their latest findings
-    rows = conn.execute(
-        """SELECT s.id, fl.severity, fl.category
+    now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
+
+    # Single SQL query: compute all scores in the database
+    conn.execute(
+        """INSERT INTO skill_scores
+              (skill_id, score, grade, finding_count,
+               critical_count, high_count, medium_count, low_count,
+               categories, last_scan_id, updated_at)
+           SELECT
+              s.id,
+              MAX(0, 100
+                - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
+                - COALESCE(SUM(CASE WHEN fl.severity = 'LOW' THEN 0 ELSE 0 END), 0)
+              ) as score,
+              CASE
+                WHEN MAX(0, 100
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
+                ) >= 90 THEN 'A'
+                WHEN MAX(0, 100
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
+                ) >= 75 THEN 'B'
+                WHEN MAX(0, 100
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
+                ) >= 50 THEN 'C'
+                WHEN MAX(0, 100
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
+                  - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
+                ) >= 25 THEN 'D'
+                ELSE 'F'
+              END as grade,
+              COALESCE(SUM(CASE WHEN fl.severity IS NOT NULL THEN 1 ELSE 0 END), 0) as finding_count,
+              COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 1 ELSE 0 END), 0) as critical_count,
+              COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 1 ELSE 0 END), 0) as high_count,
+              COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 1 ELSE 0 END), 0) as medium_count,
+              COALESCE(SUM(CASE WHEN fl.severity = 'LOW' THEN 1 ELSE 0 END), 0) as low_count,
+              COALESCE(GROUP_CONCAT(DISTINCT fl.category), '[]') as categories,
+              MAX(fl.scan_id) as last_scan_id,
+              ? as updated_at
            FROM skills s
            LEFT JOIN findings_latest fl ON s.id = fl.skill_id
            WHERE s.deleted = 0
-           ORDER BY s.id"""
-    ).fetchall()
-
-    # Group findings by skill
-    skill_findings: dict[str, list[tuple[str, str]]] = {}
-    for skill_id, severity, category in rows:
-        if skill_id not in skill_findings:
-            skill_findings[skill_id] = []
-        if severity:
-            skill_findings[skill_id].append((severity, category))
-
-    updated = 0
-    grade_dist = {"A": 0, "B": 0, "C": 0, "D": 0, "F": 0}
-
-    for skill_id, findings in skill_findings.items():
-        score = 100
-        critical = high = medium = low = 0
-        categories = set()
-
-        for severity, category in findings:
-            try:
-                sev = Severity(severity)
-            except ValueError:
-                continue
-
-            score -= SEVERITY_SCORE_IMPACT.get(sev, 0)
-            categories.add(category)
-
-            if sev == Severity.CRITICAL:
-                critical += 1
-            elif sev == Severity.HIGH:
-                high += 1
-            elif sev == Severity.MEDIUM:
-                medium += 1
-            elif sev == Severity.LOW:
-                low += 1
-
-        score = max(0, score)
-        grade = score_to_grade(score)
-
-        skill_score = SkillScore(
-            skill_id=skill_id,
-            score=score,
-            grade=grade,
-            finding_count=len(findings),
-            critical_count=critical,
-            high_count=high,
-            medium_count=medium,
-            low_count=low,
-            categories=sorted(categories),
-        )
-
-        # Get latest scan_id for this skill
-        row = conn.execute(
-            "SELECT scan_id FROM findings_latest WHERE skill_id = ? LIMIT 1",
-            (skill_id,),
-        ).fetchone()
-        scan_id = row[0] if row else None
-
-        upsert_skill_score(conn, skill_score, scan_id)
-        grade_dist[grade.value] += 1
-        updated += 1
-
+           GROUP BY s.id
+           ON CONFLICT(skill_id) DO UPDATE SET
+              score = excluded.score,
+              grade = excluded.grade,
+              finding_count = excluded.finding_count,
+              critical_count = excluded.critical_count,
+              high_count = excluded.high_count,
+              medium_count = excluded.medium_count,
+              low_count = excluded.low_count,
+              categories = excluded.categories,
+              last_scan_id = excluded.last_scan_id,
+              updated_at = excluded.updated_at""",
+        (now,),
+    )
     conn.commit()
+
+    # Get summary
+    grade_rows = conn.execute(
+        "SELECT grade, COUNT(*) FROM skill_scores GROUP BY grade"
+    ).fetchall()
+    grade_dist = {g: c for g, c in grade_rows}
+    updated = sum(grade_dist.values())
+
     logger.info(
         "Recomputed %d scores: A=%d B=%d C=%d D=%d F=%d",
         updated,
-        grade_dist["A"], grade_dist["B"], grade_dist["C"],
-        grade_dist["D"], grade_dist["F"],
+        grade_dist.get("A", 0), grade_dist.get("B", 0), grade_dist.get("C", 0),
+        grade_dist.get("D", 0), grade_dist.get("F", 0),
     )
 
     return {"updated": updated, "grade_distribution": grade_dist}
