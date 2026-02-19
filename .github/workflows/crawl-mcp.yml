@@ -1,110 +1,48 @@
-name: Crawl MCP Registries
+name: "Manual: Crawl MCP Registries"
 
 on:
-  schedule:
-    - cron: "0 4 * * *"  # Daily at 4 AM UTC
   workflow_dispatch:
     inputs:
       registry:
-        description: "Registry to crawl (mcp-registry, mcp-so, lobehub, or all)"
-        required: false
-        default: "all"
+        description: "Registry to crawl"
+        required: true
+        type: choice
+        options:
+          - mcp-registry
+          - mcp-so
+          - lobehub
 
 jobs:
-  pulsemcp:
-    if: github.event.inputs.registry == '' || github.event.inputs.registry == 'all' || github.event.inputs.registry == 'mcp-registry'
+  crawl:
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
+          cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Run PulseMCP crawler
+      - name: Restore crawl cache
+        uses: actions/cache@v4
+        with:
+          path: data/${{ inputs.registry }}/
+          key: ${{ inputs.registry }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ inputs.registry }}-
+
+      - name: Crawl ${{ inputs.registry }}
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python -m crawlers.mcp_registry --output-dir data/mcp-registry/
-
-      - name: Upload crawled files
-        uses: actions/upload-artifact@v4
-        with:
-          name: mcp-registry
-          path: data/mcp-registry/
-          retention-days: 3
-
-  mcp-so:
-    if: github.event.inputs.registry == '' || github.event.inputs.registry == 'all' || github.event.inputs.registry == 'mcp-so'
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run mcp.so crawler
-        env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python -m crawlers.mcp_so --output-dir data/mcp-so/
-
-      - name: Upload crawled files
-        uses: actions/upload-artifact@v4
-        with:
-          name: mcp-so
-          path: data/mcp-so/
-          retention-days: 3
-
-  lobehub:
-    if: github.event.inputs.registry == '' || github.event.inputs.registry == 'all' || github.event.inputs.registry == 'lobehub'
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run LobeHub crawler
-        env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python -m crawlers.lobehub --output-dir data/lobehub/
-
-      - name: Upload crawled files
-        uses: actions/upload-artifact@v4
-        with:
-          name: lobehub
-          path: data/lobehub/
-          retention-days: 3
-
-  trigger-scan:
-    needs: [pulsemcp, mcp-so, lobehub]
-    if: always() && !cancelled()
-    uses: ./.github/workflows/scan.yml
-    with:
-      registry: mcp
-    secrets: inherit
+        run: |
+          case "${{ inputs.registry }}" in
+            mcp-registry) MODULE=crawlers.mcp_registry ;;
+            mcp-so) MODULE=crawlers.mcp_so ;;
+            lobehub) MODULE=crawlers.lobehub ;;
+          esac
+          python -m $MODULE --output-dir data/${{ inputs.registry }}/

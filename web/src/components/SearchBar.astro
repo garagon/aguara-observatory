@@ -11,7 +11,7 @@ const inputClass = size === "large"
   : "w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all";
 ---
 
-<div class="relative" id="search-container" data-base={base}>
+<div class="relative z-[100]" id="search-container" data-base={base}>
   <div class="relative">
     <svg
       class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
@@ -36,7 +36,7 @@ const inputClass = size === "large"
   </div>
   <div
     id="search-results"
-    class="absolute top-full mt-2 left-0 right-0 bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl shadow-black/40 max-h-80 overflow-y-auto hidden z-50"
+    class="absolute top-full mt-2 left-0 right-0 bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl shadow-black/40 max-h-80 overflow-y-auto hidden z-[100]"
   >
   </div>
 </div>
@@ -149,9 +149,7 @@ const inputClass = size === "large"
             const hasReport = item.findings > 0;
             const href = item.type === "registry"
               ? `${base}registries/${item.registry}/`
-              : hasReport
-                ? `${base}skills/${item.registry}/${safeSlug}/`
-                : `${base}registries/${item.registry}/`;
+              : `${base}skills/${item.registry}/${safeSlug}/`;
 
             const gradeColor = gradeColorMap[item.grade] ?? "bg-gray-600";
             const findingsLabel = item.type === "registry"

@@ -1,0 +1,311 @@
+name: Daily Pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Daily at 6 AM UTC
+  workflow_dispatch:
+    inputs:
+      skip_crawl:
+        description: "Skip crawl phase (use existing Turso data)"
+        type: boolean
+        default: false
+      skip_scan:
+        description: "Skip scan phase (use existing findings)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: daily-pipeline
+  cancel-in-progress: false
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Phase 1: Crawl — discover & download skills
+  # ─────────────────────────────────────────────
+
+  crawl-skills-sh:
+    if: ${{ !inputs.skip_crawl }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["A-F", "G-L", "M-R", "S-Z"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Restore crawl cache
+        uses: actions/cache@v4
+        with:
+          path: data/skills-sh/
+          key: skills-sh-${{ matrix.shard }}-${{ github.run_number }}
+          restore-keys: |
+            skills-sh-${{ matrix.shard }}-
+
+      - name: Crawl skills.sh (shard ${{ matrix.shard }})
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: python -m crawlers.skills_sh --shard "${{ matrix.shard }}" --output-dir data/skills-sh/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crawl-skills-sh-${{ matrix.shard }}
+          path: data/
+          retention-days: 1
+          if-no-files-found: ignore
+
+  crawl-clawhub:
+    if: ${{ !inputs.skip_crawl }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Restore crawl cache
+        uses: actions/cache@v4
+        with:
+          path: data/clawhub/
+          key: clawhub-${{ github.run_number }}
+          restore-keys: |
+            clawhub-
+
+      - name: Crawl ClawHub
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m crawlers.clawhub --output-dir data/clawhub/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crawl-clawhub
+          path: data/
+          retention-days: 1
+          if-no-files-found: ignore
+
+  crawl-mcp:
+    if: ${{ !inputs.skip_crawl }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mcp-registry
+            module: crawlers.mcp_registry
+          - name: mcp-so
+            module: crawlers.mcp_so
+          - name: lobehub
+            module: crawlers.lobehub
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Restore crawl cache
+        uses: actions/cache@v4
+        with:
+          path: data/${{ matrix.name }}/
+          key: ${{ matrix.name }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ matrix.name }}-
+
+      - name: Crawl ${{ matrix.name }}
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m ${{ matrix.module }} --output-dir data/${{ matrix.name }}/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crawl-${{ matrix.name }}
+          path: data/
+          retention-days: 1
+          if-no-files-found: ignore
+
+  # ─────────────────────────────────────────────
+  # Phase 2: Scan — run Aguara on crawled skills
+  # ─────────────────────────────────────────────
+
+  scan:
+    needs: [crawl-skills-sh, crawl-clawhub, crawl-mcp]
+    if: ${{ always() && !cancelled() && !inputs.skip_scan }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - run: pip install -r requirements.txt
+
+      - name: Build Aguara from source
+        run: |
+          git clone --depth 1 https://github.com/garagon/aguara.git /tmp/aguara-src
+          cd /tmp/aguara-src
+          go build -o "$GITHUB_WORKSPACE/bin/aguara" ./cmd/aguara/
+          chmod +x "$GITHUB_WORKSPACE/bin/aguara"
+          "$GITHUB_WORKSPACE/bin/aguara" version
+
+      - name: Download crawled files
+        uses: actions/download-artifact@v4
+        with:
+          pattern: crawl-*
+          path: data/
+          merge-multiple: true
+
+      - name: List crawled data
+        run: |
+          echo "=== Crawled data ==="
+          for dir in data/*/; do
+            count=$(find "$dir" -name "*.md" 2>/dev/null | wc -l)
+            echo "  $(basename "$dir"): $count files"
+          done
+
+      - name: Scan and ingest each registry
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          for REG in skills-sh clawhub mcp-registry mcp-so lobehub; do
+            DATA_DIR="data/$REG"
+            if [ ! -d "$DATA_DIR" ] || [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
+              echo "::notice::Skipping $REG (no data)"
+              continue
+            fi
+
+            echo "::group::Scanning $REG"
+            RESULTS="data/${REG}-results.json"
+
+            # Run Aguara scan
+            ./bin/aguara scan "$DATA_DIR" --format json > "$RESULTS" 2>/dev/null || true
+
+            # Ingest results into Turso
+            python -m scanner.ingest "$RESULTS" --registry "$REG"
+            echo "::endgroup::"
+          done
+
+  # ─────────────────────────────────────────────
+  # Phase 3: Aggregate — stats, scores, export
+  # ─────────────────────────────────────────────
+
+  aggregate:
+    needs: scan
+    if: ${{ always() && !cancelled() && (needs.scan.result == 'success' || needs.scan.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Compute daily stats
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m aggregator.stats
+
+      - name: Recompute skill scores
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m aggregator.scores
+
+      - name: Export static API + datasets
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m aggregator.export --output-dir web/public/api/v1 --datasets-dir web/public/datasets
+
+      - name: Summary
+        run: |
+          echo "### Export Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat web/public/api/v1/stats.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-data
+          path: |
+            web/public/api/
+            web/public/datasets/
+          retention-days: 7
+
+  # ─────────────────────────────────────────────
+  # Phase 4: Publish — build Astro & deploy Pages
+  # ─────────────────────────────────────────────
+
+  publish:
+    needs: aggregate
+    if: ${{ always() && !cancelled() && needs.aggregate.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download API data
+        uses: actions/download-artifact@v4
+        with:
+          name: api-data
+          path: web/public/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install & build Astro
+        working-directory: web
+        run: npm ci && npm run build
+
+      - name: Build summary
+        run: |
+          PAGES=$(find web/dist -name "index.html" | wc -l)
+          echo "### Build Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Pages built**: $PAGES" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Deploy URL**: https://aguara-observatory.pages.dev" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy web/dist --project-name=aguara-observatory

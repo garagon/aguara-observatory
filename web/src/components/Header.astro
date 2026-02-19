@@ -7,7 +7,6 @@ const nav = [
   { label: "Registries", href: `${base}registries/` },
   { label: "Categories", href: `${base}categories/` },
   { label: "Trends", href: `${base}trends/` },
-  { label: "Benchmarks", href: `${base}benchmarks/` },
   { label: "Datasets", href: `${base}datasets/` },
   { label: "About", href: `${base}about/` },
 ];
@@ -26,13 +25,13 @@ function isActive(href: string): boolean {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
-      <a href={base} class="flex items-center gap-2 font-bold text-lg text-aguara-400 hover:text-aguara-300 transition-colors">
-        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <a href={base} class="flex items-center gap-2 font-semibold text-lg text-white hover:text-gray-200 transition-colors">
+        <svg class="w-6 h-6 text-aguara-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2L2 7l10 5 10-5-10-5z" />
           <path d="M2 17l10 5 10-5" />
           <path d="M2 12l10 5 10-5" />
         </svg>
-        Aguara Observatory
+        <span>Aguara <span class="text-gray-400 font-normal">Observatory</span></span>
       </a>
 
       <!-- Desktop nav -->
@@ -41,10 +40,10 @@ function isActive(href: string): boolean {
           <a
             href={href}
             class:list={[
-              "px-3 py-2 text-sm rounded-md transition-colors",
+              "px-3 py-2 text-sm transition-colors",
               isActive(href)
-                ? "text-aguara-400 border-b-2 border-aguara-400 rounded-b-none"
-                : "text-gray-400 hover:text-white hover:bg-gray-800",
+                ? "text-white font-medium"
+                : "text-gray-400 hover:text-white",
             ]}
           >
             {label}

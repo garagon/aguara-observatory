@@ -1,7 +1,6 @@
-name: Aggregate & Export
+name: "Manual: Aggregate & Export"
 
 on:
-  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -12,14 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
+          cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
       - name: Compute daily stats
         env:
@@ -39,17 +36,10 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: python -m aggregator.export --output-dir web/public/api/v1 --datasets-dir web/public/datasets
 
-      - name: Upload API artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: api-data
           path: |
             web/public/api/
             web/public/datasets/
           retention-days: 7
-
-  trigger-publish:
-    needs: aggregate
-    if: always() && !cancelled()
-    uses: ./.github/workflows/publish.yml
-    secrets: inherit

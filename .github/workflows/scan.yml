@@ -1,21 +1,13 @@
-name: Scan Skills
+name: "Manual: Scan Registry"
 
 on:
-  workflow_call:
-    inputs:
-      registry:
-        description: "Registry to scan (skills-sh, clawhub, mcp-registry, mcp-so, lobehub, mcp, all)"
-        type: string
-        required: true
   workflow_dispatch:
     inputs:
       registry:
-        description: "Registry to scan"
+        description: "Registry to scan (requires crawled data in cache)"
         required: true
-        default: "all"
         type: choice
         options:
-          - all
           - skills-sh
           - clawhub
           - mcp-registry
@@ -30,75 +22,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
+          cache: pip
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Download Aguara binary
-        run: |
-          python -c "
-          from scanner.run import download_aguara
-          from pathlib import Path
-          download_aguara(Path('bin'))
-          "
-
-      - name: Get Aguara version
-        id: version
-        run: |
-          VERSION=$(./bin/aguara version 2>/dev/null || echo "unknown")
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Download crawled files
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-go@v5
         with:
-          path: data/
-          merge-multiple: true
+          go-version: "1.25"
 
-      - name: Determine registries to scan
-        id: registries
+      - run: pip install -r requirements.txt
+
+      - name: Restore crawl cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/${{ inputs.registry }}/
+          key: ${{ inputs.registry }}-
+          restore-keys: |
+            ${{ inputs.registry }}-
+
+      - name: Build Aguara from source
         run: |
-          REG="${{ inputs.registry }}"
-          if [ "$REG" = "all" ] || [ "$REG" = "mcp" ]; then
-            echo "list=skills-sh clawhub mcp-registry mcp-so lobehub" >> "$GITHUB_OUTPUT"
-          elif [ "$REG" = "mcp" ]; then
-            echo "list=mcp-registry mcp-so lobehub" >> "$GITHUB_OUTPUT"
-          else
-            echo "list=$REG" >> "$GITHUB_OUTPUT"
-          fi
+          git clone --depth 1 https://github.com/garagon/aguara.git /tmp/aguara-src
+          cd /tmp/aguara-src
+          go build -o "$GITHUB_WORKSPACE/bin/aguara" ./cmd/aguara/
+          "$GITHUB_WORKSPACE/bin/aguara" version
 
-      - name: Scan and ingest each registry
+      - name: Scan ${{ inputs.registry }}
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
-          for REG in ${{ steps.registries.outputs.list }}; do
-            DATA_DIR="data/$REG"
-            if [ ! -d "$DATA_DIR" ] || [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
-              echo "Skipping $REG (no data)"
-              continue
-            fi
-
-            echo "=== Scanning $REG ==="
-            RESULTS="data/${REG}-results.json"
-
-            # Run Aguara scan
-            ./bin/aguara scan "$DATA_DIR" --format json > "$RESULTS" 2>/dev/null || true
-
-            # Ingest results
-            python -m scanner.ingest "$RESULTS" \
-              --registry "$REG" \
-              --aguara-version "${{ steps.version.outputs.version }}"
-
-            echo "=== $REG scan complete ==="
-          done
-
-  trigger-aggregate:
-    needs: scan
-    if: always() && !cancelled()
-    uses: ./.github/workflows/aggregate.yml
-    secrets: inherit
+          DATA_DIR="data/${{ inputs.registry }}"
+          RESULTS="data/${{ inputs.registry }}-results.json"
+          ./bin/aguara scan "$DATA_DIR" --format json > "$RESULTS" 2>/dev/null || true
+          python -m scanner.ingest "$RESULTS" --registry "${{ inputs.registry }}"

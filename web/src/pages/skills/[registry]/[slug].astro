@@ -91,29 +91,41 @@ if (report) {
         </div>
       </div>
 
-      <!-- Severity summary -->
-      {report.findings.length > 0 && (
-        <div class="flex flex-wrap gap-3 mb-6">
-          {["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((sev) => {
-            const count = sevCounts[sev];
-            if (!count) return null;
-            return (
-              <div class="flex items-center gap-1.5">
-                <SeverityBadge severity={sev} />
-                <span class="text-sm font-mono text-gray-400">{count}</span>
-              </div>
-            );
-          })}
+      {report.findings.length > 0 ? (
+        <>
+          <!-- Severity summary -->
+          <div class="flex flex-wrap gap-3 mb-6">
+            {["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((sev) => {
+              const count = sevCounts[sev];
+              if (!count) return null;
+              return (
+                <div class="flex items-center gap-1.5">
+                  <SeverityBadge severity={sev} />
+                  <span class="text-sm font-mono text-gray-400">{count}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <!-- Findings -->
+          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
+            <h2 class="text-base font-semibold text-white mb-4">
+              Findings <span class="text-gray-500 font-normal">({report.findings.length})</span>
+            </h2>
+            <FindingsTable findings={report.findings} />
+          </div>
+        </>
+      ) : (
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 text-center">
+          <svg class="w-12 h-12 mx-auto mb-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+          <h2 class="text-lg font-semibold text-white mb-2">No Security Issues Found</h2>
+          <p class="text-sm text-gray-400 max-w-md mx-auto">
+            Aguara's static analysis detected no security findings in this skill. It scored a perfect 100/100.
+          </p>
         </div>
       )}
-
-      <!-- Findings -->
-      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
-        <h2 class="text-base font-semibold text-white mb-4">
-          Findings <span class="text-gray-500 font-normal">({report.findings.length})</span>
-        </h2>
-        <FindingsTable findings={report.findings} />
-      </div>
     </>
   ) : (
     <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center">

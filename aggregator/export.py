@@ -340,18 +340,17 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
 
 
 def _export_skill_reports(conn, output_dir: Path) -> int:
-    """Generate /api/v1/skills/{registry}/{slug}.json for skills with findings."""
+    """Generate /api/v1/skills/{registry}/{slug}.json for ALL skills (not just those with findings)."""
     rows = conn.execute(
-        """SELECT DISTINCT fl.skill_id, s.registry_id, s.slug, s.name, s.url,
+        """SELECT s.id, s.registry_id, s.slug, s.name, s.url,
                   s.first_seen, s.last_seen, s.metadata
-           FROM findings_latest fl
-           JOIN skills s ON fl.skill_id = s.id
+           FROM skills s
            WHERE s.deleted = 0"""
     ).fetchall()
 
     count = 0
     for skill_id, registry_id, slug, name, url, first_seen, last_seen, metadata_json in rows:
-        # Get findings
+        # Get findings (may be empty for clean skills)
         finding_rows = conn.execute(
             """SELECT rule_id, severity, category, subcategory, line,
                       matched_text, message
