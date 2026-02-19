@@ -37,6 +37,7 @@ const { id, labels, datasets, yLabel = "", height = "h-72" } = Astro.props;
     const rawDatasets = JSON.parse(canvas.dataset.datasets || "[]");
     const yLabel = canvas.dataset.yLabel || "";
 
+    const fewPoints = labels.length <= 4;
     const datasets = rawDatasets.map((ds: { label: string; data: number[]; color: string }) => ({
       label: ds.label,
       data: ds.data,
@@ -44,7 +45,7 @@ const { id, labels, datasets, yLabel = "", height = "h-72" } = Astro.props;
       backgroundColor: ds.color + "20",
       fill: true,
       tension: 0.3,
-      pointRadius: 0,
+      pointRadius: fewPoints ? 4 : 0,
       pointHitRadius: 10,
       borderWidth: 2,
     }));

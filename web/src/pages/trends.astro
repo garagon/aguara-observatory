@@ -1,9 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import TrendChart from "../components/TrendChart.astro";
-import { getWeeklyTrends } from "../lib/api";
+import { getWeeklyTrends, getStats } from "../lib/api";
 
 const trends = getWeeklyTrends();
+const stats = getStats();
 
 // Prepare chart data (reverse so oldest is first)
 const reversed = [...trends].reverse();
@@ -13,6 +14,24 @@ const totalFindings = reversed.map((t) => t.totals.total_findings);
 const criticalCount = reversed.map((t) => t.totals.critical_count);
 const avgScore = reversed.map((t) => t.totals.avg_score);
 const newSkills = reversed.map((t) => t.totals.new_skills);
+
+// Per-registry breakdown from latest week
+const latest = trends[0];
+const registryNames: Record<string, string> = {
+  "skills-sh": "Skills.sh",
+  "clawhub": "ClawHub",
+  "mcp-registry": "PulseMCP",
+  "mcp-so": "mcp.so",
+  "lobehub": "LobeHub",
+};
+
+// Pre-process registry data for the template (avoid type assertions in JSX)
+const registryRows = latest
+  ? Object.entries(latest.registries).map(([regId, data]) => {
+      const d = data as Record<string, number>;
+      return { regId, name: registryNames[regId] || regId, ...d };
+    })
+  : [];
 ---
 
 <Base title="Trends">
@@ -21,7 +40,59 @@ const newSkills = reversed.map((t) => t.totals.new_skills);
     Weekly trends across all monitored registries.
   </p>
 
-  {trends.length > 0 ? (
+  {/* Current snapshot */}
+  {latest && (
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-white mb-4">Current Week: {latest.week_start} to {latest.week_end}</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-800 text-left text-gray-400">
+              <th class="pb-3 pr-4 font-medium">Registry</th>
+              <th class="pb-3 pr-4 font-medium text-right">Skills</th>
+              <th class="pb-3 pr-4 font-medium text-right">Findings</th>
+              <th class="pb-3 pr-4 font-medium text-right">Critical</th>
+              <th class="pb-3 pr-4 font-medium text-right">High</th>
+              <th class="pb-3 pr-4 font-medium text-right">Avg Score</th>
+              <th class="pb-3 font-medium text-right">New Skills</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800/50">
+            {registryRows.map((d) => (
+                <tr class="hover:bg-gray-900/50">
+                  <td class="py-2.5 pr-4 text-gray-300 font-medium">{d.name}</td>
+                  <td class="py-2.5 pr-4 text-right text-gray-400 tabular-nums">{d.total_skills?.toLocaleString()}</td>
+                  <td class="py-2.5 pr-4 text-right text-gray-400 tabular-nums">{d.total_findings?.toLocaleString()}</td>
+                  <td class="py-2.5 pr-4 text-right tabular-nums">
+                    <span class={d.critical_count > 0 ? "text-red-400" : "text-gray-600"}>{d.critical_count}</span>
+                  </td>
+                  <td class="py-2.5 pr-4 text-right tabular-nums">
+                    <span class={d.high_count > 0 ? "text-orange-400" : "text-gray-600"}>{d.high_count}</span>
+                  </td>
+                  <td class="py-2.5 pr-4 text-right text-gray-400 tabular-nums">{d.avg_score?.toFixed(1)}</td>
+                  <td class="py-2.5 text-right text-gray-400 tabular-nums">{d.new_skills?.toLocaleString()}</td>
+                </tr>
+            ))}
+          </tbody>
+          {stats && (
+            <tfoot>
+              <tr class="border-t border-gray-700 font-medium">
+                <td class="pt-3 pr-4 text-white">Total</td>
+                <td class="pt-3 pr-4 text-right text-white tabular-nums">{stats.total_skills.toLocaleString()}</td>
+                <td class="pt-3 pr-4 text-right text-white tabular-nums">{stats.total_findings.toLocaleString()}</td>
+                <td class="pt-3 pr-4 text-right text-red-400 tabular-nums">{stats.severity_distribution?.CRITICAL || 0}</td>
+                <td class="pt-3 pr-4 text-right text-orange-400 tabular-nums">{stats.severity_distribution?.HIGH || 0}</td>
+                <td class="pt-3 pr-4 text-right text-white tabular-nums">{stats.avg_score}</td>
+                <td class="pt-3 text-right text-white tabular-nums">{latest.totals.new_skills?.toLocaleString()}</td>
+              </tr>
+            </tfoot>
+          )}
+        </table>
+      </div>
+    </div>
+  )}
+
+  {trends.length > 1 ? (
     <div class="space-y-8">
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 class="text-lg font-semibold text-white mb-4">Total Skills Over Time</h2>
@@ -66,10 +137,15 @@ const newSkills = reversed.map((t) => t.totals.new_skills);
         />
       </div>
     </div>
+  ) : trends.length === 1 ? (
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
+      <p class="text-gray-400">Charts will appear after the second weekly scan.</p>
+      <p class="text-gray-500 text-sm mt-2">Currently tracking {stats?.total_skills.toLocaleString()} skills across {stats?.registries_count} registries.</p>
+    </div>
   ) : (
     <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
       <p class="text-gray-400">No trend data available yet.</p>
-      <p class="text-gray-500 text-sm mt-2">Trends will appear after multiple days of scans.</p>
+      <p class="text-gray-500 text-sm mt-2">Trends will appear after the first scan cycle completes.</p>
     </div>
   )}
 </Base>
