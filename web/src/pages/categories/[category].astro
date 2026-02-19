@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import ScoreGrade from "../../components/ScoreGrade.astro";
 import { listCategoryPages, getCategorySkills } from "../../lib/api";
-import { gradeBarColors, registryNames } from "../../lib/constants";
+import { gradeBarColors, registryNames, categoryDescriptions } from "../../lib/constants";
 
 export function getStaticPaths() {
   const categories = listCategoryPages();
@@ -12,9 +12,11 @@ export function getStaticPaths() {
 const { category } = Astro.params;
 const data = getCategorySkills(category!);
 const base = import.meta.env.BASE_URL;
+const displayCategory = category!.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const catDescription = categoryDescriptions[category!] ?? `AI agent skills with ${displayCategory} security findings.`;
 ---
 
-<Base title={`${category} findings`}>
+<Base title={`${displayCategory} Findings`} description={catDescription}>
   <div class="mb-8">
     <a href={`${base}categories/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
       &larr; All Categories

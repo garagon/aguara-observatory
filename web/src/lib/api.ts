@@ -197,6 +197,39 @@ export function getSearchIndex(): SearchEntry[] {
   return loadJson<SearchEntry[]>("search-index.json") ?? [];
 }
 
+/** Top compromised skills across all registries, deduplicated, sorted by score asc then findings desc. */
+export function getMostCompromised(limit = 10): (RegistrySkill & { registry_id: string })[] {
+  const all: (RegistrySkill & { registry_id: string })[] = [];
+  const registriesDir = path.join(API_DIR, "registries");
+  if (!fs.existsSync(registriesDir)) return [];
+
+  for (const reg of fs.readdirSync(registriesDir)) {
+    const skillsFile = path.join(registriesDir, reg, "skills.json");
+    if (!fs.existsSync(skillsFile)) continue;
+    const skills = JSON.parse(fs.readFileSync(skillsFile, "utf-8")) as RegistrySkill[];
+    for (const s of skills) {
+      if (s.finding_count > 0) {
+        all.push({ ...s, registry_id: reg });
+      }
+    }
+  }
+
+  // Sort: lowest score first, then most findings
+  all.sort((a, b) => a.score - b.score || b.finding_count - a.finding_count);
+
+  // Deduplicate by skill name (keep worst)
+  const seen = new Set<string>();
+  const result: typeof all = [];
+  for (const s of all) {
+    const key = s.name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(s);
+    if (result.length >= limit) break;
+  }
+  return result;
+}
+
 /** List all available skill report files for static path generation. */
 export function listSkillReports(): { registry: string; slug: string }[] {
   const skillsDir = path.join(API_DIR, "skills");

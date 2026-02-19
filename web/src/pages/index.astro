@@ -4,17 +4,17 @@ import StatCard from "../components/StatCard.astro";
 import RegistryCard from "../components/RegistryCard.astro";
 import SeverityBadge from "../components/SeverityBadge.astro";
 import SearchBar from "../components/SearchBar.astro";
-import { getStats, getRegistries, getCategories, getRecentFeed } from "../lib/api";
-import { scoreToGrade, gradeBarColors, gradeOrder, categoryDescriptions } from "../lib/constants";
+import { getStats, getRegistries, getCategories, getMostCompromised } from "../lib/api";
+import { scoreToGrade, gradeColors, gradeBarColors, gradeOrder, categoryDescriptions } from "../lib/constants";
 
 const stats = getStats();
 const registries = getRegistries();
 const categories = getCategories();
-const feed = getRecentFeed();
+const compromised = getMostCompromised(8);
 const base = import.meta.env.BASE_URL;
 ---
 
-<Base title="Ecosystem Overview" description="Security scores, findings, and trends across 28,000+ AI agent skills and MCP servers. Updated daily.">
+<Base title="AI Agent Security Scanner" description="Security scores, findings, and trends across 28,000+ AI agent skills and MCP servers. Updated daily.">
   <!-- Hero -->
   <div class="relative -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12">
     <!-- Subtle gradient glow -->
@@ -22,17 +22,17 @@ const base = import.meta.env.BASE_URL;
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
 
     <div class="relative text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400">
+      <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400 animate-fade-in">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         Scanning {stats ? stats.registries_count : 5} registries daily
       </div>
-      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight animate-slide-up">
         AI Agent Security Watch
       </h1>
-      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms">
         Daily security scanning of every public AI agent skill registry and MCP server directory.
       </p>
-      <div class="max-w-xl mx-auto">
+      <div class="max-w-xl mx-auto animate-slide-up" style="animation-delay: 200ms">
         <SearchBar />
       </div>
     </div>
@@ -41,7 +41,7 @@ const base = import.meta.env.BASE_URL;
   {stats ? (
     <>
       <!-- Key metrics -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 animate-fade-in">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 animate-slide-up" style="animation-delay: 300ms">
         <StatCard
           label="Skills Monitored"
           value={stats.total_skills}
@@ -68,7 +68,7 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- Severity + Grade side by side -->
-      <div class="grid lg:grid-cols-2 gap-6 mb-12">
+      <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 450ms">
         <!-- Severity distribution -->
         {stats.severity_distribution && Object.keys(stats.severity_distribution).length > 0 && (
           <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
@@ -87,7 +87,7 @@ const base = import.meta.env.BASE_URL;
                       <span class="text-sm font-mono text-gray-300">{count.toLocaleString()}</span>
                     </div>
                     <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div class={`h-full ${barColor} rounded-full transition-all`} style={`width: ${pct}%`} />
+                      <div class={`h-full ${barColor} rounded-full animate-bar-grow origin-left`} style={`width: ${pct}%`} />
                     </div>
                   </div>
                 );
@@ -113,7 +113,7 @@ const base = import.meta.env.BASE_URL;
                     </span>
                     <div class="flex-1">
                       <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div class={`h-full ${gradeBarColors[grade]} rounded-full`} style={`width: ${displayPct}%`} />
+                        <div class={`h-full ${gradeBarColors[grade]} rounded-full animate-bar-grow origin-left`} style={`width: ${displayPct}%`} />
                       </div>
                     </div>
                     <span class="w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
@@ -136,7 +136,7 @@ const base = import.meta.env.BASE_URL;
   )}
 
   <!-- Registries -->
-  <div class="mb-12">
+  <div class="mb-12 animate-slide-up" style="animation-delay: 600ms">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-semibold text-white">Monitored Registries</h2>
       <a href={`${base}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
@@ -163,8 +163,8 @@ const base = import.meta.env.BASE_URL;
     )}
   </div>
 
-  <!-- Categories + Recent findings side by side -->
-  <div class="grid lg:grid-cols-2 gap-6">
+  <!-- Categories + Most compromised side by side -->
+  <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 750ms">
     <!-- Top categories -->
     {categories.length > 0 && (
       <div>
@@ -185,7 +185,7 @@ const base = import.meta.env.BASE_URL;
               >
                 <span class="flex-1 text-sm text-gray-300 group-hover:text-white transition-colors">{cat.category}</span>
                 <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
-                  <div class="h-full bg-aguara-500/50 rounded-full" style={`width: ${pct}%`} />
+                  <div class="h-full bg-aguara-500/50 rounded-full animate-bar-grow origin-left" style={`width: ${pct}%`} />
                 </div>
                 <span class="text-xs font-mono text-gray-500 w-12 text-right">{cat.count}</span>
               </a>
@@ -195,28 +195,36 @@ const base = import.meta.env.BASE_URL;
       </div>
     )}
 
-    <!-- Recent findings -->
-    {feed.length > 0 && (
+    <!-- Most compromised skills -->
+    {compromised.length > 0 && (
       <div>
-        <h2 class="text-xl font-semibold text-white mb-4">Recent Findings</h2>
+        <h2 class="text-xl font-semibold text-white mb-4">Most Compromised Skills</h2>
         <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
-          {feed.slice(0, 8).map((item, i) => {
-            const slug = item.slug || item.skill_id.replace(`${item.registry_id}:`, "");
-            const safeSlug = slug.replace(/\//g, "_").replace(/:/g, "_");
-            const href = `${base}skills/${item.registry_id}/${safeSlug}/`;
+          {compromised.map((skill, i) => {
+            const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
+            const href = `${base}skills/${skill.registry_id}/${safeSlug}/`;
+            const gc = gradeColors[skill.grade] || gradeColors["F"];
             return (
-              <a href={href} class={`block px-5 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
-                <div class="flex items-center gap-2">
-                  <SeverityBadge severity={item.severity} />
-                  <span class="text-sm text-gray-300 truncate flex-1">{item.skill_name || item.skill_id}</span>
-                  <span class="text-xs text-gray-600 shrink-0">{item.registry_id}</span>
-                </div>
-                <p class="text-xs text-gray-500 mt-1 pl-[4.5rem]">{item.rule_id}</p>
+              <a href={href} class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
+                <span class={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold border ${gc.css}`}>
+                  {skill.grade}
+                </span>
+                <span class="text-sm text-gray-300 truncate flex-1">{skill.name}</span>
+                <span class="text-xs text-gray-500 shrink-0">{skill.finding_count} findings</span>
+                <span class="text-xs text-gray-600 shrink-0 w-16 text-right">{skill.registry_id}</span>
               </a>
             );
           })}
         </div>
       </div>
     )}
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="text-center text-xs text-gray-600 py-6 border-t border-gray-800/50 animate-fade-in" style="animation-delay: 900ms">
+    <p>
+      Results may include false positives. Aguara is continuously improved as more public data is collected.
+      <a href={`${base}about/`} class="text-gray-500 hover:text-gray-400 underline underline-offset-2 transition-colors">Learn more</a>
+    </p>
   </div>
 </Base>

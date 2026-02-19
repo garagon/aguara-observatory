@@ -34,8 +34,9 @@ export default {
         ],
       },
       animation: {
-        "fade-in": "fadeIn 0.5s ease-out",
-        "slide-up": "slideUp 0.5s ease-out",
+        "fade-in": "fadeIn 0.5s ease-out both",
+        "slide-up": "slideUp 0.5s ease-out both",
+        "bar-grow": "barGrow 0.8s ease-out both",
       },
       keyframes: {
         fadeIn: {
@@ -45,6 +46,10 @@ export default {
         slideUp: {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        barGrow: {
+          "0%": { transform: "scaleX(0)" },
+          "100%": { transform: "scaleX(1)" },
         },
       },
     },

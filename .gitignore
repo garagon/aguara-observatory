@@ -40,3 +40,6 @@ DOCS/
 # Env
 .env
 .env.local
+
+# Local Netlify folder
+.netlify

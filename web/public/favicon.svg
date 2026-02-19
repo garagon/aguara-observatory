@@ -1,23 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Fox face - minimal geometric -->
-  <!-- Left ear -->
-  <path d="M6 3L10 12H4L6 3Z" fill="#f08844"/>
-  <!-- Right ear -->
-  <path d="M26 3L22 12H28L26 3Z" fill="#f08844"/>
-  <!-- Head -->
-  <ellipse cx="16" cy="18" rx="10" ry="9" fill="#f08844"/>
-  <!-- Inner ear left -->
-  <path d="M7 6L9.5 11H5.5L7 6Z" fill="#d06a2c"/>
-  <!-- Inner ear right -->
-  <path d="M25 6L22.5 11H26.5L25 6Z" fill="#d06a2c"/>
-  <!-- Face mask - lighter snout area -->
-  <ellipse cx="16" cy="21" rx="5" ry="5" fill="#f9a85c"/>
-  <!-- Eyes -->
-  <circle cx="12" cy="17" r="1.5" fill="#1a1a2e"/>
-  <circle cx="20" cy="17" r="1.5" fill="#1a1a2e"/>
-  <!-- Eye shine -->
-  <circle cx="12.5" cy="16.5" r="0.5" fill="white"/>
-  <circle cx="20.5" cy="16.5" r="0.5" fill="white"/>
-  <!-- Nose -->
-  <ellipse cx="16" cy="20" rx="1.5" ry="1" fill="#1a1a2e"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f08844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+  <path d="M2 17l10 5 10-5" />
+  <path d="M2 12l10 5 10-5" />
 </svg>

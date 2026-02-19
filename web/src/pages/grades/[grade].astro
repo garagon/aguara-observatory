@@ -13,7 +13,7 @@ const data = getGradeSkills(grade!);
 const base = import.meta.env.BASE_URL;
 ---
 
-<Base title={`Grade ${grade} Skills`}>
+<Base title={`Grade ${grade} Skills`} description={`AI agent skills rated Grade ${grade} (score ${gradeRanges[grade!]}). ${gradeDescriptions[grade!]}`}>
   <div class="mb-8">
     <a href={`${base}`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
       &larr; Overview
