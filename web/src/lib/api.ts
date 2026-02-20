@@ -180,11 +180,6 @@ export function listGradePages(): string[] {
   return fs.readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => f.replace(".json", ""));
 }
 
-export function getSkillReport(registryId: string, slug: string): SkillReport | null {
-  const safeSlug = slug.replace(/\//g, "_").replace(/:/g, "_");
-  return loadJson<SkillReport>(`skills/${registryId}/${safeSlug}.json`);
-}
-
 export function getRegistryStats(registryId: string): Record<string, unknown> | null {
   return loadJson<Record<string, unknown>>(`registries/${registryId}/stats.json`);
 }
@@ -230,22 +225,3 @@ export function getMostCompromised(limit = 10): (RegistrySkill & { registry_id: 
   return result;
 }
 
-/** List all available skill report files for static path generation. */
-export function listSkillReports(): { registry: string; slug: string }[] {
-  const skillsDir = path.join(API_DIR, "skills");
-  if (!fs.existsSync(skillsDir)) return [];
-
-  const results: { registry: string; slug: string }[] = [];
-  const registries = fs.readdirSync(skillsDir).filter((f) => {
-    return fs.statSync(path.join(skillsDir, f)).isDirectory();
-  });
-
-  for (const reg of registries) {
-    const regDir = path.join(skillsDir, reg);
-    const files = fs.readdirSync(regDir).filter((f) => f.endsWith(".json"));
-    for (const file of files) {
-      results.push({ registry: reg, slug: file.replace(".json", "") });
-    }
-  }
-  return results;
-}
