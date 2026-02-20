@@ -43,3 +43,6 @@ DOCS/
 
 # Local Netlify folder
 .netlify
+
+# Separate repo for landing page
+sitio-aguara/
