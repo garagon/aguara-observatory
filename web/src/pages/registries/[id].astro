@@ -35,9 +35,9 @@ const displayName = registry?.name ?? registryNames[id!] ?? id;
   </nav>
 
   <!-- Header -->
-  <div class="flex items-start justify-between mb-8">
-    <div>
-      <h1 class="text-3xl font-bold text-white tracking-tight">{displayName}</h1>
+  <div class="flex flex-col sm:flex-row items-start justify-between mb-8 gap-4">
+    <div class="min-w-0">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">{displayName}</h1>
       {registry?.description && (
         <p class="text-gray-400 mt-2">{registry.description}</p>
       )}
@@ -118,7 +118,7 @@ const displayName = registry?.name ?? registryNames[id!] ?? id;
               type="text"
               id="skill-filter"
               placeholder="Filter..."
-              class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 w-48"
+              class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 w-32 sm:w-48"
             />
           </div>
           <div class="overflow-x-auto max-h-[600px] overflow-y-auto" id="skills-table-container">

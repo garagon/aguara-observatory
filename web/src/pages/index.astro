@@ -16,20 +16,20 @@ const base = import.meta.env.BASE_URL;
 
 <Base title="AI Agent Security Scanner" description="Security scores, findings, and trends across 28,000+ AI agent skills and MCP servers. Updated daily.">
   <!-- Hero -->
-  <div class="relative z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12">
+  <div class="relative z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12 overflow-hidden">
     <!-- Subtle gradient glow -->
     <div class="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-gray-950 to-gray-950 -z-10"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] max-w-full h-[200px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
 
     <div class="relative text-center">
       <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400 animate-fade-in">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         Scanning {stats ? stats.registries_count : 5} registries daily
       </div>
-      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight animate-slide-up">
+      <h1 class="text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight animate-slide-up">
         AI Agent Security Watch
       </h1>
-      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms">
+      <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms">
         Daily security scanning of every public AI agent skill registry and MCP server directory.
       </p>
       <div class="max-w-xl mx-auto animate-slide-up" style="animation-delay: 200ms">
@@ -116,10 +116,10 @@ const base = import.meta.env.BASE_URL;
                         <div class={`h-full ${gradeBarColors[grade]} rounded-full animate-bar-grow origin-left`} style={`width: ${displayPct}%`} />
                       </div>
                     </div>
-                    <span class="w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
+                    <span class="w-14 sm:w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
                       {count.toLocaleString()}
                     </span>
-                    <span class="w-10 text-right text-xs text-gray-500">{pct}%</span>
+                    <span class="w-8 sm:w-10 text-right text-xs text-gray-500">{pct}%</span>
                   </a>
                 );
               })}
@@ -211,7 +211,7 @@ const base = import.meta.env.BASE_URL;
                 </span>
                 <span class="text-sm text-gray-300 truncate flex-1">{skill.name}</span>
                 <span class="text-xs text-gray-500 shrink-0">{skill.finding_count} findings</span>
-                <span class="text-xs text-gray-600 shrink-0 w-16 text-right">{skill.registry_id}</span>
+                <span class="text-xs text-gray-600 shrink-0 w-16 text-right hidden sm:inline">{skill.registry_id}</span>
               </a>
             );
           })}

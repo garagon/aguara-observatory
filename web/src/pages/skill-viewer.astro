@@ -5,19 +5,19 @@ import Base from "../layouts/Base.astro";
 <Base title="Loading..." description="Security scan report for an AI agent skill.">
   <!-- Loading skeleton (shown until JS replaces content) -->
   <div id="skill-loading">
-    <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
-      <div class="h-4 w-16 bg-gray-800 rounded animate-pulse"></div>
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-      <div class="h-4 w-20 bg-gray-800 rounded animate-pulse"></div>
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-      <div class="h-4 w-32 bg-gray-800 rounded animate-pulse"></div>
+    <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-hidden">
+      <div class="h-4 w-16 bg-gray-800 rounded animate-pulse shrink-0"></div>
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+      <div class="h-4 w-20 bg-gray-800 rounded animate-pulse shrink-0"></div>
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+      <div class="h-4 w-32 bg-gray-800 rounded animate-pulse min-w-0"></div>
     </nav>
-    <div class="flex items-start justify-between mb-8 gap-4">
+    <div class="flex flex-col sm:flex-row items-start justify-between mb-8 gap-4">
       <div class="flex-1 min-w-0">
-        <div class="h-8 w-64 bg-gray-800 rounded animate-pulse mb-2"></div>
-        <div class="h-4 w-48 bg-gray-800 rounded animate-pulse"></div>
+        <div class="h-8 w-full max-w-[16rem] bg-gray-800 rounded animate-pulse mb-2"></div>
+        <div class="h-4 w-48 max-w-full bg-gray-800 rounded animate-pulse"></div>
       </div>
-      <div class="w-16 h-16 bg-gray-800 rounded-lg animate-pulse"></div>
+      <div class="w-16 h-16 bg-gray-800 rounded-lg animate-pulse shrink-0"></div>
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
       <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4"><div class="h-4 w-16 bg-gray-800 rounded animate-pulse mb-2"></div><div class="h-4 w-24 bg-gray-800 rounded animate-pulse"></div></div>
@@ -138,7 +138,7 @@ import Base from "../layouts/Base.astro";
       var html = "";
 
       // Breadcrumbs
-      html += '<nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">' +
+      html += '<nav class="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-hidden">' +
         '<a href="/registries/" class="hover:text-aguara-400 transition-colors">Registries</a>' +
         '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>' +
         '<a href="/registries/' + encodeURIComponent(registry) + '/" class="hover:text-aguara-400 transition-colors">' + escHtml(regName) + '</a>' +
@@ -147,10 +147,10 @@ import Base from "../layouts/Base.astro";
         '</nav>';
 
       // Header
-      html += '<div class="flex items-start justify-between mb-8 gap-4">' +
+      html += '<div class="flex flex-col sm:flex-row items-start justify-between mb-8 gap-4">' +
         '<div class="flex-1 min-w-0">' +
-          '<h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">' + escHtml(report.name || report.slug) + '</h1>' +
-          '<p class="text-sm text-gray-500 mt-1 font-mono truncate">' + escHtml(report.skill_id) + '</p>';
+          '<h1 class="text-xl sm:text-3xl font-bold text-white tracking-tight break-words">' + escHtml(report.name || report.slug) + '</h1>' +
+          '<p class="text-xs sm:text-sm text-gray-500 mt-1 font-mono truncate">' + escHtml(report.skill_id) + '</p>';
       if (report.description) {
         html += '<p class="text-sm text-gray-400 mt-2">' + escHtml(report.description) + '</p>';
       }
