@@ -302,10 +302,101 @@ def classify_finding(rule_id: str, severity: str, matched_text: str) -> Classifi
         # Default HIGH
         return Classification("needs_review", "high_needs_context")
 
-    # ── MEDIUM findings: mostly needs review ──
+    # ── MEDIUM findings ──
     if severity == "MEDIUM":
         if DOC_INSTALL_RE.search(text):
             return Classification("likely_fp", "doc_install_pattern")
+
+        # ── Manual labeling from benchmark review (2026-02-23) ──
+
+        # MCPCFG_008: auto-confirm flag — MEDIUM matches are often
+        # isolated "-y" or "--yes" in docs, not full commands
+        if rule_id == "MCPCFG_008":
+            stripped = text.strip().strip('"\'')
+            if stripped in ("-y", "--yes", "--auto-approve", "-Y"):
+                return Classification("likely_fp", "isolated_flag_in_docs")
+            return Classification("likely_tp", "auto_confirm_in_command")
+
+        # CMDEXEC_002: eval/exec — partial matches ("exec" in "execute")
+        if rule_id == "CMDEXEC_002":
+            if re.search(r"\beval\s*\(", text) or re.search(r"\bexec\s*\(", text):
+                return Classification("likely_tp", "dynamic_code_eval")
+            return Classification("likely_fp", "eval_exec_partial_match")
+
+        # CMDEXEC_003: subprocess — documentation about subprocess is common
+        if rule_id == "CMDEXEC_003":
+            if "shell=True" in text or "shell=true" in text_lower:
+                return Classification("likely_tp", "subprocess_shell_true")
+            return Classification("needs_review", "subprocess_reference")
+
+        # EXFIL_010: non-standard port — localhost ports are dev/test
+        if rule_id == "EXFIL_010":
+            if "localhost" in text_lower or "127.0.0.1" in text_lower:
+                return Classification("likely_fp", "localhost_dev_port")
+            return Classification("needs_review", "non_standard_port")
+
+        # EXTDL_016: download binary/archive — mostly legitimate tools
+        if rule_id == "EXTDL_016":
+            if "github.com" in text_lower or "githubusercontent.com" in text_lower:
+                return Classification("likely_fp", "github_download")
+            return Classification("needs_review", "binary_download")
+
+        # CMDEXEC_011: cron/scheduled execution — mostly docs about cron
+        if rule_id == "CMDEXEC_011":
+            if "crontab" in text_lower and len(text) < 20:
+                return Classification("likely_fp", "crontab_reference")
+            return Classification("needs_review", "cron_execution")
+
+        # CMDEXEC_008: tmux/screen injection — mostly automation docs
+        if rule_id == "CMDEXEC_008":
+            return Classification("needs_review", "terminal_multiplexer")
+
+        # EXTDL_005: shell profile modification — PATH setup is common
+        if rule_id == "EXTDL_005":
+            if "PATH" in text:
+                return Classification("likely_fp", "path_setup_instruction")
+            return Classification("needs_review", "shell_profile_modification")
+
+        # EXTDL_014: conditional download and install — docs about deps
+        if rule_id == "EXTDL_014":
+            return Classification("needs_review", "conditional_install")
+
+        # EXFIL_012: email/messaging access — context-dependent
+        if rule_id == "EXFIL_012":
+            return Classification("needs_review", "email_messaging_access")
+
+        # MCP_007: cross-tool data leakage — normal API auth vs exfil
+        if rule_id == "MCP_007":
+            return Classification("needs_review", "cross_tool_data")
+
+        # CMDEXEC_010: MCP code execution tool
+        if rule_id == "CMDEXEC_010":
+            return Classification("needs_review", "mcp_code_exec_tool")
+
+        # EXFIL_009: base64 encode and send
+        if rule_id == "EXFIL_009":
+            return Classification("needs_review", "base64_exfil_pattern")
+
+        # EXTDL_002: remote SDK/script fetch
+        if rule_id == "EXTDL_002":
+            return Classification("needs_review", "remote_sdk_fetch")
+
+        # CMDEXEC_001: shell command in string
+        if rule_id == "CMDEXEC_001":
+            return Classification("needs_review", "shell_command_string")
+
+        # CRED_011/CRED_010: credential patterns
+        if rule_id in ("CRED_011", "CRED_010"):
+            return Classification("needs_review", "credential_pattern")
+
+        # PROMPT_INJECTION_015: prompt injection in MEDIUM
+        if rule_id == "PROMPT_INJECTION_015":
+            return Classification("likely_tp", "prompt_injection_medium")
+
+        # SUPPLY_012: supply chain in MEDIUM
+        if rule_id == "SUPPLY_012":
+            return Classification("likely_tp", "supply_chain_medium")
+
         return Classification("needs_review", "medium_needs_context")
 
     return Classification("needs_review", "unclassified")
