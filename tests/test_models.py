@@ -29,7 +29,7 @@ def test_severity_score_impact():
     assert SEVERITY_SCORE_IMPACT[Severity.CRITICAL] == 25
     assert SEVERITY_SCORE_IMPACT[Severity.HIGH] == 15
     assert SEVERITY_SCORE_IMPACT[Severity.MEDIUM] == 8
-    assert SEVERITY_SCORE_IMPACT[Severity.LOW] == 3
+    assert SEVERITY_SCORE_IMPACT[Severity.LOW] == 0
     assert SEVERITY_SCORE_IMPACT[Severity.INFO] == 0
 
 

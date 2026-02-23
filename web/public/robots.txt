@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://watch.aguarascan.com/sitemap.xml
 Sitemap: https://watch.aguarascan.com/sitemap-index.xml

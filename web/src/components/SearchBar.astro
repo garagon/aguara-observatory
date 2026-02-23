@@ -7,8 +7,8 @@ interface Props {
 const { placeholder = "Search skills and registries...", size = "default" } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const inputClass = size === "large"
-  ? "w-full pl-11 pr-4 py-3.5 bg-gray-900/80 border border-gray-700/50 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all backdrop-blur-sm"
-  : "w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all";
+  ? "w-full pl-11 pr-4 py-3.5 bg-gray-900/80 border border-gray-700/50 rounded-xl text-base sm:text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all backdrop-blur-sm"
+  : "w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all";
 ---
 
 <div class="relative z-[100]" id="search-container" data-base={base}>
