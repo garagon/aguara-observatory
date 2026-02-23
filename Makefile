@@ -1,4 +1,4 @@
-.PHONY: install test lint crawl scan aggregate export clean init-db
+.PHONY: install test lint crawl scan aggregate export clean init-db crawl-incr-all crawl-full-all
 
 # --- Setup ---
 
@@ -41,6 +41,44 @@ crawl-vendor-audits:
 
 crawl-all: crawl-skills-sh crawl-clawhub crawl-mcp-registry crawl-mcp-so crawl-lobehub
 
+# --- Incremental crawling ---
+
+crawl-incr-skills-sh:
+	python -m crawlers.skills_sh --mode incremental $(ARGS)
+
+crawl-incr-clawhub:
+	python -m crawlers.clawhub --mode incremental $(ARGS)
+
+crawl-incr-mcp-registry:
+	python -m crawlers.mcp_registry --mode incremental $(ARGS)
+
+crawl-incr-mcp-so:
+	python -m crawlers.mcp_so --mode incremental $(ARGS)
+
+crawl-incr-lobehub:
+	python -m crawlers.lobehub --mode incremental $(ARGS)
+
+crawl-incr-all: crawl-incr-skills-sh crawl-incr-clawhub crawl-incr-mcp-registry crawl-incr-mcp-so crawl-incr-lobehub
+
+# --- Full crawling (explicit) ---
+
+crawl-full-skills-sh:
+	python -m crawlers.skills_sh --mode full $(ARGS)
+
+crawl-full-clawhub:
+	python -m crawlers.clawhub --mode full $(ARGS)
+
+crawl-full-mcp-registry:
+	python -m crawlers.mcp_registry --mode full $(ARGS)
+
+crawl-full-mcp-so:
+	python -m crawlers.mcp_so --mode full $(ARGS)
+
+crawl-full-lobehub:
+	python -m crawlers.lobehub --mode full $(ARGS)
+
+crawl-full-all: crawl-full-skills-sh crawl-full-clawhub crawl-full-mcp-registry crawl-full-mcp-so crawl-full-lobehub
+
 # --- Scanning ---
 
 scan:
@@ -74,7 +112,9 @@ web-dev:
 	cd web && npm run dev
 
 web-build:
+	python scripts/fix_sitemap.py --pre
 	cd web && npm run build
+	python scripts/fix_sitemap.py
 
 # --- Cleanup ---
 

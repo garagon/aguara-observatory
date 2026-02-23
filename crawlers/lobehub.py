@@ -2,6 +2,8 @@
 """Crawler for LobeHub plugin marketplace.
 
 LobeHub publishes a plugin index as a JSON file on GitHub.
+
+Incremental mode: hashes the index JSON responses. If unchanged, skips entirely.
 """
 
 from __future__ import annotations
@@ -25,8 +27,15 @@ LOBEHUB_AGENTS_INDEX = "https://chat-agents.lobehub.com/index.json"
 class LobeHubCrawler(BaseCrawler):
     registry_id = "lobehub"
 
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1, crawl_mode="incremental"):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers, crawl_mode=crawl_mode)
+
     def discover(self) -> list[dict]:
-        """Fetch all plugins/tools from LobeHub indexes."""
+        """Fetch all plugins/tools from LobeHub indexes.
+
+        In incremental mode, hashes each index response. If unchanged from
+        stored hash, skips that index entirely.
+        """
         all_plugins = []
 
         for index_url, kind, items_key in [
@@ -37,9 +46,23 @@ class LobeHubCrawler(BaseCrawler):
                 self.rate_limiter.wait()
                 resp = requests.get(index_url, timeout=30)
                 resp.raise_for_status()
-                data = resp.json()
             except Exception as e:
                 logger.warning("Failed to fetch LobeHub %s index: %s", kind, e)
+                continue
+
+            # Incremental: check if index content changed
+            if self.crawl_mode == "incremental":
+                index_hash = content_hash(resp.text)
+                stored_hash = self.get_state(f"index_hash:{kind}")
+                if stored_hash and stored_hash == index_hash:
+                    logger.info("LobeHub %s index unchanged (hash match) — skipping", kind)
+                    continue
+                self.set_state(f"index_hash:{kind}", index_hash)
+
+            try:
+                data = resp.json()
+            except Exception as e:
+                logger.warning("Failed to parse LobeHub %s index JSON: %s", kind, e)
                 continue
 
             plugins = data.get(items_key, [])
@@ -148,13 +171,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Crawl LobeHub registry")
     parser.add_argument("--output-dir", type=Path, help="Output directory")
+    parser.add_argument("--mode", choices=["full", "incremental"], default="incremental", help="Crawl mode")
     args = parser.parse_args()
 
     setup_logging()
     conn = connect()
     init_schema(conn)
 
-    crawler = LobeHubCrawler(conn, output_dir=args.output_dir)
+    crawler = LobeHubCrawler(conn, output_dir=args.output_dir, crawl_mode=args.mode)
     stats = crawler.crawl()
     conn.commit()
     print(json.dumps(stats, indent=2))

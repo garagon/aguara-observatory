@@ -7,6 +7,7 @@ Changes from original:
   - Shard support (A-F, G-L, M-R, S-Z) for parallel GH Actions
   - Writes to Turso DB instead of local JSON manifest
   - Incremental via content SHA-256 hash
+  - Incremental mode: conditional sitemap + new-only discovery
 """
 
 from __future__ import annotations
@@ -37,20 +38,45 @@ RAW_RATE_LIMIT_MS = 100
 class SkillsShCrawler(BaseCrawler):
     registry_id = "skills-sh"
 
-    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1):
-        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers)
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1, crawl_mode="incremental"):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers, crawl_mode=crawl_mode)
         self._repo_trees: dict[str, dict | None] = {}  # cache
 
     # --- Discovery ---
 
     def discover(self) -> list[dict]:
-        """Fetch sitemap and parse all skill URLs."""
-        logger.info("Fetching sitemap from %s", SITEMAP_URL)
-        resp = requests.get(SITEMAP_URL, timeout=30, headers={
-            "User-Agent": "AguaraObservatory/0.1"
-        })
+        """Fetch sitemap and parse all skill URLs.
+
+        In incremental mode, uses If-None-Match/If-Modified-Since on the sitemap.
+        If 304, returns empty list. If changed, returns only new skills not in DB.
+        """
+        headers = {"User-Agent": "AguaraObservatory/0.1"}
+
+        if self.crawl_mode == "incremental":
+            stored_etag = self.get_state("sitemap_etag")
+            stored_last_modified = self.get_state("sitemap_last_modified")
+            if stored_etag:
+                headers["If-None-Match"] = stored_etag
+            if stored_last_modified:
+                headers["If-Modified-Since"] = stored_last_modified
+
+        logger.info("Fetching sitemap from %s (mode=%s)", SITEMAP_URL, self.crawl_mode)
+        resp = requests.get(SITEMAP_URL, timeout=30, headers=headers)
+
+        if resp.status_code == 304:
+            logger.info("Sitemap unchanged (304) — nothing new to crawl")
+            return []
+
         resp.raise_for_status()
         logger.info("Sitemap size: %d bytes", len(resp.text))
+
+        # Store sitemap ETags for future incremental runs
+        etag = resp.headers.get("ETag", "")
+        last_modified = resp.headers.get("Last-Modified", "")
+        if etag:
+            self.set_state("sitemap_etag", etag)
+        if last_modified:
+            self.set_state("sitemap_last_modified", last_modified)
 
         skills = self._parse_sitemap(resp.text)
         logger.info("Parsed %d skill URLs from sitemap", len(skills))
@@ -59,6 +85,14 @@ class SkillsShCrawler(BaseCrawler):
         if self.shard:
             skills = [s for s in skills if shard_matches(s["slug"], self.shard)]
             logger.info("After shard filter (%s): %d skills", self.shard, len(skills))
+
+        # In incremental mode, filter to only new skills not in DB
+        if self.crawl_mode == "incremental":
+            from crawlers.db import get_skills_by_registry
+            known_slugs = {row[1] for row in get_skills_by_registry(self.conn, self.registry_id)}
+            new_skills = [s for s in skills if s["slug"] not in known_slugs]
+            logger.info("Incremental: %d known, %d new skills to process", len(known_slugs), len(new_skills))
+            return new_skills
 
         return skills
 
@@ -266,6 +300,7 @@ def main():
     parser.add_argument("--shard", help="Letter range shard (e.g. A-F)")
     parser.add_argument("--output-dir", type=Path, help="Output directory for skill files")
     parser.add_argument("--rate-limit", type=int, default=500, help="Rate limit in ms")
+    parser.add_argument("--mode", choices=["full", "incremental"], default="incremental", help="Crawl mode")
     args = parser.parse_args()
 
     setup_logging()
@@ -277,6 +312,7 @@ def main():
         output_dir=args.output_dir,
         rate_limit_ms=args.rate_limit,
         shard=args.shard,
+        crawl_mode=args.mode,
     )
     stats = crawler.crawl()
     conn.commit()

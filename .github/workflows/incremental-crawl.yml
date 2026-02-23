@@ -1,113 +1,38 @@
-name: Daily Pipeline
+name: Incremental Crawl
 
 on:
   schedule:
-    - cron: "0 6 * * *"  # Daily at 6 AM UTC
+    - cron: "0 0,6,12,18 * * *"  # Every 6 hours
   workflow_dispatch:
     inputs:
-      skip_crawl:
-        description: "Skip crawl phase (use existing Turso data)"
-        type: boolean
-        default: false
-      skip_scan:
-        description: "Skip scan phase (use existing findings)"
+      force_full:
+        description: "Force full crawl instead of incremental"
         type: boolean
         default: false
 
 concurrency:
-  group: daily-pipeline
-  cancel-in-progress: false
+  group: incremental-crawl
+  cancel-in-progress: true
+
+env:
+  CRAWL_MODE: ${{ inputs.force_full && 'full' || 'incremental' }}
 
 jobs:
   # ─────────────────────────────────────────────
-  # Phase 1: Crawl — discover & download skills
+  # Phase 1: Incremental crawl — all registries
   # ─────────────────────────────────────────────
 
-  crawl-skills-sh:
-    if: ${{ !inputs.skip_crawl }}
+  crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: ["A-F", "G-L", "M-R", "S-Z"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - run: pip install -r requirements.txt
-
-      - name: Restore crawl cache
-        uses: actions/cache@v4
-        with:
-          path: data/skills-sh/
-          key: skills-sh-${{ matrix.shard }}-${{ github.run_number }}
-          restore-keys: |
-            skills-sh-${{ matrix.shard }}-
-
-      - name: Crawl skills.sh (shard ${{ matrix.shard }})
-        env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
-        run: python -m crawlers.skills_sh --shard "${{ matrix.shard }}" --output-dir data/skills-sh/ --mode full
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: crawl-skills-sh-${{ matrix.shard }}
-          path: data/
-          retention-days: 1
-          if-no-files-found: ignore
-
-  crawl-clawhub:
-    if: ${{ !inputs.skip_crawl }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - run: pip install -r requirements.txt
-
-      - name: Restore crawl cache
-        uses: actions/cache@v4
-        with:
-          path: data/clawhub/
-          key: clawhub-${{ github.run_number }}
-          restore-keys: |
-            clawhub-
-
-      - name: Crawl ClawHub
-        env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python -m crawlers.clawhub --output-dir data/clawhub/ --mode full
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: crawl-clawhub
-          path: data/
-          retention-days: 1
-          if-no-files-found: ignore
-
-  crawl-mcp:
-    if: ${{ !inputs.skip_crawl }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         include:
+          - name: clawhub
+            module: crawlers.clawhub
+          - name: skills-sh
+            module: crawlers.skills_sh
           - name: mcp-registry
             module: crawlers.mcp_registry
           - name: mcp-so
@@ -129,15 +54,33 @@ jobs:
         uses: actions/cache@v4
         with:
           path: data/${{ matrix.name }}/
-          key: ${{ matrix.name }}-${{ github.run_number }}
+          key: ${{ matrix.name }}-incr-${{ github.run_number }}
           restore-keys: |
+            ${{ matrix.name }}-incr-
             ${{ matrix.name }}-
 
-      - name: Crawl ${{ matrix.name }}
+      - name: Crawl ${{ matrix.name }} (mode=${{ env.CRAWL_MODE }})
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python -m ${{ matrix.module }} --output-dir data/${{ matrix.name }}/ --mode full
+          GH_TOKEN: ${{ github.token }}
+          PULSEMCP_API_KEY: ${{ secrets.PULSEMCP_API_KEY }}
+          PULSEMCP_TENANT_ID: ${{ secrets.PULSEMCP_TENANT_ID }}
+        run: python -m ${{ matrix.module }} --output-dir data/${{ matrix.name }}/ --mode ${{ env.CRAWL_MODE }}
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -f "data/${{ matrix.name }}/.changed_files.txt" ]; then
+            COUNT=$(wc -l < "data/${{ matrix.name }}/.changed_files.txt" | tr -d ' ')
+            echo "changed=$COUNT" >> "$GITHUB_OUTPUT"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::${{ matrix.name }}: $COUNT files changed"
+          else
+            echo "changed=0" >> "$GITHUB_OUTPUT"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::${{ matrix.name }}: no changes"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -147,14 +90,14 @@ jobs:
           if-no-files-found: ignore
 
   # ─────────────────────────────────────────────
-  # Phase 2: Scan — run Aguara on crawled skills
+  # Phase 2: Delta scan — only changed files
   # ─────────────────────────────────────────────
 
   scan:
-    needs: [crawl-skills-sh, crawl-clawhub, crawl-mcp]
-    if: ${{ always() && !cancelled() && !inputs.skip_scan }}
+    needs: crawl
+    if: ${{ always() && !cancelled() }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -185,44 +128,56 @@ jobs:
           path: data/
           merge-multiple: true
 
-      - name: List crawled data
-        run: |
-          echo "=== Crawled data ==="
-          for dir in data/*/; do
-            count=$(find "$dir" -name "*.md" 2>/dev/null | wc -l)
-            echo "  $(basename "$dir"): $count files"
-          done
-
-      - name: Scan and ingest each registry
+      - name: Delta scan and ingest
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
+          ANY_CHANGES=false
           for REG in skills-sh clawhub mcp-registry mcp-so lobehub; do
             DATA_DIR="data/$REG"
+            MANIFEST="$DATA_DIR/.changed_files.txt"
+
             if [ ! -d "$DATA_DIR" ] || [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
               echo "::notice::Skipping $REG (no data)"
               continue
             fi
 
+            # Use delta directory if manifest exists
+            SCAN_DIR="$DATA_DIR"
+            if [ -f "$MANIFEST" ] && [ -s "$MANIFEST" ]; then
+              DELTA_DIR="data/delta-$REG"
+              mkdir -p "$DELTA_DIR"
+              while IFS= read -r fname; do
+                [ -z "$fname" ] && continue
+                if [ -f "$DATA_DIR/$fname" ]; then
+                  ln -sf "$(realpath "$DATA_DIR/$fname")" "$DELTA_DIR/$fname"
+                fi
+              done < "$MANIFEST"
+              SCAN_DIR="$DELTA_DIR"
+              COUNT=$(wc -l < "$MANIFEST" | tr -d ' ')
+              echo "::notice::$REG: scanning $COUNT changed files (delta)"
+              ANY_CHANGES=true
+            else
+              echo "::notice::$REG: no manifest, running full scan"
+            fi
+
             echo "::group::Scanning $REG"
             RESULTS="data/${REG}-results.json"
-
-            # Run Aguara scan
-            ./bin/aguara scan "$DATA_DIR" --format json > "$RESULTS" 2>/dev/null || true
-
-            # Ingest results into Turso
-            python -m scanner.ingest "$RESULTS" --registry "$REG"
+            ./bin/aguara scan "$SCAN_DIR" --format json > "$RESULTS" 2>/dev/null || true
+            python -m scanner.ingest "$RESULTS" --registry "$REG" --delta
             echo "::endgroup::"
           done
 
+          echo "any_changes=$ANY_CHANGES" >> "$GITHUB_OUTPUT"
+
   # ─────────────────────────────────────────────
-  # Phase 3: Aggregate — stats, scores, export
+  # Phase 3: Aggregate + publish (if changes)
   # ─────────────────────────────────────────────
 
   aggregate:
     needs: scan
-    if: ${{ always() && !cancelled() && (needs.scan.result == 'success' || needs.scan.result == 'skipped') }}
+    if: ${{ always() && !cancelled() && needs.scan.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -254,13 +209,6 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: python -m aggregator.export --output-dir web/public/api/v1 --datasets-dir web/public/datasets
 
-      - name: Summary
-        run: |
-          echo "### Export Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat web/public/api/v1/stats.json >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-
       - uses: actions/upload-artifact@v4
         with:
           name: api-data
@@ -268,10 +216,6 @@ jobs:
             web/public/api/
             web/public/datasets/
           retention-days: 7
-
-  # ─────────────────────────────────────────────
-  # Phase 4: Publish — build Astro & deploy Pages
-  # ─────────────────────────────────────────────
 
   publish:
     needs: aggregate
@@ -296,18 +240,12 @@ jobs:
         working-directory: web
         run: npm ci && npm run build
 
-      - name: Build summary
-        run: |
-          PAGES=$(find web/dist -name "index.html" | wc -l)
-          echo "### Build Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Pages built**: $PAGES" >> "$GITHUB_STEP_SUMMARY"
-
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3
         with:
           publish-dir: web/dist
           production-deploy: true
-          deploy-message: "Daily pipeline - ${{ github.sha }}"
+          deploy-message: "Incremental crawl - ${{ github.sha }}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

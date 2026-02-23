@@ -6,6 +6,7 @@ Changes from original:
   - No skill limit (crawls ALL skills)
   - Incremental via sort=updated + content hash
   - Writes to Turso DB
+  - Incremental mode: watermark updatedAt + ETag HEAD pre-check
 """
 
 from __future__ import annotations
@@ -30,13 +31,27 @@ DOWNLOAD_RATE_LIMIT_MS = 3100  # 20 downloads/min limit
 class ClawHubCrawler(BaseCrawler):
     registry_id = "clawhub"
 
-    def __init__(self, conn, *, output_dir=None, rate_limit_ms=3100, shard=None, max_workers=1):
-        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers)
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=3100, shard=None, max_workers=1, crawl_mode="incremental"):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers, crawl_mode=crawl_mode)
 
     def discover(self) -> list[dict]:
-        """Fetch all skills from ClawHub API with pagination."""
+        """Fetch all skills from ClawHub API with pagination.
+
+        In incremental mode, stops paginating when reaching skills older than last_crawl_at.
+        """
         all_skills = []
         cursor = None
+        last_updated_at = None  # stored as str(epoch_ms) from API
+
+        if self.crawl_mode == "incremental":
+            raw = self.get_state("last_updated_at")
+            if raw:
+                try:
+                    last_updated_at = int(raw)
+                    logger.info("Incremental mode: watermark last_updated_at=%s", last_updated_at)
+                except ValueError:
+                    logger.warning("Invalid watermark '%s', ignoring", raw)
+                    last_updated_at = None
 
         while True:
             url = f"{CLAWHUB_API}/skills?limit=200&sort=updated"
@@ -55,19 +70,34 @@ class ClawHubCrawler(BaseCrawler):
             if not items:
                 break
 
+            stop_paginating = False
             for item in items:
                 slug = item.get("slug", "")
-                if slug:
-                    all_skills.append({
-                        "slug": slug,
-                        "name": item.get("name", slug),
-                        "url": f"https://clawhub.ai/skills/{slug}",
-                        "metadata": {
-                            k: item.get(k)
-                            for k in ("description", "author", "version", "updatedAt")
-                            if item.get(k)
-                        },
-                    })
+                if not slug:
+                    continue
+
+                raw_updated = item.get("updatedAt")
+
+                # In incremental mode, stop when we reach skills older than watermark
+                # updatedAt is epoch ms (int) from the API
+                if last_updated_at and raw_updated is not None and int(raw_updated) <= last_updated_at:
+                    logger.info("Reached watermark at %s, stopping pagination (%d skills so far)", raw_updated, len(all_skills))
+                    stop_paginating = True
+                    break
+
+                all_skills.append({
+                    "slug": slug,
+                    "name": item.get("name", slug),
+                    "url": f"https://clawhub.ai/skills/{slug}",
+                    "metadata": {
+                        k: item.get(k)
+                        for k in ("description", "author", "version", "updatedAt")
+                        if item.get(k)
+                    },
+                })
+
+            if stop_paginating:
+                break
 
             cursor = data.get("nextCursor")
             if not cursor:
@@ -76,12 +106,39 @@ class ClawHubCrawler(BaseCrawler):
             time.sleep(0.3)
             logger.info("Discovered %d skills so far...", len(all_skills))
 
+        # Update watermark to the newest updatedAt seen (first item, since sorted desc)
+        if all_skills and all_skills[0].get("metadata", {}).get("updatedAt"):
+            newest = str(all_skills[0]["metadata"]["updatedAt"])
+            self.set_state("last_updated_at", newest)
+            logger.info("Updated watermark last_updated_at=%s", newest)
+        elif not all_skills and not last_updated_at:
+            # First run with no skills found — store current epoch ms as fallback
+            import time as _time
+            self.set_state("last_updated_at", str(int(_time.time() * 1000)))
+
         return all_skills
 
     def download(self, slug: str, **kwargs) -> CrawlResult:
-        """Download a skill zip from ClawHub and extract SKILL.md."""
+        """Download a skill zip from ClawHub and extract SKILL.md.
+
+        In incremental mode, does a HEAD request first to check ETag before
+        downloading the full ZIP.
+        """
         skill_id = f"{self.registry_id}:{slug}"
         url = f"{CLAWHUB_API}/download?slug={slug}&tag=latest"
+
+        # Incremental: HEAD pre-check with ETag
+        if self.crawl_mode == "incremental":
+            stored_etag = self.get_state(f"etag:{slug}")
+            if stored_etag:
+                try:
+                    head_resp = requests.head(url, timeout=15)
+                    if head_resp.status_code == 200:
+                        remote_etag = head_resp.headers.get("ETag", "")
+                        if remote_etag and remote_etag == stored_etag:
+                            return CrawlResult(skill_id=skill_id, slug=slug, skipped=True)
+                except requests.RequestException:
+                    pass  # Fall through to full download
 
         for attempt in range(3):
             self.rate_limiter.wait()
@@ -102,6 +159,11 @@ class ClawHubCrawler(BaseCrawler):
                 time.sleep(5)
         else:
             return CrawlResult(skill_id=skill_id, slug=slug, error="429 after retries")
+
+        # Store ETag for future incremental runs
+        etag = resp.headers.get("ETag", "")
+        if etag:
+            self.set_state(f"etag:{slug}", etag)
 
         # Extract SKILL.md from zip
         try:
@@ -141,13 +203,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Crawl ClawHub registry")
     parser.add_argument("--output-dir", type=Path, help="Output directory")
+    parser.add_argument("--mode", choices=["full", "incremental"], default="incremental", help="Crawl mode")
     args = parser.parse_args()
 
     setup_logging()
     conn = connect()
     init_schema(conn)
 
-    crawler = ClawHubCrawler(conn, output_dir=args.output_dir)
+    crawler = ClawHubCrawler(conn, output_dir=args.output_dir, crawl_mode=args.mode)
     stats = crawler.crawl()
     conn.commit()
     print(json.dumps(stats, indent=2))

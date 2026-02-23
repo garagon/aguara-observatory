@@ -3,6 +3,8 @@
 
 mcp.so is an HTML-based directory. We scrape server listings and their
 detail pages to extract README/description content.
+
+Incremental mode: stores ETag per detail page, uses conditional requests.
 """
 
 from __future__ import annotations
@@ -24,6 +26,9 @@ MCP_SO_BASE = "https://mcp.so"
 
 class McpSoCrawler(BaseCrawler):
     registry_id = "mcp-so"
+
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1, crawl_mode="incremental"):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers, crawl_mode=crawl_mode)
 
     def discover(self) -> list[dict]:
         """Discover MCP servers from mcp.so listing pages."""
@@ -81,19 +86,35 @@ class McpSoCrawler(BaseCrawler):
         return all_servers
 
     def download(self, slug: str, **kwargs) -> CrawlResult:
-        """Download server detail page from mcp.so and extract content."""
+        """Download server detail page from mcp.so and extract content.
+
+        In incremental mode, uses If-None-Match with stored ETag.
+        """
         skill_id = f"{self.registry_id}:{slug}"
         url = kwargs.get("url", f"{MCP_SO_BASE}/server/{slug}")
 
+        headers = {"User-Agent": "AguaraObservatory/0.1"}
+
+        # Incremental: conditional request with stored ETag
+        if self.crawl_mode == "incremental":
+            stored_etag = self.get_state(f"etag:{slug}")
+            if stored_etag:
+                headers["If-None-Match"] = stored_etag
+
         self.rate_limiter.wait()
         try:
-            resp = requests.get(url, timeout=30, headers={
-                "User-Agent": "AguaraObservatory/0.1"
-            })
+            resp = requests.get(url, timeout=30, headers=headers)
+            if resp.status_code == 304:
+                return CrawlResult(skill_id=skill_id, slug=slug, skipped=True)
             if resp.status_code != 200:
                 return CrawlResult(skill_id=skill_id, slug=slug, error=f"HTTP {resp.status_code}")
         except requests.RequestException as e:
             return CrawlResult(skill_id=skill_id, slug=slug, error=str(e))
+
+        # Store ETag for future incremental runs
+        etag = resp.headers.get("ETag", "")
+        if etag:
+            self.set_state(f"etag:{slug}", etag)
 
         # Extract content from detail page
         content = self._extract_content(resp.text, kwargs.get("name", slug))
@@ -161,13 +182,14 @@ def main():
     parser = argparse.ArgumentParser(description="Crawl mcp.so registry")
     parser.add_argument("--shard", help="Letter range shard (e.g. A-M)")
     parser.add_argument("--output-dir", type=Path, help="Output directory")
+    parser.add_argument("--mode", choices=["full", "incremental"], default="incremental", help="Crawl mode")
     args = parser.parse_args()
 
     setup_logging()
     conn = connect()
     init_schema(conn)
 
-    crawler = McpSoCrawler(conn, output_dir=args.output_dir, shard=args.shard)
+    crawler = McpSoCrawler(conn, output_dir=args.output_dir, shard=args.shard, crawl_mode=args.mode)
     stats = crawler.crawl()
     conn.commit()
     print(json.dumps(stats, indent=2))

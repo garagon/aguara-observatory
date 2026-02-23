@@ -2,6 +2,8 @@
 """Crawler for PulseMCP registry (www.pulsemcp.com).
 
 PulseMCP has a public API for listing MCP servers.
+
+Incremental mode: stores max updated_at watermark, skips servers not updated since.
 """
 
 from __future__ import annotations
@@ -23,6 +25,9 @@ PULSEMCP_API = "https://api.pulsemcp.com/v0.1"
 class PulseMCPCrawler(BaseCrawler):
     registry_id = "mcp-registry"
 
+    def __init__(self, conn, *, output_dir=None, rate_limit_ms=500, shard=None, max_workers=1, crawl_mode="incremental"):
+        super().__init__(conn, output_dir=output_dir, rate_limit_ms=rate_limit_ms, shard=shard, max_workers=max_workers, crawl_mode=crawl_mode)
+
     def _api_headers(self) -> dict:
         """Build API headers with auth if available."""
         headers = {"User-Agent": "AguaraObservatory/0.1"}
@@ -37,16 +42,24 @@ class PulseMCPCrawler(BaseCrawler):
     def discover(self) -> list[dict]:
         """Fetch all MCP servers from PulseMCP API.
 
-        Requires PULSEMCP_API_KEY and PULSEMCP_TENANT_ID env vars.
+        In incremental mode, stores max updated_at and filters out servers
+        not updated since the last crawl.
         """
         headers = self._api_headers()
         if "X-API-Key" not in headers:
             logger.warning("PULSEMCP_API_KEY not set — skipping PulseMCP crawl")
             return []
 
+        max_updated_at = None
+        if self.crawl_mode == "incremental":
+            max_updated_at = self.get_state("max_updated_at")
+            if max_updated_at:
+                logger.info("Incremental mode: watermark max_updated_at=%s", max_updated_at)
+
         all_servers = []
         cursor = None
         limit = 100
+        new_max_updated_at = max_updated_at or ""
 
         while True:
             params = {"limit": limit}
@@ -76,6 +89,17 @@ class PulseMCPCrawler(BaseCrawler):
                 if not slug:
                     continue
 
+                updated_at = server.get("updated_at", "")
+
+                # Track the newest updated_at seen
+                if updated_at and updated_at > new_max_updated_at:
+                    new_max_updated_at = updated_at
+
+                # In incremental mode, skip servers not updated since watermark
+                if self.crawl_mode == "incremental" and max_updated_at and updated_at:
+                    if updated_at <= max_updated_at:
+                        continue
+
                 all_servers.append({
                     "slug": slug,
                     "name": name,
@@ -92,6 +116,10 @@ class PulseMCPCrawler(BaseCrawler):
             if not cursor or len(servers) < limit:
                 break
             logger.info("Discovered %d servers so far...", len(all_servers))
+
+        # Update watermark
+        if new_max_updated_at:
+            self.set_state("max_updated_at", new_max_updated_at)
 
         return all_servers
 
@@ -172,13 +200,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Crawl PulseMCP registry")
     parser.add_argument("--output-dir", type=Path, help="Output directory")
+    parser.add_argument("--mode", choices=["full", "incremental"], default="incremental", help="Crawl mode")
     args = parser.parse_args()
 
     setup_logging()
     conn = connect()
     init_schema(conn)
 
-    crawler = PulseMCPCrawler(conn, output_dir=args.output_dir)
+    crawler = PulseMCPCrawler(conn, output_dir=args.output_dir, crawl_mode=args.mode)
     stats = crawler.crawl()
     conn.commit()
     print(json.dumps(stats, indent=2))

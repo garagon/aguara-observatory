@@ -275,3 +275,67 @@ def upsert_daily_stat(conn: libsql.Connection, date: str, registry_id: str, **kw
         """,
         values,
     )
+
+
+# --- Crawl State (incremental watermarks) ---
+
+def get_crawl_state(conn: libsql.Connection, registry_id: str, key: str) -> str | None:
+    """Read a crawl state value. Returns None if not set."""
+    row = conn.execute(
+        "SELECT value FROM crawl_state WHERE registry_id = ? AND key = ?",
+        (registry_id, key),
+    ).fetchone()
+    return row[0] if row else None
+
+
+def set_crawl_state(conn: libsql.Connection, registry_id: str, key: str, value: str) -> None:
+    """Write a crawl state value (upsert)."""
+    conn.execute(
+        """
+        INSERT INTO crawl_state (registry_id, key, value, updated_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(registry_id, key) DO UPDATE SET
+            value = excluded.value,
+            updated_at = excluded.updated_at
+        """,
+        (registry_id, key, value, _now()),
+    )
+
+
+# --- Crawl Runs (observability) ---
+
+def create_crawl_run(conn: libsql.Connection, registry_id: str, mode: str = "full") -> int:
+    """Create a new crawl run record. Returns run ID."""
+    cursor = conn.execute(
+        "INSERT INTO crawl_runs (registry_id, mode) VALUES (?, ?)",
+        (registry_id, mode),
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
+def finish_crawl_run(
+    conn: libsql.Connection,
+    run_id: int,
+    *,
+    duration_s: float = 0,
+    discovered: int = 0,
+    downloaded: int = 0,
+    skipped: int = 0,
+    failed: int = 0,
+    changed_files: int = 0,
+    status: str = "completed",
+    error: str | None = None,
+) -> None:
+    """Mark a crawl run as completed or failed."""
+    conn.execute(
+        """
+        UPDATE crawl_runs SET finished_at = ?, duration_s = ?,
+            discovered = ?, downloaded = ?, skipped = ?, failed = ?,
+            changed_files = ?, status = ?, error = ?
+        WHERE id = ?
+        """,
+        (_now(), duration_s, discovered, downloaded, skipped, failed,
+         changed_files, status, error, run_id),
+    )
+    conn.commit()

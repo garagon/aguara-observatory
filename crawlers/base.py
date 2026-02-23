@@ -4,13 +4,21 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import libsql_experimental as libsql
 
-from crawlers.db import upsert_skill, get_skill_hash
+from crawlers.db import (
+    upsert_skill,
+    get_skill_hash,
+    get_crawl_state,
+    set_crawl_state,
+    create_crawl_run,
+    finish_crawl_run,
+)
 from crawlers.models import CrawlResult
 from crawlers.utils import RateLimiter, content_hash
 
@@ -34,13 +42,16 @@ class BaseCrawler(ABC):
         rate_limit_ms: int = 500,
         shard: str | None = None,
         max_workers: int = 1,
+        crawl_mode: str = "incremental",
     ):
         self.conn = conn
         self.output_dir = output_dir or Path(f"data/{self.registry_id}")
         self.rate_limiter = RateLimiter(rate_limit_ms)
         self.shard = shard
         self.max_workers = max_workers
+        self.crawl_mode = crawl_mode  # "full" | "incremental"
         self.stats = {"discovered": 0, "downloaded": 0, "skipped": 0, "failed": 0}
+        self.changed_slugs: list[str] = []
         self._db_lock = threading.Lock()
 
     @property
@@ -66,46 +77,109 @@ class BaseCrawler(ABC):
         """
         ...
 
+    # --- Crawl state helpers ---
+
+    def get_state(self, key: str) -> str | None:
+        """Read a crawl state value for this registry."""
+        with self._db_lock:
+            return get_crawl_state(self.conn, self.registry_id, key)
+
+    def set_state(self, key: str, value: str) -> None:
+        """Write a crawl state value for this registry."""
+        with self._db_lock:
+            set_crawl_state(self.conn, self.registry_id, key, value)
+
     def crawl(self) -> dict:
         """Run full crawl: discover → download (incremental).
 
         Returns stats dict.
         """
-        logger.info("[%s] Starting crawl (shard=%s, workers=%d)", self.registry_id, self.shard, self.max_workers)
-
-        # Phase 1: Discover
-        skills = self.discover()
-        self.stats["discovered"] = len(skills)
-        logger.info("[%s] Discovered %d skills", self.registry_id, len(skills))
-
-        # Phase 2a: Register all skills in DB (serial, fast)
-        for skill_info in skills:
-            upsert_skill(
-                self.conn,
-                self.registry_id,
-                skill_info["slug"],
-                name=skill_info.get("name"),
-                url=skill_info.get("url"),
-                metadata=skill_info.get("metadata"),
-            )
-        self.conn.commit()
-
-        # Phase 2b: Download (concurrent or sequential)
-        if self.max_workers > 1:
-            self._crawl_concurrent(skills)
-        else:
-            self._crawl_sequential(skills)
-
-        self.conn.commit()
+        t0 = time.monotonic()
+        run_id = create_crawl_run(self.conn, self.registry_id, self.crawl_mode)
         logger.info(
-            "[%s] Crawl complete: %d discovered, %d downloaded, %d skipped, %d failed",
-            self.registry_id,
-            self.stats["discovered"],
-            self.stats["downloaded"],
-            self.stats["skipped"],
-            self.stats["failed"],
+            "[%s] Starting crawl (mode=%s, shard=%s, workers=%d, run=#%d)",
+            self.registry_id, self.crawl_mode, self.shard, self.max_workers, run_id,
         )
+
+        try:
+            # Phase 1: Discover
+            skills = self.discover()
+            self.stats["discovered"] = len(skills)
+            logger.info("[%s] Discovered %d skills", self.registry_id, len(skills))
+
+            # Phase 2a: Register all skills in DB (serial, fast)
+            for skill_info in skills:
+                upsert_skill(
+                    self.conn,
+                    self.registry_id,
+                    skill_info["slug"],
+                    name=skill_info.get("name"),
+                    url=skill_info.get("url"),
+                    metadata=skill_info.get("metadata"),
+                )
+            self.conn.commit()
+
+            # Phase 2b: Download (concurrent or sequential)
+            if self.max_workers > 1:
+                self._crawl_concurrent(skills)
+            else:
+                self._crawl_sequential(skills)
+
+            self.conn.commit()
+
+            # Write manifest of changed files
+            self._write_manifest()
+
+            duration = time.monotonic() - t0
+            logger.info(
+                "[%s] Crawl complete in %.1fs: %d discovered, %d downloaded, %d skipped, %d failed, %d changed",
+                self.registry_id, duration,
+                self.stats["discovered"],
+                self.stats["downloaded"],
+                self.stats["skipped"],
+                self.stats["failed"],
+                len(self.changed_slugs),
+            )
+
+            finish_crawl_run(
+                self.conn, run_id,
+                duration_s=duration,
+                discovered=self.stats["discovered"],
+                downloaded=self.stats["downloaded"],
+                skipped=self.stats["skipped"],
+                failed=self.stats["failed"],
+                changed_files=len(self.changed_slugs),
+                status="completed",
+            )
+        except Exception as e:
+            duration = time.monotonic() - t0
+            finish_crawl_run(
+                self.conn, run_id,
+                duration_s=duration,
+                discovered=self.stats["discovered"],
+                downloaded=self.stats["downloaded"],
+                skipped=self.stats["skipped"],
+                failed=self.stats["failed"],
+                changed_files=len(self.changed_slugs),
+                status="failed",
+                error=str(e),
+            )
+            raise
+
         return self.stats
+
+    def _write_manifest(self) -> None:
+        """Write .changed_files.txt with list of changed file paths."""
+        if not self.changed_slugs:
+            return
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path = self.output_dir / ".changed_files.txt"
+        lines = []
+        for slug in self.changed_slugs:
+            safe_name = slug.replace("/", "_").replace(":", "_")
+            lines.append(f"{safe_name}.md")
+        manifest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        logger.info("[%s] Wrote manifest: %d changed files → %s", self.registry_id, len(lines), manifest_path)
 
     def _crawl_sequential(self, skills: list[dict]) -> None:
         """Download skills sequentially (original behavior)."""
@@ -179,6 +253,7 @@ class BaseCrawler(ABC):
 
         if result.content:
             self._save_content(slug, result.content)
+            self.changed_slugs.append(slug)
 
         self.stats["downloaded"] += 1
 

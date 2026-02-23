@@ -212,6 +212,29 @@ def ingest_scan_results(
     return scan_id
 
 
+def build_delta_dir(data_dir: Path, manifest_path: Path, delta_dir: Path) -> int:
+    """Create a delta directory with symlinks to only changed files.
+
+    Reads .changed_files.txt manifest and symlinks those files from data_dir
+    into delta_dir. Returns count of files linked.
+    """
+    if not manifest_path.exists():
+        return 0
+
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for line in manifest_path.read_text().splitlines():
+        fname = line.strip()
+        if not fname:
+            continue
+        src = data_dir / fname
+        dst = delta_dir / fname
+        if src.exists():
+            dst.symlink_to(src.resolve())
+            count += 1
+    return count
+
+
 def main():
     """CLI entrypoint: ingest scan results from JSON file."""
     import argparse
@@ -222,6 +245,8 @@ def main():
     parser.add_argument("results_file", type=Path, help="Aguara JSON results file")
     parser.add_argument("--registry", required=True, help="Registry ID")
     parser.add_argument("--aguara-version", default="unknown", help="Aguara version")
+    parser.add_argument("--delta", action="store_true",
+                        help="Delta mode: only ingest results, preserve existing scores for unchanged skills")
     args = parser.parse_args()
 
     setup_logging()
