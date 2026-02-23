@@ -9,9 +9,8 @@ from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-import libsql_experimental as libsql
-
 from crawlers.db import (
+    ResilientConnection,
     upsert_skill,
     get_skill_hash,
     get_crawl_state,
@@ -36,7 +35,7 @@ class BaseCrawler(ABC):
 
     def __init__(
         self,
-        conn: libsql.Connection,
+        conn: ResilientConnection,
         *,
         output_dir: Path | None = None,
         rate_limit_ms: int = 500,

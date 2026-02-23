@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,12 +17,78 @@ logger = logging.getLogger("observatory.db")
 
 SCHEMA_DIR = Path(__file__).parent.parent / "schemas"
 
+# Hrana/Turso errors that indicate a stale stream requiring reconnect.
+_RETRIABLE_ERRORS = ("stream not found", "stream expired", "connection", "hrana")
+
+_MAX_RETRIES = 3
+_RETRY_BACKOFF = 1.0  # seconds, doubles each attempt
+
+
+def _raw_connect(url: str, auth_token: str) -> libsql.Connection:
+    if url.startswith("libsql://"):
+        return libsql.connect(url, auth_token=auth_token)
+    return libsql.connect(url)
+
+
+class ResilientConnection:
+    """Wrapper around libsql.Connection with automatic reconnect on stream errors."""
+
+    def __init__(self, url: str, auth_token: str):
+        self._url = url
+        self._auth_token = auth_token
+        self._conn = _raw_connect(url, auth_token)
+
+    def _reconnect(self) -> None:
+        logger.warning("Reconnecting to Turso (%s)", self._url)
+        self._conn = _raw_connect(self._url, self._auth_token)
+
+    def _is_retriable(self, exc: Exception) -> bool:
+        msg = str(exc).lower()
+        return any(err in msg for err in _RETRIABLE_ERRORS)
+
+    def execute(self, sql, params=()):
+        for attempt in range(_MAX_RETRIES):
+            try:
+                return self._conn.execute(sql, params)
+            except Exception as exc:
+                if not self._is_retriable(exc) or attempt == _MAX_RETRIES - 1:
+                    raise
+                wait = _RETRY_BACKOFF * (2 ** attempt)
+                logger.warning("DB execute failed (attempt %d/%d): %s — retrying in %.1fs",
+                               attempt + 1, _MAX_RETRIES, exc, wait)
+                time.sleep(wait)
+                self._reconnect()
+        raise RuntimeError("unreachable")
+
+    def commit(self):
+        for attempt in range(_MAX_RETRIES):
+            try:
+                return self._conn.commit()
+            except Exception as exc:
+                if not self._is_retriable(exc) or attempt == _MAX_RETRIES - 1:
+                    raise
+                wait = _RETRY_BACKOFF * (2 ** attempt)
+                logger.warning("DB commit failed (attempt %d/%d): %s — retrying in %.1fs",
+                               attempt + 1, _MAX_RETRIES, exc, wait)
+                time.sleep(wait)
+                self._reconnect()
+        raise RuntimeError("unreachable")
+
+    def close(self):
+        self._conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
 
 def connect(
     url: str | None = None,
     auth_token: str | None = None,
-) -> libsql.Connection:
-    """Connect to Turso or local SQLite.
+) -> ResilientConnection:
+    """Connect to Turso or local SQLite with automatic reconnect.
 
     Environment variables:
         TURSO_DATABASE_URL: Turso database URL (libsql://...)
@@ -31,14 +98,7 @@ def connect(
     """
     url = url or os.environ.get("TURSO_DATABASE_URL", "file:observatory.db")
     auth_token = auth_token or os.environ.get("TURSO_AUTH_TOKEN", "")
-
-    if url.startswith("libsql://"):
-        conn = libsql.connect(url, auth_token=auth_token)
-    else:
-        # Local SQLite file
-        conn = libsql.connect(url)
-
-    return conn
+    return ResilientConnection(url, auth_token)
 
 
 def init_schema(conn: libsql.Connection) -> None:
