@@ -7,13 +7,13 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Continuous security scanning of AI agent skill registries and MCP server directories. Open data for a safer AI ecosystem." } = Astro.props;
+const { title, description = "Scanning 31,000+ AI agent skills daily across 5 public registries. Open source. Open data." } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
 const siteUrl = Astro.site ? new URL(base, Astro.site).href.replace(/\/$/, "") : "";
 const canonicalUrl = siteUrl ? new URL(Astro.url.pathname, Astro.site).href : "";
 const ogImageUrl = siteUrl ? `${siteUrl}/og-image.png` : "/og-image.png";
-const fullTitle = `${title} | Aguara Watch`;
+const fullTitle = `Aguara Watch — ${title}`;
 ---
 
 <!doctype html>
@@ -54,15 +54,31 @@ const fullTitle = `${title} | Aguara Watch`;
     <meta property="og:description" content={description} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:site_name" content="Aguara Watch" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@AguaraScan" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Aguara Watch",
+      "url": "https://watch.aguarascan.com",
+      "description": "Continuous public security scanning of AI agent skill registries. Open source. Open data.",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "license": "https://opensource.org/licenses/Apache-2.0",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    })} />
 
     <title>{fullTitle}</title>
   </head>
@@ -72,5 +88,71 @@ const fullTitle = `${title} | Aguara Watch`;
       <slot />
     </main>
     <Footer />
+
+    <!-- Event tracking -->
+    <script is:inline>
+    (function() {
+      function track(name, params) {
+        if (typeof gtag === 'function') gtag('event', name, params);
+      }
+
+      // Outbound link clicks (GitHub, MCP, external)
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('a[href]');
+        if (!link) return;
+        var href = link.getAttribute('href') || '';
+        var label = link.textContent.trim().substring(0, 80);
+
+        if (href.includes('aguara-mcp')) {
+          track('mcp_click', { link_text: label, link_url: href });
+        } else if (href.includes('github.com/garagon/aguara')) {
+          track('github_click', { link_text: label, link_url: href });
+        } else if (href.includes('aguarascan.com') && !href.includes('watch.')) {
+          track('landing_click', { link_text: label, link_url: href });
+        } else if (href.startsWith('http') && !href.includes(location.hostname)) {
+          track('outbound_click', { link_text: label, link_url: href });
+        }
+
+        // Internal navigation tracking
+        if (href.includes('/registries/') && !href.endsWith('/registries/')) {
+          var reg = href.split('/registries/')[1].replace(/\/$/, '');
+          track('registry_view', { registry: reg });
+        } else if (href.includes('/categories/') && !href.endsWith('/categories/')) {
+          var cat = href.split('/categories/')[1].replace(/\/$/, '');
+          track('category_view', { category: cat });
+        } else if (href.includes('/grades/')) {
+          var grade = href.split('/grades/')[1].replace(/\/$/, '');
+          track('grade_view', { grade: grade });
+        } else if (href.includes('/skills/')) {
+          track('skill_view', { link_text: label, link_url: href });
+        }
+      });
+
+      // Search tracking
+      var searchInput = document.querySelector('#search-input, input[type="search"], input[placeholder*="Search"]');
+      if (searchInput) {
+        var searchTimeout;
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          var q = searchInput.value.trim();
+          if (q.length >= 3) {
+            searchTimeout = setTimeout(function() {
+              track('search', { search_term: q.substring(0, 100) });
+            }, 1000);
+          }
+        });
+      }
+
+      // Dataset download tracking
+      document.querySelectorAll('a[href*="/api/v1/"], a[download]').forEach(function(link) {
+        link.addEventListener('click', function() {
+          track('dataset_download', {
+            file_name: link.getAttribute('href'),
+            link_text: link.textContent.trim().substring(0, 80)
+          });
+        });
+      });
+    })();
+    </script>
   </body>
 </html>
