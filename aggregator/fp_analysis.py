@@ -145,7 +145,9 @@ def classify_finding(rule_id: str, severity: str, matched_text: str) -> Classifi
         return Classification("likely_fp", "env_var_http_verb_name")
 
     # ── MCPCFG_001: npx without version pin ──
-    if rule_id == "MCPCFG_001" and MCP_NPX_CONFIG_RE.search(text):
+    # Note: HIGH-severity MCPCFG_001 is handled in the HIGH block below.
+    # This only catches non-HIGH occurrences (MEDIUM/INFO).
+    if rule_id == "MCPCFG_001" and severity != "HIGH" and MCP_NPX_CONFIG_RE.search(text):
         return Classification("needs_review", "npx_no_pin_real_but_noisy")
 
     # ── MCP_007/009/010: tool documentation patterns ──
@@ -188,6 +190,115 @@ def classify_finding(rule_id: str, severity: str, matched_text: str) -> Classifi
         # Supply chain
         if rule_id.startswith("SUPPLY_"):
             return Classification("likely_tp", "supply_chain_pattern")
+
+        # ── Manual labeling from benchmark review (2026-02-23) ──
+
+        # CMDEXEC_013: shell script execution — skill runs shell scripts,
+        # real risk even if intentional (arbitrary code execution)
+        if rule_id == "CMDEXEC_013":
+            return Classification("likely_tp", "shell_script_execution")
+
+        # CMDEXEC_012: chained shell commands (curl|sh) — always TP
+        if rule_id == "CMDEXEC_012":
+            return Classification("likely_tp", "chained_shell_execution")
+
+        # EXTDL_009: pip install — skill instructs installing packages,
+        # real supply chain risk (arbitrary package execution)
+        if rule_id == "EXTDL_009":
+            return Classification("likely_tp", "pip_install_arbitrary")
+
+        # EXTDL_004: npm install -g — global install is real risk
+        if rule_id == "EXTDL_004":
+            return Classification("likely_tp", "npm_global_install")
+
+        # EXTDL_003: npx -y auto-confirm — supply chain risk
+        if rule_id == "EXTDL_003":
+            return Classification("likely_tp", "npx_auto_confirm")
+
+        # EXTDL_008: unverified npx package — no version pin
+        if rule_id == "EXTDL_008":
+            return Classification("likely_tp", "npx_unverified_package")
+
+        # EXTDL_011: brew/apt/yum install — skill instructs installing
+        # system packages, real supply chain risk (arbitrary package execution).
+        # Note: DOC_INSTALL_RE matches the install command itself, so can't use
+        # it to distinguish doc vs real context here.
+        if rule_id == "EXTDL_011":
+            return Classification("likely_tp", "system_package_install")
+
+        # MCPCFG_004: non-localhost URL — FP if example/docs domain
+        if rule_id == "MCPCFG_004":
+            if "example.com" in text_lower or "example.org" in text_lower:
+                return Classification("likely_fp", "example_domain")
+            if any(d in text_lower for d in ["docs.", "documentation", "/docs/"]):
+                return Classification("likely_fp", "documentation_url")
+            return Classification("likely_tp", "remote_mcp_server")
+
+        # MCPCFG_008: auto-confirm flag (-y) — bypasses user verification
+        if rule_id == "MCPCFG_008":
+            return Classification("likely_tp", "auto_confirm_bypass")
+
+        # MCPCFG_001: npx without version pin — real config risk
+        if rule_id == "MCPCFG_001":
+            return Classification("likely_tp", "npx_no_version_pin")
+
+        # MCPCFG_003: shell metacharacters in args
+        if rule_id == "MCPCFG_003":
+            return Classification("likely_tp", "shell_metacharacters")
+
+        # THIRDPARTY_001: "runtime URL controlling behavior" — pattern
+        # matches documentation links, not actual runtime fetch instructions.
+        # ALL-match mode catches keyword fragments from markdown.
+        if rule_id == "THIRDPARTY_001":
+            if "example.com" in text_lower:
+                return Classification("likely_fp", "example_url")
+            return Classification("likely_fp", "doc_link_pattern")
+
+        # THIRDPARTY_002: mutable GitHub raw content — real risk
+        if rule_id == "THIRDPARTY_002":
+            return Classification("likely_tp", "mutable_github_raw")
+
+        # THIRDPARTY_004: "external API response without validation" —
+        # pattern too loose, matches truncated table cells and docs
+        if rule_id == "THIRDPARTY_004":
+            return Classification("likely_fp", "doc_table_fragment")
+
+        # INDIRECT_010: unscoped Bash in allowed tools — overpermissioned
+        if rule_id == "INDIRECT_010":
+            return Classification("likely_tp", "unscoped_bash_tool")
+
+        # INDIRECT_005: user-provided URL consumed by agent — correct
+        # detection of SSRF-like pattern in skill descriptions
+        if rule_id == "INDIRECT_005":
+            return Classification("likely_tp", "user_url_consumption")
+
+        # EXTDL_010: go install from remote — real supply chain risk
+        if rule_id == "EXTDL_010":
+            return Classification("likely_tp", "go_install_remote")
+
+        # EXTDL_012: cargo/gem install — samples show placeholder names
+        # ("a", "b"), pattern matching incomplete fragments
+        if rule_id == "EXTDL_012":
+            if len(text_lower.split()) <= 3:
+                return Classification("likely_fp", "install_fragment")
+            return Classification("likely_tp", "cargo_gem_install")
+
+        # EXTDL_015: docker pull/run — real commands but mostly
+        # legitimate images; TP since skill instructs running containers
+        if rule_id == "EXTDL_015":
+            return Classification("likely_tp", "docker_pull_run")
+
+        # CRED_017: docker env credentials — shows credential TEMPLATES
+        # (KEY=<empty>), not actual leaked values
+        if rule_id == "CRED_017":
+            if "=" in text and not re.search(r"=\S{8,}", text):
+                return Classification("likely_fp", "credential_template")
+            return Classification("likely_tp", "credential_in_docker_env")
+
+        # CMDEXEC_009: agent shell tool usage — context-dependent
+        if rule_id == "CMDEXEC_009":
+            return Classification("needs_review", "shell_tool_usage")
+
         # Default HIGH
         return Classification("needs_review", "high_needs_context")
 
