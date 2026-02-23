@@ -3,6 +3,8 @@ name: Daily Pipeline
 on:
   schedule:
     - cron: "0 6 * * *"  # Daily at 6 AM UTC
+  repository_dispatch:
+    types: [aguara-release]
   workflow_dispatch:
     inputs:
       skip_crawl:
