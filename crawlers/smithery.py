@@ -24,7 +24,7 @@ from crawlers.utils import content_hash
 logger = logging.getLogger("observatory.smithery")
 
 SMITHERY_API = "https://registry.smithery.ai"
-PAGE_SIZE = 100
+PAGE_SIZE = 50  # API returns empty pages above 50
 
 
 class SmitheryCrawler(BaseCrawler):

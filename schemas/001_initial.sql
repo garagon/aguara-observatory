@@ -15,7 +15,9 @@ INSERT OR IGNORE INTO registries (id, name, url, description) VALUES
     ('clawhub',      'ClawHub',      'https://clawhub.ai',      'ClawHub AI agent skills registry'),
     ('mcp-registry', 'PulseMCP',     'https://www.pulsemcp.com','PulseMCP MCP server directory'),
     ('mcp-so',       'mcp.so',       'https://mcp.so',          'MCP server discovery platform'),
-    ('lobehub',      'LobeHub',      'https://lobehub.com',     'LobeHub plugin marketplace');
+    ('lobehub',      'LobeHub',      'https://lobehub.com',     'LobeHub plugin marketplace'),
+    ('smithery',     'Smithery',     'https://smithery.ai',     'Smithery MCP server registry'),
+    ('glama',        'Glama',        'https://glama.ai',        'Glama MCP server directory');
 
 -- Discovered skills/servers
 CREATE TABLE IF NOT EXISTS skills (
