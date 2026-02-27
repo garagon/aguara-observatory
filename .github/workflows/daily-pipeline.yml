@@ -116,6 +116,10 @@ jobs:
             module: crawlers.mcp_so
           - name: lobehub
             module: crawlers.lobehub
+          - name: smithery
+            module: crawlers.smithery
+          - name: glama
+            module: crawlers.glama
 
     steps:
       - uses: actions/checkout@v4
@@ -200,7 +204,7 @@ jobs:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
-          for REG in skills-sh clawhub mcp-registry mcp-so lobehub; do
+          for REG in skills-sh clawhub mcp-registry mcp-so lobehub smithery glama; do
             DATA_DIR="data/$REG"
             if [ ! -d "$DATA_DIR" ] || [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
               echo "::notice::Skipping $REG (no data)"

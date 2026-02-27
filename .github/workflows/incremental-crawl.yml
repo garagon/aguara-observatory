@@ -39,6 +39,10 @@ jobs:
             module: crawlers.mcp_so
           - name: lobehub
             module: crawlers.lobehub
+          - name: smithery
+            module: crawlers.smithery
+          - name: glama
+            module: crawlers.glama
 
     steps:
       - uses: actions/checkout@v4
@@ -134,7 +138,7 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           ANY_CHANGES=false
-          for REG in skills-sh clawhub mcp-registry mcp-so lobehub; do
+          for REG in skills-sh clawhub mcp-registry mcp-so lobehub smithery glama; do
             DATA_DIR="data/$REG"
             MANIFEST="$DATA_DIR/.changed_files.txt"
 

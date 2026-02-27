@@ -41,6 +41,8 @@ REGISTRY_SLUG_PATTERNS = {
     "mcp-registry": re.compile(r"^(.+)\.md$"),
     "mcp-so": re.compile(r"^(.+)\.md$"),
     "lobehub": re.compile(r"^(.+)\.md$"),
+    "smithery": re.compile(r"^(.+)\.md$"),
+    "glama": re.compile(r"^(.+)\.md$"),
 }
 
 
@@ -113,6 +115,7 @@ def ingest_scan_results(
     scan_result: dict,
     registry_id: str,
     aguara_version: str = "unknown",
+    delta: bool = False,
 ) -> int:
     """Ingest a full scan result into the database.
 
@@ -121,6 +124,7 @@ def ingest_scan_results(
         scan_result: Raw Aguara JSON scan output
         registry_id: Which registry these skills belong to
         aguara_version: Version of Aguara used
+        delta: If True, only score skills present in this scan (incremental mode)
 
     Returns:
         Scan ID
@@ -175,26 +179,26 @@ def ingest_scan_results(
 
         skills_scanned += 1
 
-    # Also score skills with NO findings (clean, score=100)
-    scanned_slugs = set()
-    for fname in by_file:
-        slug = fname.removesuffix(".md")
-        scanned_slugs.add(slug)
+    # Score clean skills — ONLY in full scan mode.
+    # In delta mode, we only scanned a subset of files, so we must NOT
+    # overwrite scores for skills that weren't in this scan.
+    if not delta:
+        scanned_slugs = set()
+        for fname in by_file:
+            slug = fname.removesuffix(".md")
+            scanned_slugs.add(slug)
 
-    # Score clean skills (scanned but no findings)
-    for slug, skill_id in known_skills.items():
-        if slug in scanned_slugs:
-            continue  # Already scored above
-        # Check if this skill's file exists in the scan dir (meaning it was scanned)
-        # Since Aguara doesn't list clean files, we score all known skills not in by_file
-        clean_score = SkillScore(
-            skill_id=skill_id,
-            score=100,
-            grade=score_to_grade(100),
-            finding_count=0,
-        )
-        upsert_skill_score(conn, clean_score, scan_id)
-        skills_scanned += 1
+        for slug, skill_id in known_skills.items():
+            if slug in scanned_slugs:
+                continue  # Already scored above
+            clean_score = SkillScore(
+                skill_id=skill_id,
+                score=100,
+                grade=score_to_grade(100),
+                finding_count=0,
+            )
+            upsert_skill_score(conn, clean_score, scan_id)
+            skills_scanned += 1
 
     finish_scan(
         conn,
@@ -254,8 +258,10 @@ def main():
     init_schema(conn)
 
     scan_result = json.loads(args.results_file.read_text())
-    scan_id = ingest_scan_results(conn, scan_result, args.registry, args.aguara_version)
-    print(f"Ingested scan #{scan_id}")
+    scan_id = ingest_scan_results(
+        conn, scan_result, args.registry, args.aguara_version, delta=args.delta,
+    )
+    print(f"Ingested scan #{scan_id} (delta={args.delta})")
 
 
 if __name__ == "__main__":
