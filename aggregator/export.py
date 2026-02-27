@@ -10,6 +10,7 @@ import csv
 import io
 import json
 import logging
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -94,6 +95,15 @@ def export_all(conn, output_dir: Path | None = None, datasets_dir: Path | None =
 
     logger.info("Export complete: %s", files)
     return files
+
+
+# Characters forbidden by upload-artifact (NTFS-unsafe): " : < > | * ? \r \n
+_UNSAFE_FILENAME_RE = re.compile(r'[\":<>|*?\r\n]')
+
+
+def _sanitize_filename(name: str) -> str:
+    """Replace characters that are unsafe for artifact upload and NTFS."""
+    return _UNSAFE_FILENAME_RE.sub("_", name.replace("/", "_"))
 
 
 def _write_json(path: Path, data) -> None:
@@ -407,7 +417,7 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
             "findings": findings_by_skill.get(skill_id, []),
         }
 
-        safe_slug = slug.replace("/", "_").replace(":", "_")
+        safe_slug = _sanitize_filename(slug)
         _write_json(output_dir / "skills" / registry_id / f"{safe_slug}.json", report)
         count += 1
 
