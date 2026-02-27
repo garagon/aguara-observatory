@@ -62,6 +62,8 @@ export const registryNames: Record<string, string> = {
   "mcp-registry": "PulseMCP",
   "mcp-so": "mcp.so",
   lobehub: "LobeHub",
+  smithery: "Smithery",
+  glama: "Glama",
 };
 
 export const registryDescriptions: Record<string, string> = {
@@ -70,6 +72,8 @@ export const registryDescriptions: Record<string, string> = {
   "mcp-registry": "MCP server directory",
   "mcp-so": "MCP server discovery platform",
   lobehub: "Plugin marketplace",
+  smithery: "MCP server registry",
+  glama: "MCP server directory",
 };
 
 // --- Severity mappings ---

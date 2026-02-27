@@ -9,7 +9,7 @@ import { scoreToGrade, gradeBarColors, registryNames, gradeOrder } from "../../l
 export function getStaticPaths() {
   const registries = getRegistries();
   if (registries.length === 0) {
-    return ["skills-sh", "clawhub", "mcp-registry", "mcp-so", "lobehub"].map((id) => ({
+    return ["skills-sh", "clawhub", "mcp-registry", "mcp-so", "lobehub", "smithery", "glama"].map((id) => ({
       params: { id },
     }));
   }
@@ -136,17 +136,12 @@ const displayName = registry?.name ?? registryNames[id!] ?? id;
               <tbody class="divide-y divide-gray-800/30" id="skills-tbody">
                 {skills.map((skill) => {
                   const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
-                  const hasReport = skill.finding_count > 0;
                   return (
                     <tr class="hover:bg-gray-800/30 transition-colors skill-row" data-name={(skill.name || skill.slug).toLowerCase()}>
                       <td class="px-5 py-2.5">
-                        {hasReport ? (
-                          <a href={`${base}skills/${id}/${safeSlug}/`} class="text-aguara-400 hover:text-aguara-300 transition-colors">
-                            {skill.name || skill.slug}
-                          </a>
-                        ) : (
-                          <span class="text-gray-300">{skill.name || skill.slug}</span>
-                        )}
+                        <a href={`${base}skills/${id}/${safeSlug}/`} class="text-aguara-400 hover:text-aguara-300 transition-colors">
+                          {skill.name || skill.slug}
+                        </a>
                       </td>
                       <td class="px-4 py-2.5 text-center">
                         <span class={`inline-block w-7 text-center font-bold text-xs rounded-md ${gradeBarColors[skill.grade]} text-white py-0.5`}>
