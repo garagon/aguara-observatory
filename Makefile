@@ -116,6 +116,11 @@ web-build:
 	cd web && npm run build
 	python scripts/fix_sitemap.py
 
+web-build-incr:
+	python scripts/fix_sitemap.py --pre
+	cd web && bash scripts/build-incremental.sh
+	python scripts/fix_sitemap.py
+
 # --- Cleanup ---
 
 clean:

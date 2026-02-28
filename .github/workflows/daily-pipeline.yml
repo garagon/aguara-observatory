@@ -294,19 +294,38 @@ jobs:
           name: api-data
           path: web/public/
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install & build Astro
+      - name: Restore skill page cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            web/.cache/skills/
+            web/.cache/.skill_hashes.prev.json
+            web/.cache/.layout_hash
+          key: skill-pages-${{ github.run_number }}
+          restore-keys: |
+            skill-pages-
+
+      - name: Install & build (incremental)
         working-directory: web
-        run: npm ci && npm run build
+        run: |
+          npm ci
+          bash scripts/build-incremental.sh
 
       - name: Build summary
         run: |
           PAGES=$(find web/dist -name "index.html" | wc -l)
+          SKILL_PAGES=$(find web/dist/skills -name "index.html" 2>/dev/null | wc -l)
           echo "### Build Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Pages built**: $PAGES" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Total pages**: $PAGES" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Skill pages**: $SKILL_PAGES" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3

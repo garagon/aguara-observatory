@@ -7,6 +7,7 @@ Generates files for web/public/api/v1/ to be served as static API.
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import logging
@@ -73,8 +74,11 @@ def export_all(conn, output_dir: Path | None = None, datasets_dir: Path | None =
     files["feed/recent.json"] = True
 
     # /api/v1/skills/{registry}/{slug}.json — Individual skill reports
-    skill_count = _export_skill_reports(conn, output_dir)
+    skill_count, skill_hashes = _export_skill_reports(conn, output_dir)
     files["skill_reports"] = skill_count
+
+    # .skill_hashes.json — manifest for incremental HTML builds
+    _write_json(output_dir / ".skill_hashes.json", skill_hashes)
 
     # /api/v1/registries/{id}/skills.json — Per-registry skill list
     for reg in registries:
@@ -349,10 +353,12 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
     _write_json(output_dir / "feed" / "recent.json", feed)
 
 
-def _export_skill_reports(conn, output_dir: Path) -> int:
+def _export_skill_reports(conn, output_dir: Path) -> tuple[int, dict[str, str]]:
     """Generate /api/v1/skills/{registry}/{slug}.json for ALL skills.
 
     Uses 3 bulk queries instead of N+1 to avoid slow round-trips to remote Turso.
+    Returns (count, hashes) where hashes maps "registry/slug" to a content hash
+    for incremental HTML build support.
     """
     # 1. Fetch all skills
     skill_rows = conn.execute(
@@ -393,6 +399,7 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
 
     # Write JSON files (no more DB queries)
     count = 0
+    skill_hashes: dict[str, str] = {}
     for skill_id, registry_id, slug, name, url, first_seen, last_seen, metadata_json in skill_rows:
         description = None
         if metadata_json:
@@ -418,10 +425,12 @@ def _export_skill_reports(conn, output_dir: Path) -> int:
         }
 
         safe_slug = _sanitize_filename(slug)
+        json_bytes = json.dumps(report, sort_keys=True, default=str).encode()
+        skill_hashes[f"{registry_id}/{safe_slug}"] = hashlib.sha256(json_bytes).hexdigest()[:16]
         _write_json(output_dir / "skills" / registry_id / f"{safe_slug}.json", report)
         count += 1
 
-    return count
+    return count, skill_hashes
 
 
 def _export_registry_skills(conn, output_dir: Path, registry_id: str) -> None:

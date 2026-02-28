@@ -197,6 +197,18 @@ export function getSkillReport(registry: string, slug: string): SkillReport | nu
 }
 
 export function listAllSkills(): { registry: string; slug: string }[] {
+  // Incremental mode: only build pages for changed skills
+  const changedPath = path.join(process.cwd(), ".changed_skills.json");
+  if (fs.existsSync(changedPath)) {
+    const changed = JSON.parse(fs.readFileSync(changedPath, "utf-8")) as {
+      registry: string;
+      slug: string;
+    }[];
+    console.log(`[incremental] Building ${changed.length} changed skill pages`);
+    return changed;
+  }
+
+  // Full mode: build all skill pages
   const skillsDir = path.join(API_DIR, "skills");
   if (!fs.existsSync(skillsDir)) return [];
   const results: { registry: string; slug: string }[] = [];

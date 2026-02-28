@@ -21,6 +21,8 @@ web/node_modules/
 web/public/api/
 web/public/datasets/
 web/.astro/
+web/.cache/
+web/.changed_skills.json
 
 # Astro/Node (root level from dev)
 .astro/
@@ -36,6 +38,7 @@ Thumbs.db
 
 # Private docs
 DOCS/
+CLAUDE.md
 
 # Env
 .env
