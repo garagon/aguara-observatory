@@ -5,9 +5,10 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title: string;
   description?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description = "Scanning 31,000+ AI agent skills daily across 5 public registries. Open source. Open data." } = Astro.props;
+const { title, description = "Scanning 31,000+ AI agent skills daily across 7 public registries. Open source. Open data.", jsonLd } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
 const siteUrl = Astro.site ? new URL(base, Astro.site).href.replace(/\/$/, "") : "";
@@ -44,6 +45,9 @@ const fullTitle = `Aguara Watch — ${title}`;
     <!-- Canonical URL -->
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
+    <!-- LLM-friendly descriptions -->
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly description" />
+
     <!-- SEO -->
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#f08844" />
@@ -79,6 +83,7 @@ const fullTitle = `Aguara Watch — ${title}`;
       "license": "https://opensource.org/licenses/Apache-2.0",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     })} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
     <title>{fullTitle}</title>
   </head>

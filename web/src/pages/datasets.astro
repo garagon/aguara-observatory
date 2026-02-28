@@ -34,6 +34,33 @@ const datasets = [
   },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Dataset",
+      "name": "Aguara Watch — Security Findings Dataset",
+      "description": "All security findings from daily scans of 31,000+ AI agent skills across 7 registries.",
+      "url": "https://watch.aguarascan.com/datasets/",
+      "license": "https://opensource.org/licenses/Apache-2.0",
+      "creator": { "@type": "Organization", "name": "Aguara Contributors" },
+      "distribution": [
+        { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://watch.aguarascan.com/datasets/findings.csv" },
+        { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://watch.aguarascan.com/datasets/scores.csv" },
+        { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://watch.aguarascan.com/datasets/skills.csv" },
+        { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://watch.aguarascan.com/api/v1/stats.json" },
+      ],
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://watch.aguarascan.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Datasets" },
+      ],
+    },
+  ],
+};
+
 const apiEndpoints = [
   { endpoint: "/api/v1/stats.json", desc: "Global statistics" },
   { endpoint: "/api/v1/registries.json", desc: "Registry list with stats" },
@@ -48,7 +75,7 @@ const apiEndpoints = [
 ];
 ---
 
-<Base title="Datasets" description="Open datasets and API for AI agent security research.">
+<Base title="Datasets" description="Open datasets and API for AI agent security research." jsonLd={jsonLd}>
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Open Datasets</h1>
     <p class="text-gray-400">

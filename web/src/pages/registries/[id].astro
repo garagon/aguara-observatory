@@ -24,9 +24,35 @@ const skills = getRegistrySkills(id!);
 const base = import.meta.env.BASE_URL;
 
 const displayName = registry?.name ?? registryNames[id!] ?? id;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "DataCatalog",
+      "name": `${displayName} — Aguara Watch`,
+      "description": `Security scan results for ${displayName} registry.`,
+      "url": `https://watch.aguarascan.com/registries/${id}/`,
+      "dataset": {
+        "@type": "Dataset",
+        "name": `${displayName} Security Scan Data`,
+        "description": `Security findings and scores for ${skills.length} skills in the ${displayName} registry.`,
+        "size": `${skills.length} skills`,
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://watch.aguarascan.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Registries", "item": "https://watch.aguarascan.com/registries/" },
+        { "@type": "ListItem", "position": 3, "name": displayName },
+      ],
+    },
+  ],
+};
 ---
 
-<Base title={displayName!} description={`Security scan results for ${displayName} registry.`}>
+<Base title={displayName!} description={`Security scan results for ${displayName} registry.`} jsonLd={jsonLd}>
   <!-- Breadcrumb -->
   <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
     <a href={`${base}registries/`} class="hover:text-aguara-400 transition-colors">Registries</a>

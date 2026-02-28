@@ -1,0 +1,36 @@
+# Aguara Watch — AI Agent Security Observatory
+
+> Continuous public security scanning of 31,000+ AI agent skills across 7 registries. Open source. Open data.
+
+## What It Does
+
+Aguara Watch crawls public AI agent skill registries daily, runs the Aguara deterministic security scanner on every skill, and publishes results as open data. It detects prompt injection, credential leaks, command execution, supply-chain attacks, and 10 more threat categories using 148+ detection rules.
+
+## Key Data
+
+- 7 registries monitored: Skills.sh, ClawHub, PulseMCP, mcp.so, LobeHub, Smithery, Glama
+- 31,000+ skills scanned daily
+- 13 threat categories, 148+ detection rules
+- Grades A-F based on 100-point scoring (CRITICAL -25, HIGH -15, MEDIUM -8)
+- Full scan history with first-seen/last-seen timestamps
+
+## API Endpoints
+
+- GET /api/v1/stats.json — Global statistics (totals, grade distribution, severity distribution)
+- GET /api/v1/registries.json — List of all monitored registries
+- GET /api/v1/skills/{registry}/{slug}.json — Individual skill security report
+- GET /api/v1/categories.json — Finding counts by threat category
+- GET /api/v1/trends/weekly.json — Weekly trend data
+
+## Datasets (CSV)
+
+- /api/v1/datasets/findings.csv — All security findings
+- /api/v1/datasets/scores.csv — All skill scores and grades
+- /api/v1/datasets/skills.csv — Skill metadata
+
+## Related Projects
+
+- Aguara Scanner: https://aguarascan.com — Deterministic security scanner for AI agent skills and MCP servers
+- Aguara MCP: https://github.com/garagon/aguara-mcp — MCP server for on-demand security scanning
+- Oktsec: https://oktsec.com — Runtime security for AI agents
+- Source code: https://github.com/garagon/aguara-observatory

@@ -192,6 +192,25 @@ export function getSearchIndex(): SearchEntry[] {
   return loadJson<SearchEntry[]>("search-index.json") ?? [];
 }
 
+export function getSkillReport(registry: string, slug: string): SkillReport | null {
+  return loadJson<SkillReport>(`skills/${registry}/${slug}.json`);
+}
+
+export function listAllSkills(): { registry: string; slug: string }[] {
+  const skillsDir = path.join(API_DIR, "skills");
+  if (!fs.existsSync(skillsDir)) return [];
+  const results: { registry: string; slug: string }[] = [];
+  for (const reg of fs.readdirSync(skillsDir)) {
+    const regDir = path.join(skillsDir, reg);
+    if (!fs.statSync(regDir).isDirectory()) continue;
+    for (const file of fs.readdirSync(regDir)) {
+      if (!file.endsWith(".json")) continue;
+      results.push({ registry: reg, slug: file.replace(".json", "") });
+    }
+  }
+  return results;
+}
+
 /** Top compromised skills across all registries, deduplicated, sorted by score asc then findings desc. */
 export function getMostCompromised(limit = 10): (RegistrySkill & { registry_id: string })[] {
   const all: (RegistrySkill & { registry_id: string })[] = [];

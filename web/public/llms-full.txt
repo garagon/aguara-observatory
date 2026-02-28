@@ -1,0 +1,125 @@
+# Aguara Watch — AI Agent Security Observatory
+
+> Continuous public security scanning of 31,000+ AI agent skills across 7 registries. Open source. Open data.
+
+Website: https://watch.aguarascan.com
+Source: https://github.com/garagon/aguara-observatory
+License: Apache-2.0
+
+## Overview
+
+Aguara Watch is the data layer of the Aguara security ecosystem. It crawls 7 public AI agent skill registries daily, runs the Aguara deterministic security scanner on every discovered skill, computes security grades (A-F), and publishes all results as a static site with a free JSON API and CSV datasets.
+
+The scanner uses 148+ detection rules across 13 threat categories to identify security issues in skill definitions, MCP server configurations, and agent tool descriptions — without executing any code.
+
+## Monitored Registries
+
+1. **Skills.sh** (skills-sh) — Community-curated skill marketplace
+2. **ClawHub** (clawhub) — AI agent skill repository
+3. **PulseMCP** (mcp-registry) — MCP server directory with community ratings
+4. **mcp.so** (mcp-so) — MCP server aggregator and search engine
+5. **LobeHub** (lobehub) — Open-source AI agent framework with plugin/agent ecosystem
+6. **Smithery** (smithery) — MCP server registry with deployment tools
+7. **Glama** (glama) — MCP server directory with runtime analytics
+
+## Threat Categories (13)
+
+1. **external-download** — Skills that download or execute external resources at runtime
+2. **command-execution** — Shell command injection or arbitrary code execution vectors
+3. **prompt-injection** — Attempts to override system prompts or hijack agent behavior
+4. **mcp-config** — Misconfigured MCP server settings (over-permissive, insecure defaults)
+5. **third-party-content** — Loading untrusted third-party content into agent context
+6. **ssrf-cloud** — Server-side request forgery targeting cloud metadata or internal services
+7. **exfiltration** — Data exfiltration channels (DNS, HTTP, file system)
+8. **supply-chain** — Dependency confusion, typosquatting, or malicious package references
+9. **credential-leak** — Hardcoded secrets, API keys, or tokens in skill definitions
+10. **mcp-attack** — Attacks exploiting MCP protocol weaknesses (tool poisoning, rug pulls)
+11. **unicode-attack** — Unicode-based obfuscation (homoglyphs, bidi overrides, invisible characters)
+12. **indirect-injection** — Indirect prompt injection via external data sources
+13. **toxic-flow** — Data flows that could lead to unintended harmful outputs
+
+## Scoring Methodology
+
+Each skill starts with a baseline score of 100 points. Points are deducted per finding based on severity:
+
+| Severity | Point Deduction | Description |
+|----------|----------------|-------------|
+| CRITICAL | -25 points | Actively exploitable security vulnerabilities |
+| HIGH | -15 points | Serious security issues with clear attack vectors |
+| MEDIUM | -8 points | Moderate security concerns requiring attention |
+| LOW | 0 points | Informational findings, no score impact |
+
+Minimum score is 0. Scores do not go negative.
+
+## Grade Definitions
+
+| Grade | Score Range | Meaning |
+|-------|-----------|---------|
+| A | 90–100 | Excellent — minimal or no security issues |
+| B | 75–89 | Good — minor issues detected |
+| C | 50–74 | Fair — moderate security concerns |
+| D | 25–49 | Poor — significant security issues |
+| F | 0–24 | Failing — critical security vulnerabilities |
+
+## API Endpoints
+
+All endpoints return JSON. Base URL: https://watch.aguarascan.com
+
+| Endpoint | Description |
+|----------|-------------|
+| GET /api/v1/stats.json | Global statistics: total skills, scanned count, findings, average score, grade/severity distributions |
+| GET /api/v1/registries.json | List of all monitored registries with skill counts and average scores |
+| GET /api/v1/registries/{id}/stats.json | Per-registry statistics (replace {id} with registry slug) |
+| GET /api/v1/registries/{id}/skills.json | All skills in a registry with scores, grades, finding counts |
+| GET /api/v1/skills/{registry}/{slug}.json | Full security report for a single skill (findings, score, metadata) |
+| GET /api/v1/categories.json | Finding counts grouped by threat category |
+| GET /api/v1/categories/{category}.json | Skills affected by a specific threat category |
+| GET /api/v1/grades/{grade}.json | Skills with a specific grade (A, B, C, D, F) |
+| GET /api/v1/trends/weekly.json | Weekly trend data (totals, per-registry breakdowns) |
+| GET /api/v1/feed/recent.json | Recent critical/high findings across all registries |
+| GET /api/v1/benchmarks/vendors.json | Vendor comparison benchmarks (precision, recall, F1) |
+| GET /api/v1/search-index.json | Lightweight search index of all skills |
+| GET /api/v1/datasets/manifest.json | Dataset file manifest with sizes and checksums |
+
+## Datasets (CSV Downloads)
+
+| File | Description |
+|------|-------------|
+| /api/v1/datasets/findings.csv | All security findings with skill ID, rule ID, severity, category, matched text |
+| /api/v1/datasets/scores.csv | All skill scores and grades with registry info |
+| /api/v1/datasets/skills.csv | Skill metadata: names, descriptions, URLs, first/last seen dates |
+
+All datasets are regenerated daily and are freely available for research and analysis.
+
+## Frequently Asked Questions
+
+**Q: How often is data updated?**
+A: The full pipeline (crawl → scan → aggregate → publish) runs daily via GitHub Actions CI.
+
+**Q: Is the scan data free to use?**
+A: Yes. All data is published under the Apache-2.0 license. The JSON API and CSV datasets are free for any use.
+
+**Q: What does Aguara scan for?**
+A: Aguara performs deterministic static analysis on skill definitions, tool descriptions, and MCP configurations. It uses pattern matching and structural analysis — no code execution.
+
+**Q: Can I scan my own skills?**
+A: Yes. Use the Aguara CLI scanner directly: https://aguarascan.com. It runs locally and supports JSON, YAML, and Markdown skill files.
+
+**Q: Can I scan skills via an AI assistant?**
+A: Yes. The Aguara MCP server (https://github.com/garagon/aguara-mcp) lets Claude, Cursor, and other MCP-compatible AI agents scan skills on demand.
+
+**Q: Why might a skill get a low score?**
+A: Common reasons include: hardcoded API keys, shell command execution in tool descriptions, external URL fetching without validation, prompt injection patterns, and misconfigured MCP settings.
+
+**Q: What if a finding is a false positive?**
+A: Aguara is a deterministic scanner — it reports patterns that match known threat signatures. Some matches may be intentional or benign. The score reflects risk surface, not confirmed exploitation.
+
+**Q: How are registries selected?**
+A: Registries are included based on being publicly accessible, actively maintained, and serving as a discovery mechanism for AI agent skills or MCP servers.
+
+## Related Projects
+
+- **Aguara Scanner** (https://aguarascan.com) — The deterministic security scanner that powers all analysis. Open-source CLI tool for scanning AI agent skills and MCP servers locally.
+- **Aguara MCP** (https://github.com/garagon/aguara-mcp) — MCP server that exposes Aguara scanning capabilities to AI agents (Claude, Cursor, etc.) for on-demand security analysis.
+- **Aguara Observatory** (https://github.com/garagon/aguara-observatory) — Source code for this platform: crawlers, aggregation pipeline, and static site.
+- **Oktsec** (https://oktsec.com) — Runtime security platform for AI agents. Complements Aguara's static analysis with dynamic protection.

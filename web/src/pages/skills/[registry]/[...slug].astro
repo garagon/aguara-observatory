@@ -1,0 +1,193 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { listAllSkills, getSkillReport } from "../../../lib/api";
+import type { SkillReport, SkillFinding } from "../../../lib/api";
+import { gradeColors, severityColors, severityOrder, severityRank, registryNames } from "../../../lib/constants";
+
+export function getStaticPaths() {
+  return listAllSkills().map(({ registry, slug }) => ({
+    params: { registry, slug },
+  }));
+}
+
+const { registry, slug } = Astro.params;
+const report = getSkillReport(registry!, slug as string);
+
+if (!report) {
+  return Astro.redirect("/registries/");
+}
+
+const regName = registryNames[report.registry_id] || report.registry_id;
+const gc = gradeColors[report.grade] || gradeColors.C;
+
+// Severity counts
+const sevCounts: Record<string, number> = {};
+for (const f of report.findings) {
+  sevCounts[f.severity] = (sevCounts[f.severity] || 0) + 1;
+}
+
+// Sort findings by severity
+const sortedFindings = [...report.findings].sort(
+  (a, b) => (severityRank[a.severity] ?? 5) - (severityRank[b.severity] ?? 5)
+);
+
+function formatDate(iso?: string): string {
+  if (!iso) return "\u2014";
+  try {
+    return new Date(iso).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+const skillName = report.name || report.slug;
+const pageTitle = `${skillName} — Security Report`;
+const pageDesc = report.findings.length > 0
+  ? `Security scan report for ${skillName} from ${regName}. Score: ${report.score}/100 (Grade ${report.grade}). ${report.findings.length} finding(s) detected.`
+  : `Security scan report for ${skillName} from ${regName}. Score: ${report.score}/100 (Grade ${report.grade}). No security issues found.`;
+
+// JSON-LD structured data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": skillName,
+      "url": report.url || `https://watch.aguarascan.com/skills/${registry}/${slug}/`,
+      "description": report.description || pageDesc,
+      "applicationCategory": "AI Agent Skill",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": report.score,
+        "bestRating": 100,
+        "worstRating": 0,
+        "ratingCount": 1,
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://watch.aguarascan.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Registries", "item": "https://watch.aguarascan.com/registries/" },
+        { "@type": "ListItem", "position": 3, "name": regName, "item": `https://watch.aguarascan.com/registries/${registry}/` },
+        { "@type": "ListItem", "position": 4, "name": skillName },
+      ],
+    },
+  ],
+};
+---
+
+<Base title={pageTitle} description={pageDesc} jsonLd={jsonLd}>
+  <!-- Breadcrumbs -->
+  <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500 overflow-hidden">
+    <a href="/registries/" class="hover:text-aguara-400 transition-colors shrink-0">Registries</a>
+    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+    <a href={`/registries/${registry}/`} class="hover:text-aguara-400 transition-colors shrink-0">{regName}</a>
+    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+    <span class="text-gray-300 truncate max-w-[200px]">{skillName}</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row items-start justify-between mb-8 gap-4">
+    <div class="flex-1 min-w-0">
+      <h1 class="text-xl sm:text-3xl font-bold text-white tracking-tight break-words">{skillName}</h1>
+      <p class="text-xs sm:text-sm text-gray-500 mt-1 font-mono truncate">{report.skill_id}</p>
+      {report.description && <p class="text-sm text-gray-400 mt-2">{report.description}</p>}
+      {report.url && (
+        <a href={report.url} class="inline-flex items-center gap-1 text-sm text-aguara-400 hover:text-aguara-300 mt-2 transition-colors" target="_blank" rel="noopener noreferrer">
+          View source
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
+        </a>
+      )}
+    </div>
+    <div class="flex items-center gap-2">
+      <div class={`w-16 h-16 text-3xl ${gc.css} rounded-lg border-2 flex items-center justify-center font-bold`}>{report.grade}</div>
+      <span class="text-sm text-gray-400">{report.score}/100</span>
+    </div>
+  </div>
+
+  <!-- Meta cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">First Seen</p>
+      <p class="text-sm text-gray-300 font-mono">{formatDate(report.first_seen)}</p>
+    </div>
+    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Last Scanned</p>
+      <p class="text-sm text-gray-300 font-mono">{formatDate(report.last_seen)}</p>
+    </div>
+    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Findings</p>
+      <p class="text-sm text-gray-300 font-mono"><span class="font-bold text-white">{report.findings.length}</span></p>
+    </div>
+    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Score</p>
+      <p class="text-sm text-gray-300 font-mono"><span class="font-bold text-white">{report.score}/100</span></p>
+    </div>
+  </div>
+
+  {report.findings.length > 0 ? (
+    <>
+      {/* Severity summary */}
+      <div class="flex flex-wrap gap-3 mb-6">
+        {severityOrder.map((sev) => {
+          const count = sevCounts[sev];
+          if (!count) return null;
+          const sc = severityColors[sev] || severityColors.INFO;
+          return (
+            <div class="flex items-center gap-1.5">
+              <span class={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border ${sc}`}>{sev}</span>
+              <span class="text-sm font-mono text-gray-400">{count}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Findings table */}
+      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
+        <h2 class="text-base font-semibold text-white mb-4">
+          Findings <span class="text-gray-500 font-normal">({report.findings.length})</span>
+        </h2>
+        <div class="space-y-2">
+          {sortedFindings.map((f) => {
+            const sc = severityColors[f.severity.toUpperCase()] || severityColors.INFO;
+            return (
+              <div class="border border-gray-800/50 rounded-xl overflow-hidden hover:border-gray-700/50 transition-colors">
+                <div class="flex items-center gap-3 px-4 py-2.5 bg-gray-800/20">
+                  <span class={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border ${sc}`}>{f.severity.toUpperCase()}</span>
+                  <span class="font-mono text-xs text-gray-300">{f.rule_id}</span>
+                  <span class="text-xs text-gray-600 hidden sm:inline">{f.category}</span>
+                  {f.line && <span class="text-xs text-gray-600 ml-auto font-mono">L{f.line}</span>}
+                </div>
+                {f.matched_text && (
+                  <div class="px-4 py-2.5 bg-gray-950/30 border-t border-gray-800/30">
+                    <pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto leading-relaxed"><code>{f.matched_text}</code></pre>
+                  </div>
+                )}
+                {f.message && (
+                  <div class="px-4 py-2 border-t border-gray-800/30">
+                    <p class="text-xs text-gray-500">{f.message}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  ) : (
+    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 text-center">
+      <svg class="w-12 h-12 mx-auto mb-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+      </svg>
+      <h2 class="text-lg font-semibold text-white mb-2">No Security Issues Found</h2>
+      <p class="text-sm text-gray-400 max-w-md mx-auto">
+        Aguara's static analysis detected no security findings in this skill. It scored a perfect 100/100.
+      </p>
+    </div>
+  )}
+</Base>
