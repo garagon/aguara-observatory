@@ -1,0 +1,71 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Canonicalize lowercase grade URLs to uppercase (SEO fix)
+# Prevents /grades/d/ and /grades/D/ from competing in search results
+[[redirects]]
+  from = "/grades/a/*"
+  to = "/grades/A/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/a"
+  to = "/grades/A/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/b/*"
+  to = "/grades/B/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/b"
+  to = "/grades/B/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/c/*"
+  to = "/grades/C/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/c"
+  to = "/grades/C/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/d/*"
+  to = "/grades/D/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/d"
+  to = "/grades/D/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/f/*"
+  to = "/grades/F/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grades/f"
+  to = "/grades/F/"
+  status = 301
+  force = true
+
+# Existing SPA rewrite for skill viewer
+[[redirects]]
+  from = "/skills/*"
+  to = "/skill-viewer/"
+  status = 200
