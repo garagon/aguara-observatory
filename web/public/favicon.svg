@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f08844" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-  <path d="M2 17l10 5 10-5" />
-  <path d="M2 12l10 5 10-5" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="4" fill="#0a0a0a"/>
+  <g transform="translate(16,16)">
+    <!-- outer eye shape -->
+    <path d="M-10,0 Q-5,-7 0,-7 Q5,-7 10,0 Q5,7 0,7 Q-5,7 -10,0Z" fill="none" stroke="#f08844" stroke-width="1.8"/>
+    <!-- iris -->
+    <circle cx="0" cy="0" r="3.5" fill="none" stroke="#f08844" stroke-width="1.8"/>
+    <!-- pupil -->
+    <circle cx="0" cy="0" r="1.2" fill="#f08844"/>
+  </g>
 </svg>
