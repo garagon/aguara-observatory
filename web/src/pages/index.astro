@@ -54,14 +54,9 @@ const base = import.meta.env.BASE_URL;
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[300px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
         <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-aguara-400/3 rounded-full blur-2xl -z-10"></div>
 
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 mb-8 rounded-full border border-gray-700/50 bg-gray-900/60 text-xs text-gray-400 animate-fade-in backdrop-blur-sm">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          173+ rules &middot; 13 categories &middot; 100% client-side
-        </div>
-
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight animate-slide-up leading-[1.1]">
-          Scan Any AI Agent for<br class="hidden sm:block" />
-          <span class="text-aguara-400">Security Vulnerabilities</span>
+<h1 class="font-bold text-white mb-6 animate-slide-up leading-[1.1]">
+          <span class="block text-4xl sm:text-5xl lg:text-6xl tracking-tight">Scan Any AI Agent</span>
+          <span class="block text-3xl sm:text-4xl lg:text-5xl font-semibold text-aguara-400 mt-3 tracking-normal">Security Vulnerabilities</span>
         </h1>
 
         <p class="text-lg text-gray-400 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 100ms">
@@ -239,6 +234,31 @@ const base = import.meta.env.BASE_URL;
         </span>
       </div>
 
+      <!-- Browser compatibility -->
+      <div class="flex items-center justify-center gap-3 text-[11px] text-gray-600 mb-16">
+        <span class="text-gray-700">Works on</span>
+        <!-- Chrome -->
+        <span class="inline-flex items-center gap-1 text-gray-500">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 5.09l.097.345-3.96 6.86A12.1 12.1 0 0024 12c0-.685-.057-1.357-.169-2.012H15.62z"/><circle cx="12" cy="12" r="3.882"/></svg>
+          Chrome
+        </span>
+        <!-- Firefox -->
+        <span class="inline-flex items-center gap-1 text-gray-500">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 5.075c.742.98 1.245 2.267 1.396 3.28-.455-.214-1.108-.39-1.79-.332-.07-.408-.2-.83-.39-1.238-.37-.79-.956-1.39-1.678-1.673a4.602 4.602 0 00-.543-.19c.243-.04.5-.058.77-.044.838.052 1.594.408 2.235.197zM12 2.08c1.844 0 3.562.534 5.015 1.455-.105.07-.224.157-.353.26-.78.63-1.648 1.87-2.758 1.78-.99-.08-1.422-.97-2.637-1.073-1.46-.124-2.643.757-3.275 1.453C7 6.99 6.734 8.363 6.884 9.748c-2.223-.942-3.828-2.95-4.584-4.28A9.865 9.865 0 0112 2.08zm-7.236 4.4c.547.977 2.06 3.163 4.453 4.143-.33.744-.541 1.575-.541 2.46 0 1.62.628 3.092 1.656 4.197-.3.04-.614.06-.942.06-4.67 0-7.593-3.752-7.593-3.752s-.298-.37-.298-.964c-.034-2.32.944-4.578 3.265-6.144zm8.156 12.238c2.752-.59 4.877-2.883 5.448-5.73.32.195.6.462.807.825.676 1.177.484 2.825-.52 4.1a9.92 9.92 0 01-5.735 2.805z"/></svg>
+          Firefox
+        </span>
+        <!-- Safari -->
+        <span class="inline-flex items-center gap-1 text-gray-500">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.5c5.799 0 10.5 4.701 10.5 10.5S17.799 22.5 12 22.5 1.5 17.799 1.5 12 6.201 1.5 12 1.5zm0 1.125a9.375 9.375 0 100 18.75 9.375 9.375 0 000-18.75zM8.75 7.25l7 2.5-2.5 7-7-2.5 2.5-7zm3.25 3.5a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5z"/></svg>
+          Safari
+        </span>
+        <!-- Edge -->
+        <span class="inline-flex items-center gap-1 text-gray-500">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.86 17.86q.14 0 .25.12.1.13.1.25 0 .46-.14.92-.14.47-.45 1.02-.31.54-.77 1.07-.46.52-1.13.95-.68.43-1.55.68-.88.26-1.9.26-1.14 0-2.16-.32-1.01-.32-1.85-.92-.84-.6-1.42-1.44-.58-.84-.89-1.86-.3-1.02-.3-2.23 0-1.78.73-3.45.72-1.67 1.96-2.97 1.24-1.3 2.86-2.09Q16.86 9 18.63 9q1.45 0 2.24.43.79.42.79 1.07 0 .25-.06.46-.05.22-.17.43-.12.2-.15.28-.03.08-.03.15 0 .24.2.41.19.17.19.37 0 .36-.42.88-.42.52-1.18.93-.77.4-1.8.68-1.04.28-2.3.28-1.65 0-2.88-.63-.64 1.47-.64 2.85 0 .42.08.85.07.43.27.82.2.4.52.73.33.33.83.54.5.2 1.16.2 1.07 0 1.96-.3.89-.31 1.57-.74.68-.44 1.17-.92.48-.49.77-.9.28-.41.4-.65.12-.23.22-.23z"/><path d="M10.88 4.35Q12.16 3 14.13 3q.74 0 1.42.2-.55.5-1.05 1.24-.5.73-.9 1.59-.38.87-.65 1.77-.26.9-.37 1.75-.1.85-.1 1.57 0 .26.02.59.47-.1 1.09-.37.62-.28 1.2-.74.59-.46.92-1.12.34-.66.34-1.48 0-.1-.01-.2-.02-.1-.03-.2 1.33 1.06 1.33 3.14 0 1.73-.72 3.02-.72 1.28-1.78 1.28-.68 0-1.2-.22-.52-.22-1-.58-.49-.36-1.03-.59-.53-.23-1.27-.23-1.66 0-2.91 1.3-.3-.48-.5-1.03-.2-.56-.28-1.05-.08-.5-.08-.93 0-1.35.55-2.77.54-1.43 1.5-2.6z"/></svg>
+          Edge
+        </span>
+      </div>
+
       <!-- Stats bar -->
       <div class="border-t border-b border-gray-800/60 py-10 mb-16">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
@@ -262,7 +282,7 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- What the scanner checks -->
-      <div class="mb-16 max-w-4xl mx-auto">
+      <div id="categories-section" class="mb-16 max-w-4xl mx-auto">
         <div class="text-center mb-8">
           <h2 class="text-xl font-bold text-white mb-3">What the scanner detects</h2>
           <p class="text-sm text-gray-500">Every scan checks for vulnerabilities across 13 security categories</p>
@@ -321,7 +341,7 @@ const base = import.meta.env.BASE_URL;
       </div>
 
       <!-- How it works -->
-      <div class="mb-20 max-w-5xl mx-auto hiw-section">
+      <div id="hiw-section" class="mb-20 max-w-5xl mx-auto hiw-section">
         <div class="text-center mb-12">
           <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">How it works</h2>
           <p class="text-base text-gray-400 max-w-2xl mx-auto">Three steps to find security vulnerabilities in any AI agent skill, MCP server, or configuration file.</p>
@@ -422,7 +442,7 @@ const base = import.meta.env.BASE_URL;
         </div>
 
         <!-- Why it matters -->
-        <div class="bg-gray-900/30 border border-gray-800/50 rounded-2xl p-8 sm:p-10">
+        <div id="why-scan-section" class="bg-gray-900/30 border border-gray-800/50 rounded-2xl p-8 sm:p-10">
           <div class="max-w-3xl mx-auto text-center">
             <h3 class="text-lg sm:text-xl font-bold text-white mb-4">Why scan your AI agent tools?</h3>
             <p class="text-sm text-gray-400 leading-relaxed mb-6">
@@ -844,6 +864,7 @@ const base = import.meta.env.BASE_URL;
         }).join("");
         patReposList.querySelectorAll(".pat-repo-btn").forEach(function(btn) {
           btn.addEventListener("click", function() {
+            t("pat_repo_select", { is_private: btn.querySelector(".text-yellow-500") ? true : false });
             githubUrl.value = btn.dataset.url;
             fetchBtn.disabled = false;
             githubUrl.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -861,6 +882,11 @@ const base = import.meta.env.BASE_URL;
       if (sourceUrl) return patValidated ? "github_private" : "github_public";
       if (wasFileUpload) return "upload";
       return "paste";
+    }
+
+    // --- Analytics helper ---
+    function t(name, params) {
+      if (typeof gtag === "function") gtag("event", name, params || {});
     }
 
     // --- Download helpers ---
@@ -912,9 +938,7 @@ const base = import.meta.env.BASE_URL;
       var slug = getReportSlug();
       var date = d.scanDate.slice(0, 10);
       triggerDownload(JSON.stringify(report, null, 2), "aguara-report-" + slug + "-" + date + ".json", "application/json");
-      if (typeof gtag === "function") {
-        gtag("event", "wasm_report_download", { format: "json", findings_count: d.findings.length, grade: d.grade });
-      }
+      t("wasm_report_download", { format: "json", findings_count: d.findings.length, grade: d.grade });
     }
 
     function generateHtmlReport() {
@@ -1029,9 +1053,7 @@ const base = import.meta.env.BASE_URL;
       var slug = getReportSlug();
       var date = d.scanDate.slice(0, 10);
       triggerDownload(h, "aguara-report-" + slug + "-" + date + ".html", "text/html");
-      if (typeof gtag === "function") {
-        gtag("event", "wasm_report_download", { format: "html", findings_count: d.findings.length, grade: d.grade });
-      }
+      t("wasm_report_download", { format: "html", findings_count: d.findings.length, grade: d.grade });
     }
 
     // --- Web Worker for WASM scanning (keeps main thread free) ---
@@ -1047,6 +1069,7 @@ const base = import.meta.env.BASE_URL;
         var msg = e.data;
         if (msg.type === "ready") {
           wasmLoadTimeMs = msg.loadTime;
+          t("wasm_engine_ready", { load_time_ms: Math.round(msg.loadTime) });
           return;
         }
         var cb = workerCallbacks[msg.id];
@@ -1077,6 +1100,7 @@ const base = import.meta.env.BASE_URL;
       tabPaste.classList.add("text-gray-400");
       panelUrl.classList.remove("hidden");
       panelPaste.classList.add("hidden");
+      t("scan_tab_switch", { tab: "github_url" });
     });
     tabPaste.addEventListener("click", function() {
       tabPaste.classList.add("bg-gray-800", "text-white");
@@ -1085,12 +1109,14 @@ const base = import.meta.env.BASE_URL;
       tabUrl.classList.add("text-gray-400");
       panelPaste.classList.remove("hidden");
       panelUrl.classList.add("hidden");
+      t("scan_tab_switch", { tab: "paste_upload" });
     });
 
     // --- Extension selector ---
     extBtns.forEach(function(btn) {
       btn.addEventListener("click", function() {
         selectedExt = btn.dataset.ext;
+        t("scan_ext_select", { ext: selectedExt });
         extBtns.forEach(function(b) {
           b.classList.remove("border-aguara-500", "text-aguara-400");
           b.classList.add("border-gray-700", "text-gray-400");
@@ -1134,6 +1160,7 @@ const base = import.meta.env.BASE_URL;
     dropZone.addEventListener("drop", function(e) {
       var file = e.dataTransfer.files[0];
       if (!file) return;
+      t("scan_file_drop", { file_ext: file.name.indexOf(".") !== -1 ? file.name.split(".").pop() : "unknown", file_size: file.size });
       var reader = new FileReader();
       reader.onload = function(ev) {
         contentInput.value = ev.target.result;
@@ -1257,10 +1284,12 @@ const base = import.meta.env.BASE_URL;
 
       var parsed = parseGitHubUrl(url);
       if (!parsed) {
+        t("scan_url_error", { url_domain: url.indexOf("github.com") !== -1 ? "github" : "other" });
         alert("Please enter a valid GitHub URL.\n\nExamples:\nhttps://github.com/owner/repo\nhttps://github.com/owner/repo/blob/main/skill.md");
         return;
       }
 
+      t("scan_start", { source: "github", type: parsed.type, has_pat: !!patValidated });
       sourceUrl = url;
       wasFileUpload = false;
       setState("loading");
@@ -1338,9 +1367,7 @@ const base = import.meta.env.BASE_URL;
       } else if (msg.indexOf("WASM") !== -1 || msg.indexOf("Worker") !== -1) {
         errorType = "wasm_load";
       }
-      if (typeof gtag === "function") {
-        gtag("event", "wasm_scan_error", { error_type: errorType, scan_source: getScanSource() });
-      }
+      t("wasm_scan_error", { error_type: errorType, scan_source: getScanSource() });
       alert("Error: " + err.message);
       setState("idle");
     }
@@ -1421,6 +1448,7 @@ const base = import.meta.env.BASE_URL;
       if (!content) return;
 
       var filename = currentFilename || ("skill" + selectedExt);
+      t("scan_start", { source: wasFileUpload ? "upload" : "paste", file_ext: filename.indexOf(".") !== -1 ? filename.split(".").pop() : "unknown", content_length: content.length });
       sourceUrl = null;
 
       setState("loading");
@@ -1450,24 +1478,23 @@ const base = import.meta.env.BASE_URL;
       }
       var cats = {};
       findings.forEach(function(f) { if (f.category) cats[f.category] = true; });
-      if (typeof gtag === "function") {
-        gtag("event", "wasm_scan", {
-          findings_count: findings.length,
-          score: score,
-          grade: grade,
-          duration_ms: elapsed,
-          source: sourceUrl ? "github" : "paste",
-          files_scanned: result.files_scanned || 1,
-          scan_source: getScanSource(),
-          top_severity: topSev,
-          categories_found: Object.keys(cats).join(","),
-          load_time_ms: wasmLoadTimeMs ? Math.round(wasmLoadTimeMs) : null
-        });
-      }
+      t("wasm_scan", {
+        findings_count: findings.length,
+        score: score,
+        grade: grade,
+        duration_ms: elapsed,
+        source: sourceUrl ? "github" : "paste",
+        files_scanned: result.files_scanned || 1,
+        scan_source: getScanSource(),
+        top_severity: topSev,
+        categories_found: Object.keys(cats).join(","),
+        load_time_ms: wasmLoadTimeMs ? Math.round(wasmLoadTimeMs) : null
+      });
     }
 
     // --- Reset ---
     resetBtn.addEventListener("click", function() {
+      t("scan_reset", { previous_source: getScanSource() });
       contentInput.value = "";
       githubUrl.value = "";
       scanBtn.disabled = true;
@@ -1640,6 +1667,7 @@ const base = import.meta.env.BASE_URL;
       var isHidden = patSection.classList.contains("hidden");
       patSection.classList.toggle("hidden");
       patChevron.style.transform = isHidden ? "rotate(90deg)" : "";
+      if (isHidden) t("pat_section_open");
     });
 
     // --- PAT connect ---
@@ -1653,10 +1681,9 @@ const base = import.meta.env.BASE_URL;
         patValidated = true;
         sessionStorage.setItem("aguara_github_pat", token);
         showPatAuthenticated();
-        if (typeof gtag === "function") {
-          gtag("event", "wasm_github_auth", { action: "connect" });
-        }
+        t("wasm_github_auth", { action: "connect" });
       }).catch(function(err) {
+        t("pat_validation_error");
         alert("Authentication failed: " + err.message);
         sessionStorage.removeItem("aguara_github_pat");
         githubPat = "";
@@ -1673,9 +1700,7 @@ const base = import.meta.env.BASE_URL;
       patValidated = false;
       sessionStorage.removeItem("aguara_github_pat");
       resetPatUI();
-      if (typeof gtag === "function") {
-        gtag("event", "wasm_github_auth", { action: "disconnect" });
-      }
+      t("wasm_github_auth", { action: "disconnect" });
     });
 
     // --- Download buttons ---
@@ -1689,12 +1714,41 @@ const base = import.meta.env.BASE_URL;
         patSection.classList.remove("hidden");
         patChevron.style.transform = "rotate(90deg)";
         showPatAuthenticated();
+        t("pat_session_restored");
       }).catch(function() {
         sessionStorage.removeItem("aguara_github_pat");
         githubPat = "";
         patValidated = false;
       });
     }
+
+    // --- Section visibility tracking (below-fold engagement) ---
+    var trackedSections = {};
+    var sectionObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !trackedSections[entry.target.id]) {
+          trackedSections[entry.target.id] = true;
+          t("section_view", { section: entry.target.id });
+        }
+      });
+    }, { threshold: 0.3 });
+    ["categories-section", "hiw-section", "why-scan-section"].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) sectionObserver.observe(el);
+    });
+
+    // --- Results scroll depth ---
+    var resultsTracked = false;
+    var resultsObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !resultsTracked) {
+          resultsTracked = true;
+          t("results_scrolled_to_end");
+        }
+      });
+    }, { threshold: 0.5 });
+    var resetBtnEl = document.getElementById("reset-btn");
+    if (resetBtnEl) resultsObserver.observe(resetBtnEl);
   })();
   </script>
 </Base>
