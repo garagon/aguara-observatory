@@ -1194,7 +1194,7 @@ const base = import.meta.env.BASE_URL;
 
     // --- GitHub URL parsing ---
     function parseGitHubUrl(url) {
-      url = url.trim();
+      url = url.trim().replace(/\.git\/?$/, "");
       var m;
       m = url.match(/^https?:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)$/);
       if (m) return { type: "file", owner: m[1], repo: m[2], branch: m[3], path: m[4] };
