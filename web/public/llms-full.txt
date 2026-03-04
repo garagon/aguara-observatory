@@ -1,6 +1,6 @@
-# Aguara Watch — AI Agent Security Observatory
+# Aguara Watch — AI Agent Security Scanner & Observatory
 
-> Continuous public security scanning of 31,000+ AI agent skills across 7 registries. Open source. Open data.
+> Scan AI agent skills and MCP servers for security vulnerabilities. 173+ detection rules, 13 threat categories. Free, open source, runs in your browser.
 
 Website: https://watch.aguarascan.com
 Source: https://github.com/garagon/aguara-observatory
@@ -8,9 +8,23 @@ License: Apache-2.0
 
 ## Overview
 
-Aguara Watch is the data layer of the Aguara security ecosystem. It crawls 7 public AI agent skill registries daily, runs the Aguara deterministic security scanner on every discovered skill, computes security grades (A-F), and publishes all results as a static site with a free JSON API and CSV datasets.
+Aguara Watch is the security scanning and monitoring platform of the Aguara ecosystem. It has two core functions:
 
-The scanner uses 148+ detection rules across 13 threat categories to identify security issues in skill definitions, MCP server configurations, and agent tool descriptions — without executing any code.
+1. **Online Scanner** — A free browser-based security scanner at https://watch.aguarascan.com that runs the Aguara engine locally via WebAssembly. Users can scan GitHub repositories (public or private), paste content, or upload files. No code is uploaded to any server. Results include an A-F security grade, severity breakdown by category, and downloadable reports in JSON and HTML formats.
+
+2. **Security Observatory** — A continuous monitoring system that crawls 7 public AI agent skill registries daily, scans every discovered skill with the Aguara scanner, computes security grades (A-F), and publishes all results as a static site with a free JSON API and CSV datasets.
+
+The scanner uses 173+ detection rules across 13 threat categories to identify security issues in skill definitions, MCP server configurations, and agent tool descriptions — without executing any code.
+
+## Online Scanner Features
+
+- **GitHub URL scanning**: Enter any GitHub repository, directory, or file URL to scan
+- **Private repository support**: Connect a GitHub Personal Access Token (PAT) with read-only permissions to scan private repos. Token stays in browser sessionStorage only.
+- **Paste and upload**: Paste skill content directly or drag-and-drop files
+- **Supported formats**: .md, .json, .yaml, .yml, .py, .js, .ts, .txt, .toml, .cfg, .ini, .sh, .bash
+- **WebAssembly execution**: Scanner binary (~2 MB) runs entirely in the browser via a Web Worker. Cached after first load.
+- **Reports**: Downloadable JSON and HTML reports with findings, scores, and grades
+- **Privacy**: No data is sent to any server. All scanning happens client-side.
 
 ## Monitored Registries
 
@@ -24,19 +38,19 @@ The scanner uses 148+ detection rules across 13 threat categories to identify se
 
 ## Threat Categories (13)
 
-1. **external-download** — Skills that download or execute external resources at runtime
-2. **command-execution** — Shell command injection or arbitrary code execution vectors
-3. **prompt-injection** — Attempts to override system prompts or hijack agent behavior
-4. **mcp-config** — Misconfigured MCP server settings (over-permissive, insecure defaults)
-5. **third-party-content** — Loading untrusted third-party content into agent context
-6. **ssrf-cloud** — Server-side request forgery targeting cloud metadata or internal services
-7. **exfiltration** — Data exfiltration channels (DNS, HTTP, file system)
-8. **supply-chain** — Dependency confusion, typosquatting, or malicious package references
-9. **credential-leak** — Hardcoded secrets, API keys, or tokens in skill definitions
-10. **mcp-attack** — Attacks exploiting MCP protocol weaknesses (tool poisoning, rug pulls)
-11. **unicode-attack** — Unicode-based obfuscation (homoglyphs, bidi overrides, invisible characters)
-12. **indirect-injection** — Indirect prompt injection via external data sources
-13. **toxic-flow** — Data flows that could lead to unintended harmful outputs
+1. **prompt-injection** — Attempts to override system prompts or hijack agent behavior
+2. **credential-leak** — Hardcoded secrets, API keys, or tokens in skill definitions
+3. **command-execution** — Shell command injection or arbitrary code execution vectors
+4. **exfiltration** — Data exfiltration channels (DNS, HTTP, file system)
+5. **indirect-injection** — Indirect prompt injection via external data sources
+6. **mcp-attack** — Attacks exploiting MCP protocol weaknesses (tool poisoning, rug pulls)
+7. **mcp-config** — Misconfigured MCP server settings (over-permissive, insecure defaults)
+8. **ssrf-cloud** — Server-side request forgery targeting cloud metadata or internal services
+9. **supply-chain** — Dependency confusion, typosquatting, or malicious package references
+10. **third-party-content** — Loading untrusted third-party content into agent context
+11. **toxic-flow** — Data flows that could lead to unintended harmful outputs
+12. **external-download** — Skills that download or execute external resources at runtime
+13. **unicode-attack** — Unicode-based obfuscation (homoglyphs, bidi overrides, invisible characters)
 
 ## Scoring Methodology
 
@@ -55,11 +69,11 @@ Minimum score is 0. Scores do not go negative.
 
 | Grade | Score Range | Meaning |
 |-------|-----------|---------|
-| A | 90–100 | Excellent — minimal or no security issues |
-| B | 75–89 | Good — minor issues detected |
-| C | 50–74 | Fair — moderate security concerns |
-| D | 25–49 | Poor — significant security issues |
-| F | 0–24 | Failing — critical security vulnerabilities |
+| A | 90-100 | Excellent — minimal or no security issues |
+| B | 75-89 | Good — minor issues detected |
+| C | 50-74 | Fair — moderate security concerns |
+| D | 25-49 | Poor — significant security issues |
+| F | 0-24 | Failing — critical security vulnerabilities |
 
 ## API Endpoints
 
@@ -93,17 +107,20 @@ All datasets are regenerated daily and are freely available for research and ana
 
 ## Frequently Asked Questions
 
-**Q: How often is data updated?**
-A: The full pipeline (crawl → scan → aggregate → publish) runs daily via GitHub Actions CI.
+**Q: What does the Aguara security scanner detect?**
+A: Aguara detects security vulnerabilities across 13 categories including prompt injection, credential leaks, command execution, data exfiltration, MCP attacks, SSRF, supply chain risks, and more. It uses 173+ detection rules with deterministic static analysis — no code execution.
+
+**Q: Is the scanner free to use?**
+A: Yes, completely free and open source under the Apache-2.0 license. The browser scanner runs via WebAssembly with no account required.
+
+**Q: Can I scan private GitHub repositories?**
+A: Yes. Connect a GitHub fine-grained Personal Access Token with Contents: Read-only permission. The token stays in your browser's sessionStorage and is only used for GitHub API calls — never sent to any Aguara server.
+
+**Q: How often is the observatory data updated?**
+A: The full pipeline (crawl, scan, aggregate, publish) runs daily via GitHub Actions CI.
 
 **Q: Is the scan data free to use?**
 A: Yes. All data is published under the Apache-2.0 license. The JSON API and CSV datasets are free for any use.
-
-**Q: What does Aguara scan for?**
-A: Aguara performs deterministic static analysis on skill definitions, tool descriptions, and MCP configurations. It uses pattern matching and structural analysis — no code execution.
-
-**Q: Can I scan my own skills?**
-A: Yes. Use the Aguara CLI scanner directly: https://aguarascan.com. It runs locally and supports JSON, YAML, and Markdown skill files.
 
 **Q: Can I scan skills via an AI assistant?**
 A: Yes. The Aguara MCP server (https://github.com/garagon/aguara-mcp) lets Claude, Cursor, and other MCP-compatible AI agents scan skills on demand.
@@ -113,9 +130,6 @@ A: Common reasons include: hardcoded API keys, shell command execution in tool d
 
 **Q: What if a finding is a false positive?**
 A: Aguara is a deterministic scanner — it reports patterns that match known threat signatures. Some matches may be intentional or benign. The score reflects risk surface, not confirmed exploitation.
-
-**Q: How are registries selected?**
-A: Registries are included based on being publicly accessible, actively maintained, and serving as a discovery mechanism for AI agent skills or MCP servers.
 
 ## Related Projects
 
