@@ -77,14 +77,14 @@ const base = import.meta.env.BASE_URL;
       <div id="panel-url" class="max-w-3xl mx-auto animate-slide-up" style="animation-delay: 250ms">
         <div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 sm:p-8 mb-4 backdrop-blur-sm">
           <label for="github-url" class="block text-sm text-gray-400 mb-3 font-medium">GitHub repository, file, or directory URL</label>
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <input
               id="github-url"
               type="url"
               placeholder="https://github.com/owner/repo"
               class="flex-1 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-base text-gray-200 font-mono placeholder-gray-600 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all"
             />
-            <button id="fetch-btn" disabled class="px-6 py-3 bg-aguara-500 hover:bg-aguara-600 disabled:bg-gray-800 disabled:text-gray-600 text-white text-sm font-semibold rounded-xl transition-all disabled:cursor-not-allowed whitespace-nowrap shadow-lg shadow-aguara-500/20 hover:shadow-aguara-500/30 disabled:shadow-none">
+            <button id="fetch-btn" disabled class="w-full sm:w-auto px-6 py-3 bg-aguara-500 hover:bg-aguara-600 disabled:bg-gray-800 disabled:text-gray-600 text-white text-sm font-semibold rounded-xl transition-all disabled:cursor-not-allowed whitespace-nowrap shadow-lg shadow-aguara-500/20 hover:shadow-aguara-500/30 disabled:shadow-none">
               Fetch &amp; Scan
             </button>
           </div>
@@ -108,7 +108,7 @@ const base = import.meta.env.BASE_URL;
               <!-- Token input -->
               <div id="pat-input-row">
                 <label class="block text-xs text-gray-400 mb-2 font-medium">GitHub Personal Access Token</label>
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-3">
                   <input
                     id="pat-input"
                     type="password"
@@ -116,7 +116,7 @@ const base = import.meta.env.BASE_URL;
                     placeholder="github_pat_..."
                     class="flex-1 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 font-mono placeholder-gray-600 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all"
                   />
-                  <button id="pat-connect-btn" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors whitespace-nowrap">
+                  <button id="pat-connect-btn" class="w-full sm:w-auto px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors whitespace-nowrap">
                     Connect
                   </button>
                 </div>
@@ -654,48 +654,50 @@ const base = import.meta.env.BASE_URL;
 
     <!-- Results state -->
     <div id="state-results" class="hidden">
-      <!-- Header with grade -->
-      <div class="flex items-start justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-bold text-white mb-1">Scan Results</h1>
-          <p id="result-filename" class="text-sm text-gray-400 font-mono"></p>
-          <a id="result-source-link" href="#" class="hidden inline-flex items-center gap-1 text-sm text-aguara-400 hover:text-aguara-300 mt-1 transition-colors" target="_blank" rel="noopener noreferrer">
-            View on GitHub
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
-          </a>
-        </div>
-        <div class="flex items-center gap-2">
-          <div id="grade-badge" class="w-16 h-16 text-3xl rounded-lg border-2 flex items-center justify-center font-bold"></div>
-          <span id="score-label" class="text-sm text-gray-400"></span>
-        </div>
-      </div>
-
-      <!-- Stat cards -->
-      <div class="grid grid-cols-3 gap-3 mb-4">
-        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-          <p class="text-xs text-gray-500 mb-1">Score</p>
-          <p id="stat-score" class="text-sm text-gray-300 font-mono"></p>
-        </div>
-        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-          <p class="text-xs text-gray-500 mb-1">Findings</p>
-          <p id="stat-findings" class="text-sm text-gray-300 font-mono"></p>
-        </div>
-        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-          <p class="text-xs text-gray-500 mb-1">Duration</p>
-          <p id="stat-duration" class="text-sm text-gray-300 font-mono"></p>
+      <!-- Grade hero card -->
+      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 sm:p-8 mb-6">
+        <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+          <!-- Grade badge (large, centered on mobile) -->
+          <div id="grade-badge" class="w-20 h-20 sm:w-24 sm:h-24 text-4xl sm:text-5xl rounded-2xl border-2 flex items-center justify-center font-bold shrink-0"></div>
+          <!-- Info -->
+          <div class="flex-1 text-center sm:text-left min-w-0">
+            <p id="result-filename" class="text-sm text-gray-400 font-mono truncate"></p>
+            <a id="result-source-link" href="#" class="hidden inline-flex items-center gap-1 text-sm text-aguara-400 hover:text-aguara-300 mt-0.5 transition-colors" target="_blank" rel="noopener noreferrer">
+              View on GitHub
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
+            </a>
+            <!-- Inline stats -->
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 mt-3 text-sm">
+              <span class="text-gray-500">Score <span id="stat-score" class="text-white font-semibold"></span></span>
+              <span class="text-gray-500">Findings <span id="stat-findings" class="text-white font-semibold"></span></span>
+              <span class="text-gray-500">Time <span id="stat-duration" class="text-white font-semibold"></span></span>
+            </div>
+          </div>
+          <!-- Score label (right side on desktop) -->
+          <div class="hidden sm:block text-right shrink-0">
+            <span id="score-label" class="text-3xl font-bold text-white"></span>
+          </div>
         </div>
       </div>
 
-      <!-- Download report buttons -->
-      <div class="flex gap-3 mb-8">
-        <button id="download-json-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-          Download JSON
-        </button>
-        <button id="download-html-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-          Download HTML Report
-        </button>
+      <!-- Download report CTA -->
+      <div class="bg-gray-900/30 border border-gray-800 rounded-2xl p-5 sm:p-6 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-white">Download your security report</p>
+            <p class="text-xs text-gray-500 mt-0.5">Share it with your team or keep it for your records</p>
+          </div>
+          <div class="flex gap-3 w-full sm:w-auto">
+            <button id="download-html-btn" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-aguara-500 hover:bg-aguara-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-aguara-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+              HTML Report
+            </button>
+            <button id="download-json-btn" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm font-medium rounded-xl transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+              JSON
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Files scanned (for repo mode) -->
@@ -711,10 +713,14 @@ const base = import.meta.env.BASE_URL;
       <!-- Severity summary + findings list injected here by JS -->
       <div id="results-body"></div>
 
-      <!-- Reset button -->
-      <div class="mt-8">
-        <button id="reset-btn" class="px-5 py-2 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 text-sm font-medium rounded-lg transition-colors">
+      <!-- Bottom actions -->
+      <div class="flex flex-col sm:flex-row gap-3 mt-8">
+        <button id="reset-btn" class="flex-1 sm:flex-initial px-5 py-2.5 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 text-sm font-medium rounded-xl transition-colors text-center">
           Scan another file
+        </button>
+        <button id="download-html-btn-bottom" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-aguara-500/10 hover:bg-aguara-500/20 border border-aguara-500/30 text-aguara-400 hover:text-aguara-300 text-sm font-medium rounded-xl transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+          Download Report
         </button>
       </div>
     </div>
@@ -1576,9 +1582,9 @@ const base = import.meta.env.BASE_URL;
       if (sourceUrl) { srcLink.href = sourceUrl; srcLink.classList.remove("hidden"); }
       else { srcLink.classList.add("hidden"); }
 
-      document.getElementById("stat-score").innerHTML = '<span class="font-bold text-white">' + score + '/100</span>';
-      document.getElementById("stat-findings").innerHTML = '<span class="font-bold text-white">' + findings.length + '</span>';
-      document.getElementById("stat-duration").innerHTML = '<span class="font-bold text-white">' + elapsed + ' ms</span>';
+      document.getElementById("stat-score").textContent = score + '/100';
+      document.getElementById("stat-findings").textContent = findings.length;
+      document.getElementById("stat-duration").textContent = elapsed + 'ms';
 
       // Files scanned section (repo mode)
       var filesSection = document.getElementById("files-scanned-section");
@@ -1717,6 +1723,8 @@ const base = import.meta.env.BASE_URL;
     // --- Download buttons ---
     downloadJsonBtn.addEventListener("click", generateJsonReport);
     downloadHtmlBtn.addEventListener("click", generateHtmlReport);
+    var downloadHtmlBtnBottom = document.getElementById("download-html-btn-bottom");
+    if (downloadHtmlBtnBottom) downloadHtmlBtnBottom.addEventListener("click", generateHtmlReport);
 
     // --- Auto-restore PAT on page load ---
     if (githubPat) {
