@@ -741,6 +741,14 @@ const base = import.meta.env.BASE_URL;
     };
     var SEVERITY_RANK = {CRITICAL:0, HIGH:1, MEDIUM:2, LOW:3, INFO:4};
     var SCANNABLE_EXTS = [".md",".json",".yaml",".yml",".py",".js",".ts",".txt",".toml",".cfg",".ini",".sh",".bash"];
+    var SKIP_FILES = [
+      "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb",
+      "composer.lock", "Gemfile.lock", "Pipfile.lock", "poetry.lock",
+      "go.sum", "Cargo.lock", "flake.lock",
+      ".eslintrc.json", ".prettierrc.json", "tsconfig.json", "jsconfig.json",
+      ".gitignore", ".editorconfig", "renovate.json", "dependabot.yml"
+    ];
+    var SKIP_DIRS = ["node_modules/", ".git/", "dist/", "build/", "__pycache__/", ".next/", ".nuxt/", "vendor/"];
     var MAX_FILES = 30;
     var MAX_FILE_SIZE = 256 * 1024; // 256 KB per file
 
@@ -1203,6 +1211,9 @@ const base = import.meta.env.BASE_URL;
 
     function isScannable(path) {
       var lower = path.toLowerCase();
+      var filename = lower.split("/").pop();
+      if (SKIP_FILES.indexOf(filename) !== -1) return false;
+      if (SKIP_DIRS.some(function(d) { return lower.indexOf(d) !== -1; })) return false;
       return SCANNABLE_EXTS.some(function(ext) { return lower.endsWith(ext); });
     }
 
