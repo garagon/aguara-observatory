@@ -1,0 +1,230 @@
+---
+import Base from "../layouts/Base.astro";
+import StatCard from "../components/StatCard.astro";
+import RegistryCard from "../components/RegistryCard.astro";
+import SeverityBadge from "../components/SeverityBadge.astro";
+import SearchBar from "../components/SearchBar.astro";
+import { getStats, getRegistries, getCategories, getMostCompromised } from "../lib/api";
+import { scoreToGrade, gradeColors, gradeBarColors, gradeOrder, categoryDescriptions } from "../lib/constants";
+
+const stats = getStats();
+const registries = getRegistries();
+const categories = getCategories();
+const compromised = getMostCompromised(8);
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="AI Agent Security Dashboard" description={`Scanning ${stats.total_skills?.toLocaleString() ?? '31,000+'}  AI agent skills daily across ${stats.registries_count ?? 5} public registries. Open source. Open data.`}>
+  <!-- Hero -->
+  <div class="relative z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12">
+    <!-- Subtle gradient glow -->
+    <div class="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-gray-950 to-gray-950 -z-10"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] max-w-full h-[200px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
+
+    <div class="relative text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400 animate-fade-in">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Scanning {stats ? stats.registries_count : 5} registries daily
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight animate-slide-up">
+        AI Agent Security Watch
+      </h1>
+      <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms">
+        Scanning every public AI agent skill registry for security vulnerabilities.
+      </p>
+      <div class="max-w-xl mx-auto animate-slide-up" style="animation-delay: 200ms">
+        <SearchBar />
+      </div>
+    </div>
+  </div>
+
+  {stats ? (
+    <>
+      <!-- Key metrics -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 animate-slide-up" style="animation-delay: 300ms">
+        <StatCard
+          label="Skills Monitored"
+          value={stats.total_skills}
+          icon="skills"
+        />
+        <StatCard
+          label="Security Findings"
+          value={stats.total_findings}
+          sublabel={`of ${stats.total_findings_all?.toLocaleString() ?? stats.total_findings} total`}
+          icon="findings"
+        />
+        <StatCard
+          label="Average Score"
+          value={`${stats.avg_score}`}
+          sublabel={`Grade ${scoreToGrade(stats.avg_score)}`}
+          icon="score"
+        />
+        <StatCard
+          label="Ecosystem Health"
+          value={`${Math.round(((stats.grade_distribution?.A ?? 0) / (stats.skills_scanned || 1)) * 100)}%`}
+          sublabel="Grade A skills"
+          icon="health"
+        />
+      </div>
+
+      <!-- Severity + Grade side by side -->
+      <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 450ms">
+        <!-- Severity distribution -->
+        {stats.severity_distribution && Object.keys(stats.severity_distribution).length > 0 && (
+          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Findings by Severity</h2>
+            <div class="space-y-4">
+              {["CRITICAL", "HIGH", "MEDIUM"].map((sev) => {
+                const count = stats.severity_distribution[sev] ?? 0;
+                const total = stats.total_findings || 1;
+                const pct = Math.round((count / total) * 100);
+                const barColor = sev === "CRITICAL" ? "bg-red-500" : sev === "HIGH" ? "bg-orange-500" : "bg-yellow-500";
+                if (count === 0) return null;
+                return (
+                  <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <SeverityBadge severity={sev} />
+                      <span class="text-sm font-mono text-gray-300">{count.toLocaleString()}</span>
+                    </div>
+                    <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                      <div class={`h-full ${barColor} rounded-full animate-bar-grow origin-left`} style={`width: ${pct}%`} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <!-- Grade distribution -->
+        {stats.grade_distribution && Object.keys(stats.grade_distribution).length > 0 && (
+          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Grade Distribution</h2>
+            <div class="space-y-3">
+              {gradeOrder.map((grade) => {
+                const count = stats.grade_distribution[grade] ?? 0;
+                const total = stats.skills_scanned || 1;
+                const pct = Math.round((count / total) * 100);
+                const displayPct = grade === "A" ? Math.min(pct, 100) : pct;
+                return (
+                  <a href={`${base}grades/${grade}/`} class="flex items-center gap-3 group">
+                    <span class={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold border ${gradeBarColors[grade].replace("bg-", "bg-").replace("500", "500/20")} ${gradeBarColors[grade].replace("bg-", "text-").replace("500", "400")} ${gradeBarColors[grade].replace("bg-", "border-").replace("500", "500/30")}`}>
+                      {grade}
+                    </span>
+                    <div class="flex-1">
+                      <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div class={`h-full ${gradeBarColors[grade]} rounded-full animate-bar-grow origin-left`} style={`width: ${displayPct}%`} />
+                      </div>
+                    </div>
+                    <span class="w-14 sm:w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
+                      {count.toLocaleString()}
+                    </span>
+                    <span class="w-8 sm:w-10 text-right text-xs text-gray-500">{pct}%</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  ) : (
+    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center mb-12">
+      <p class="text-gray-400 text-lg">No scan data available yet.</p>
+      <p class="text-gray-500 text-sm mt-2">Run the crawl and scan pipeline to populate data.</p>
+    </div>
+  )}
+
+  <!-- Registries -->
+  <div class="mb-12 animate-slide-up" style="animation-delay: 600ms">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-white">Monitored Registries</h2>
+      <a href={`${base}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
+        View all &rarr;
+      </a>
+    </div>
+    {registries.length > 0 ? (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {registries.map((r) => (
+          <RegistryCard
+            id={r.id}
+            name={r.name}
+            url={r.url}
+            description={r.description}
+            skillCount={r.skill_count}
+            avgScore={r.avg_score}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center">
+        <p class="text-gray-400">No registry data available yet.</p>
+      </div>
+    )}
+  </div>
+
+  <!-- Categories + Most compromised side by side -->
+  <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 750ms">
+    <!-- Top categories -->
+    {categories.length > 0 && (
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-white">Top Categories</h2>
+          <a href={`${base}categories/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
+            All {categories.length} &rarr;
+          </a>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          {categories.slice(0, 8).map((cat, i) => {
+            const maxCount = categories[0]?.count || 1;
+            const pct = Math.round((cat.count / maxCount) * 100);
+            return (
+              <a
+                href={`${base}categories/${cat.category}/`}
+                class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group ${i > 0 ? "border-t border-gray-800/50" : ""}`}
+              >
+                <span class="flex-1 text-sm text-gray-300 group-hover:text-white transition-colors">{cat.category}</span>
+                <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
+                  <div class="h-full bg-aguara-500/50 rounded-full animate-bar-grow origin-left" style={`width: ${pct}%`} />
+                </div>
+                <span class="text-xs font-mono text-gray-500 w-12 text-right">{cat.count}</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+    <!-- Most compromised skills -->
+    {compromised.length > 0 && (
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-4">Most Compromised Skills</h2>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+          {compromised.map((skill, i) => {
+            const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
+            const href = `${base}skills/${skill.registry_id}/${safeSlug}/`;
+            const gc = gradeColors[skill.grade] || gradeColors["F"];
+            return (
+              <a href={href} class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
+                <span class={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold border ${gc.css}`}>
+                  {skill.grade}
+                </span>
+                <span class="text-sm text-gray-300 truncate flex-1">{skill.name}</span>
+                <span class="text-xs text-gray-500 shrink-0">{skill.finding_count} findings</span>
+                <span class="text-xs text-gray-600 shrink-0 w-16 text-right hidden sm:inline">{skill.registry_id}</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="text-center text-xs text-gray-600 py-6 border-t border-gray-800/50 animate-fade-in" style="animation-delay: 900ms">
+    <p>
+      Results may include false positives. Aguara is continuously improved as more public data is collected.
+      <a href={`${base}about/`} class="text-gray-500 hover:text-gray-400 underline underline-offset-2 transition-colors">Learn more</a>
+    </p>
+  </div>
+</Base>

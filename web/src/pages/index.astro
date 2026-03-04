@@ -1,230 +1,1700 @@
 ---
 import Base from "../layouts/Base.astro";
-import StatCard from "../components/StatCard.astro";
-import RegistryCard from "../components/RegistryCard.astro";
-import SeverityBadge from "../components/SeverityBadge.astro";
-import SearchBar from "../components/SearchBar.astro";
-import { getStats, getRegistries, getCategories, getMostCompromised } from "../lib/api";
-import { scoreToGrade, gradeColors, gradeBarColors, gradeOrder, categoryDescriptions } from "../lib/constants";
 
-const stats = getStats();
-const registries = getRegistries();
-const categories = getCategories();
-const compromised = getMostCompromised(8);
 const base = import.meta.env.BASE_URL;
 ---
 
-<Base title="AI Agent Security Dashboard" description={`Scanning ${stats.total_skills?.toLocaleString() ?? '31,000+'}  AI agent skills daily across ${stats.registries_count ?? 5} public registries. Open source. Open data.`}>
-  <!-- Hero -->
-  <div class="relative z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-12 pb-16 mb-12">
-    <!-- Subtle gradient glow -->
-    <div class="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-gray-950 to-gray-950 -z-10"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] max-w-full h-[200px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
+<Base
+  title="AI Agent Security Scanner"
+  description="Free online security scanner for AI agent skills and MCP servers. Detects prompt injection, credential leaks, command execution, and 10 more threat categories with 173+ rules. Runs 100% in your browser via WebAssembly."
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does the Aguara security scanner detect?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Aguara detects security vulnerabilities across 13 categories including prompt injection, credential leaks, command execution, data exfiltration, MCP attacks, SSRF, supply chain risks, and more. It uses 173+ detection rules."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the scanner free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, the scanner is 100% free and open source under the Apache-2.0 license. It runs entirely in your browser via WebAssembly — no account needed, no data uploaded."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I scan private GitHub repositories?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, you can scan private repositories by connecting a GitHub Personal Access Token (PAT) with read-only Contents permission. The token stays in your browser session and is never sent to any server."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many skills does Aguara Watch monitor?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Aguara Watch continuously monitors over 46,000 AI agent skills and MCP servers across 7 public registries including Skills.sh, ClawHub, PulseMCP, mcp.so, LobeHub, Smithery, and Glama."
+        }
+      }
+    ]
+  }}
+>
+  <div id="scan-app">
+    <!-- Idle state -->
+    <div id="state-idle">
+      <!-- Hero -->
+      <div class="relative text-center pt-12 sm:pt-16 pb-12 mb-6">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-full h-[300px] bg-aguara-500/5 rounded-full blur-3xl -z-10"></div>
+        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-aguara-400/3 rounded-full blur-2xl -z-10"></div>
 
-    <div class="relative text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-gray-700/50 bg-gray-900/50 text-xs text-gray-400 animate-fade-in">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        Scanning {stats ? stats.registries_count : 5} registries daily
-      </div>
-      <h1 class="text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight animate-slide-up">
-        AI Agent Security Watch
-      </h1>
-      <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms">
-        Scanning every public AI agent skill registry for security vulnerabilities.
-      </p>
-      <div class="max-w-xl mx-auto animate-slide-up" style="animation-delay: 200ms">
-        <SearchBar />
-      </div>
-    </div>
-  </div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 mb-8 rounded-full border border-gray-700/50 bg-gray-900/60 text-xs text-gray-400 animate-fade-in backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          173+ rules &middot; 13 categories &middot; 100% client-side
+        </div>
 
-  {stats ? (
-    <>
-      <!-- Key metrics -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 animate-slide-up" style="animation-delay: 300ms">
-        <StatCard
-          label="Skills Monitored"
-          value={stats.total_skills}
-          icon="skills"
-        />
-        <StatCard
-          label="Security Findings"
-          value={stats.total_findings}
-          sublabel={`of ${stats.total_findings_all?.toLocaleString() ?? stats.total_findings} total`}
-          icon="findings"
-        />
-        <StatCard
-          label="Average Score"
-          value={`${stats.avg_score}`}
-          sublabel={`Grade ${scoreToGrade(stats.avg_score)}`}
-          icon="score"
-        />
-        <StatCard
-          label="Ecosystem Health"
-          value={`${Math.round(((stats.grade_distribution?.A ?? 0) / (stats.skills_scanned || 1)) * 100)}%`}
-          sublabel="Grade A skills"
-          icon="health"
-        />
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight animate-slide-up leading-[1.1]">
+          Scan Any AI Agent for<br class="hidden sm:block" />
+          <span class="text-aguara-400">Security Vulnerabilities</span>
+        </h1>
+
+        <p class="text-lg text-gray-400 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 100ms">
+          The same engine monitoring 46,000+ skills and MCP servers daily.
+        </p>
+        <p class="text-sm text-gray-500 mt-2 animate-slide-up" style="animation-delay: 150ms">
+          Runs locally in your browser via WebAssembly. Nothing is uploaded.
+        </p>
       </div>
 
-      <!-- Severity + Grade side by side -->
-      <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 450ms">
-        <!-- Severity distribution -->
-        {stats.severity_distribution && Object.keys(stats.severity_distribution).length > 0 && (
-          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
-            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Findings by Severity</h2>
-            <div class="space-y-4">
-              {["CRITICAL", "HIGH", "MEDIUM"].map((sev) => {
-                const count = stats.severity_distribution[sev] ?? 0;
-                const total = stats.total_findings || 1;
-                const pct = Math.round((count / total) * 100);
-                const barColor = sev === "CRITICAL" ? "bg-red-500" : sev === "HIGH" ? "bg-orange-500" : "bg-yellow-500";
-                if (count === 0) return null;
-                return (
-                  <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                      <SeverityBadge severity={sev} />
-                      <span class="text-sm font-mono text-gray-300">{count.toLocaleString()}</span>
-                    </div>
-                    <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div class={`h-full ${barColor} rounded-full animate-bar-grow origin-left`} style={`width: ${pct}%`} />
+      <!-- Tab switcher -->
+      <div class="flex gap-1 mb-6 bg-gray-900/60 rounded-xl p-1 w-fit mx-auto animate-slide-up backdrop-blur-sm border border-gray-800/50" style="animation-delay: 200ms">
+        <button id="tab-url" class="tab-btn px-5 py-2 text-sm font-medium rounded-lg bg-gray-800 text-white transition-colors">GitHub URL</button>
+        <button id="tab-paste" class="tab-btn px-5 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition-colors">Paste / Upload</button>
+      </div>
+
+      <!-- URL input panel -->
+      <div id="panel-url" class="max-w-3xl mx-auto animate-slide-up" style="animation-delay: 250ms">
+        <div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 sm:p-8 mb-4 backdrop-blur-sm">
+          <label for="github-url" class="block text-sm text-gray-400 mb-3 font-medium">GitHub repository, file, or directory URL</label>
+          <div class="flex gap-3">
+            <input
+              id="github-url"
+              type="url"
+              placeholder="https://github.com/owner/repo"
+              class="flex-1 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-base text-gray-200 font-mono placeholder-gray-600 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all"
+            />
+            <button id="fetch-btn" disabled class="px-6 py-3 bg-aguara-500 hover:bg-aguara-600 disabled:bg-gray-800 disabled:text-gray-600 text-white text-sm font-semibold rounded-xl transition-all disabled:cursor-not-allowed whitespace-nowrap shadow-lg shadow-aguara-500/20 hover:shadow-aguara-500/30 disabled:shadow-none">
+              Fetch &amp; Scan
+            </button>
+          </div>
+          <p class="text-xs text-gray-600 mt-3">Supports repositories, directories, single files, and raw.githubusercontent.com URLs</p>
+        </div>
+
+        <!-- Private repo PAT section -->
+        <div class="mb-4">
+          <button id="pat-toggle" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors group">
+            <svg class="w-4 h-4 text-gray-600 group-hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            Need to scan a private repository?
+            <svg id="pat-chevron" class="w-3.5 h-3.5 transition-transform text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+
+          <div id="pat-section" class="hidden mt-4">
+            <div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-5 sm:p-6 backdrop-blur-sm">
+              <!-- Token input -->
+              <div id="pat-input-row">
+                <label class="block text-xs text-gray-400 mb-2 font-medium">GitHub Personal Access Token</label>
+                <div class="flex gap-3">
+                  <input
+                    id="pat-input"
+                    type="password"
+                    autocomplete="off"
+                    placeholder="github_pat_..."
+                    class="flex-1 bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 font-mono placeholder-gray-600 focus:outline-none focus:border-aguara-500 focus:ring-1 focus:ring-aguara-500/30 transition-all"
+                  />
+                  <button id="pat-connect-btn" class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors whitespace-nowrap">
+                    Connect
+                  </button>
+                </div>
+                <p class="text-xs text-gray-600 mt-2 flex items-center gap-1.5">
+                  <svg class="w-3 h-3 text-emerald-500/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+                  Token stays in your browser session only. Never sent to our servers.
+                </p>
+              </div>
+
+              <!-- Authenticated state -->
+              <div id="pat-authenticated" class="hidden">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                      Connected
+                    </span>
+                    <span id="pat-rate-limit" class="text-xs text-gray-500 font-mono"></span>
+                  </div>
+                  <button id="pat-disconnect-btn" class="text-xs text-gray-500 hover:text-red-400 transition-colors font-medium">Disconnect</button>
+                </div>
+                <!-- Repos list -->
+                <div id="pat-repos">
+                  <p class="text-xs text-gray-400 mb-3 font-medium">Your repositories</p>
+                  <div id="pat-repos-list" class="space-y-1 max-h-52 overflow-y-auto rounded-xl border border-gray-800/50 bg-gray-800/20 p-2"></div>
+                  <div id="pat-repos-loading" class="flex items-center gap-2 py-4 justify-center">
+                    <svg class="animate-spin w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-xs text-gray-500">Loading repositories...</span>
+                  </div>
+                  <div id="pat-repos-empty" class="hidden text-xs text-gray-500 space-y-2 py-3 text-center">
+                    <p>No repositories found. Your token needs:</p>
+                    <ol class="list-decimal list-inside space-y-0.5 text-gray-400 text-left inline-block">
+                      <li>Select the repositories you want to scan</li>
+                      <li>Add permission <code class="px-1 py-0.5 bg-gray-800 rounded text-gray-300">Contents</code> &rarr; <code class="px-1 py-0.5 bg-gray-800 rounded text-gray-300">Read-only</code></li>
+                    </ol>
+                    <div>
+                      <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-aguara-400 hover:text-aguara-300 transition-colors mt-1">
+                        Create a new token with the right permissions
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                      </a>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="mt-4 pt-3 border-t border-gray-800/50 flex items-center justify-end">
+                <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer" class="text-xs text-gray-500 hover:text-aguara-400 transition-colors inline-flex items-center gap-1">
+                  Create a read-only token
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                </a>
+              </div>
             </div>
           </div>
-        )}
+        </div>
+      </div>
 
-        <!-- Grade distribution -->
-        {stats.grade_distribution && Object.keys(stats.grade_distribution).length > 0 && (
-          <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
-            <h2 class="text-sm font-medium text-gray-400 uppercase tracking-wider mb-5">Grade Distribution</h2>
-            <div class="space-y-3">
-              {gradeOrder.map((grade) => {
-                const count = stats.grade_distribution[grade] ?? 0;
-                const total = stats.skills_scanned || 1;
-                const pct = Math.round((count / total) * 100);
-                const displayPct = grade === "A" ? Math.min(pct, 100) : pct;
-                return (
-                  <a href={`${base}grades/${grade}/`} class="flex items-center gap-3 group">
-                    <span class={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold border ${gradeBarColors[grade].replace("bg-", "bg-").replace("500", "500/20")} ${gradeBarColors[grade].replace("bg-", "text-").replace("500", "400")} ${gradeBarColors[grade].replace("bg-", "border-").replace("500", "500/30")}`}>
-                      {grade}
-                    </span>
-                    <div class="flex-1">
-                      <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div class={`h-full ${gradeBarColors[grade]} rounded-full animate-bar-grow origin-left`} style={`width: ${displayPct}%`} />
-                      </div>
-                    </div>
-                    <span class="w-14 sm:w-20 text-right text-sm text-gray-400 group-hover:text-white transition-colors font-mono">
-                      {count.toLocaleString()}
-                    </span>
-                    <span class="w-8 sm:w-10 text-right text-xs text-gray-500">{pct}%</span>
-                  </a>
-                );
-              })}
+      <!-- Paste/upload panel (hidden by default) -->
+      <div id="panel-paste" class="hidden max-w-3xl mx-auto animate-slide-up" style="animation-delay: 250ms">
+        <div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+          <!-- File type selector -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".md">.md</button>
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".json">.json</button>
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".yaml">.yaml</button>
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".py">.py</button>
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".js">.js</button>
+            <button class="ext-btn px-3 py-1.5 text-xs font-mono rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors" data-ext=".ts">.ts</button>
+          </div>
+
+          <!-- Drop zone + textarea -->
+          <div id="drop-zone" class="bg-gray-800/30 border-2 border-dashed border-gray-700 rounded-xl p-5 mb-4 transition-colors">
+            <textarea
+              id="content-input"
+              rows="10"
+              placeholder="Paste skill content here, or drag & drop a file..."
+              class="w-full bg-transparent text-sm text-gray-200 font-mono placeholder-gray-600 resize-y focus:outline-none"
+            ></textarea>
+          </div>
+
+          <!-- Filename display -->
+          <div id="filename-display" class="hidden mb-4">
+            <span class="text-xs text-gray-500">File:</span>
+            <span id="filename-label" class="text-xs font-mono text-gray-300 ml-1"></span>
+          </div>
+
+          <!-- Scan button for paste mode -->
+          <button id="scan-btn" disabled class="px-6 py-3 bg-aguara-500 hover:bg-aguara-600 disabled:bg-gray-800 disabled:text-gray-600 text-white text-sm font-semibold rounded-xl transition-all disabled:cursor-not-allowed shadow-lg shadow-aguara-500/20 hover:shadow-aguara-500/30 disabled:shadow-none">
+            Scan
+          </button>
+        </div>
+      </div>
+
+      <!-- Trust signals -->
+      <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs text-gray-500 mt-8 mb-20 max-w-3xl mx-auto">
+        <span class="inline-flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+          100% client-side via WASM
+        </span>
+        <span class="text-gray-800">&middot;</span>
+        <span class="inline-flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          Open source &mdash; Apache-2.0
+        </span>
+        <span class="text-gray-800">&middot;</span>
+        <span class="inline-flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-yellow-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          Nothing is uploaded
+        </span>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="border-t border-b border-gray-800/60 py-10 mb-16">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-white">46K+</p>
+            <p class="text-xs text-gray-500 mt-1">Skills & MCP servers scanned</p>
+          </div>
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-white">7</p>
+            <p class="text-xs text-gray-500 mt-1">Registries monitored daily</p>
+          </div>
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-white">173+</p>
+            <p class="text-xs text-gray-500 mt-1">Detection rules</p>
+          </div>
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-white">13</p>
+            <p class="text-xs text-gray-500 mt-1">Security categories</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- What the scanner checks -->
+      <div class="mb-16 max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-xl font-bold text-white mb-3">What the scanner detects</h2>
+          <p class="text-sm text-gray-500">Every scan checks for vulnerabilities across 13 security categories</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+            Prompt Injection
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+            Credential Leaks
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+            Command Execution
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+            Data Exfiltration
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            Indirect Injection
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            MCP Attacks
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            MCP Config
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            SSRF / Cloud
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+            Supply Chain
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+            Third-Party Content
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            Toxic Flow
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            External Downloads
+          </span>
+        </div>
+      </div>
+
+      <!-- How it works -->
+      <div class="mb-20 max-w-5xl mx-auto hiw-section">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">How it works</h2>
+          <p class="text-base text-gray-400 max-w-2xl mx-auto">Three steps to find security vulnerabilities in any AI agent skill, MCP server, or configuration file.</p>
+        </div>
+
+        <!-- Steps with energy flow connectors -->
+        <div class="hidden sm:grid sm:grid-cols-[1fr_80px_1fr_80px_1fr] items-start mb-16">
+          <!-- Step 1 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6 lg:p-8">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 1</span>
+            <h3 class="text-base font-semibold text-white mb-2">Provide a source</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Enter a GitHub URL, paste content directly, or drag and drop a file. Supports repositories, directories, and individual files.</p>
+          </div>
+
+          <!-- Energy flow connector 1→2 -->
+          <div class="flex items-center justify-center pt-10">
+            <div class="hiw-connector w-full h-[2px] bg-gray-800 rounded-full overflow-hidden relative">
+              <div class="energy-pulse"></div>
             </div>
           </div>
-        )}
-      </div>
-    </>
-  ) : (
-    <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center mb-12">
-      <p class="text-gray-400 text-lg">No scan data available yet.</p>
-      <p class="text-gray-500 text-sm mt-2">Run the crawl and scan pipeline to populate data.</p>
-    </div>
-  )}
 
-  <!-- Registries -->
-  <div class="mb-12 animate-slide-up" style="animation-delay: 600ms">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold text-white">Monitored Registries</h2>
-      <a href={`${base}registries/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
-        View all &rarr;
-      </a>
-    </div>
-    {registries.length > 0 ? (
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {registries.map((r) => (
-          <RegistryCard
-            id={r.id}
-            name={r.name}
-            url={r.url}
-            description={r.description}
-            skillCount={r.skill_count}
-            avgScore={r.avg_score}
-          />
-        ))}
-      </div>
-    ) : (
-      <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-12 text-center">
-        <p class="text-gray-400">No registry data available yet.</p>
-      </div>
-    )}
-  </div>
+          <!-- Step 2 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6 lg:p-8">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 2</span>
+            <h3 class="text-base font-semibold text-white mb-2">Scan locally in your browser</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Aguara runs entirely in your browser via WebAssembly. No server, no uploads. Your code never leaves your machine.</p>
+          </div>
 
-  <!-- Categories + Most compromised side by side -->
-  <div class="grid lg:grid-cols-2 gap-6 mb-12 animate-slide-up" style="animation-delay: 750ms">
-    <!-- Top categories -->
-    {categories.length > 0 && (
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-white">Top Categories</h2>
-          <a href={`${base}categories/`} class="text-sm text-gray-400 hover:text-aguara-400 transition-colors">
-            All {categories.length} &rarr;
+          <!-- Energy flow connector 2→3 -->
+          <div class="flex items-center justify-center pt-10">
+            <div class="hiw-connector w-full h-[2px] bg-gray-800 rounded-full overflow-hidden relative">
+              <div class="energy-pulse energy-pulse-delayed"></div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6 lg:p-8">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 3</span>
+            <h3 class="text-base font-semibold text-white mb-2">Get your security report</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Receive an A-F grade, detailed severity breakdown, and actionable findings. Download reports as JSON or HTML.</p>
+          </div>
+        </div>
+
+        <!-- Mobile: stacked with vertical energy flow -->
+        <div class="sm:hidden space-y-0 mb-16">
+          <!-- Step 1 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 1</span>
+            <h3 class="text-base font-semibold text-white mb-2">Provide a source</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Enter a GitHub URL, paste content directly, or drag and drop a file.</p>
+          </div>
+          <!-- Vertical connector -->
+          <div class="flex justify-center"><div class="w-[2px] h-8 bg-gray-800 relative overflow-hidden"><div class="energy-pulse-v"></div></div></div>
+          <!-- Step 2 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 2</span>
+            <h3 class="text-base font-semibold text-white mb-2">Scan locally in your browser</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">Aguara runs via WebAssembly. No server, no uploads. Your code stays in your browser.</p>
+          </div>
+          <!-- Vertical connector -->
+          <div class="flex justify-center"><div class="w-[2px] h-8 bg-gray-800 relative overflow-hidden"><div class="energy-pulse-v energy-pulse-delayed"></div></div></div>
+          <!-- Step 3 -->
+          <div class="hiw-step text-center bg-gray-900/30 border border-gray-800/50 rounded-2xl p-6">
+            <div class="w-14 h-14 rounded-2xl bg-aguara-500/10 border border-aguara-500/20 flex items-center justify-center mx-auto mb-4 hiw-icon">
+              <svg class="w-7 h-7 text-aguara-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <span class="inline-block text-[10px] font-bold text-aguara-400/60 uppercase tracking-widest mb-2">Step 3</span>
+            <h3 class="text-base font-semibold text-white mb-2">Get your security report</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">A-F grade, severity breakdown, and downloadable JSON or HTML reports.</p>
+          </div>
+        </div>
+
+        <!-- Why it matters -->
+        <div class="bg-gray-900/30 border border-gray-800/50 rounded-2xl p-8 sm:p-10">
+          <div class="max-w-3xl mx-auto text-center">
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-4">Why scan your AI agent tools?</h3>
+            <p class="text-sm text-gray-400 leading-relaxed mb-6">
+              AI agents can execute code, access files, and make network requests on your behalf.
+              A malicious or poorly written skill can leak credentials, exfiltrate data, or run arbitrary commands on your system.
+              Scanning before installing catches these risks before they become incidents.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+              <div class="flex gap-3">
+                <svg class="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" /></svg>
+                <div>
+                  <p class="text-sm font-medium text-white">Prompt injection</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Hidden instructions can hijack your AI agent and override its behavior.</p>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <svg class="w-5 h-5 text-orange-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg>
+                <div>
+                  <p class="text-sm font-medium text-white">Credential theft</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Skills can contain or request API keys, tokens, and secrets from your environment.</p>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <svg class="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" /></svg>
+                <div>
+                  <p class="text-sm font-medium text-white">Code execution</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Malicious tools can run shell commands or download scripts on your system.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Microanimation styles for How it works -->
+      <style>
+        .hiw-step {
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .hiw-step.hiw-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .hiw-step:hover {
+          border-color: rgba(240, 136, 68, 0.25);
+          box-shadow: 0 0 30px rgba(240, 136, 68, 0.08);
+        }
+
+        /* Card glow when energy pulse arrives */
+        .hiw-step.hiw-glow {
+          border-color: rgba(240, 136, 68, 0.35);
+          box-shadow: 0 0 40px rgba(240, 136, 68, 0.12), inset 0 0 30px rgba(240, 136, 68, 0.03);
+        }
+        .hiw-step.hiw-glow .hiw-icon {
+          transform: scale(1.08);
+          box-shadow: 0 0 28px rgba(240, 136, 68, 0.25);
+        }
+
+        .hiw-icon {
+          transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .hiw-step:hover .hiw-icon {
+          transform: scale(1.1);
+          box-shadow: 0 0 24px rgba(240, 136, 68, 0.2);
+        }
+
+        /* Energy pulse — horizontal connector */
+        .energy-pulse {
+          position: absolute;
+          top: -2px;
+          left: -40%;
+          width: 40%;
+          height: 6px;
+          border-radius: 3px;
+          background: linear-gradient(90deg, transparent, rgba(240, 136, 68, 0.5), rgba(240, 136, 68, 0.9), rgba(240, 136, 68, 0.5), transparent);
+          animation: energyFlow 3s ease-in-out infinite;
+          filter: blur(1px);
+        }
+        .energy-pulse-delayed {
+          animation-delay: 1.5s;
+        }
+
+        @keyframes energyFlow {
+          0%   { left: -40%; opacity: 0; }
+          8%   { opacity: 1; }
+          92%  { opacity: 1; }
+          100% { left: 100%; opacity: 0; }
+        }
+
+        /* Energy pulse — vertical connector (mobile) */
+        .energy-pulse-v {
+          position: absolute;
+          left: -2px;
+          top: -40%;
+          height: 40%;
+          width: 6px;
+          border-radius: 3px;
+          background: linear-gradient(180deg, transparent, rgba(240, 136, 68, 0.5), rgba(240, 136, 68, 0.9), rgba(240, 136, 68, 0.5), transparent);
+          animation: energyFlowV 3s ease-in-out infinite;
+          filter: blur(1px);
+        }
+        .energy-pulse-v.energy-pulse-delayed {
+          animation-delay: 1.5s;
+        }
+
+        @keyframes energyFlowV {
+          0%   { top: -40%; opacity: 0; }
+          8%   { opacity: 1; }
+          92%  { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+
+        /* Connector glow track */
+        .hiw-connector {
+          box-shadow: 0 0 8px rgba(240, 136, 68, 0.04);
+        }
+
+        /* Stagger visibility for desktop 5-col grid children */
+        .sm\:grid > .hiw-step:nth-child(1) { transition-delay: 0s; }
+        .sm\:grid > .hiw-step:nth-child(3) { transition-delay: 0.2s; }
+        .sm\:grid > .hiw-step:nth-child(5) { transition-delay: 0.4s; }
+
+        /* Stagger for mobile stacked */
+        .sm\:hidden > .hiw-step:nth-child(1) { transition-delay: 0s; }
+        .sm\:hidden > .hiw-step:nth-child(3) { transition-delay: 0.15s; }
+        .sm\:hidden > .hiw-step:nth-child(5) { transition-delay: 0.3s; }
+      </style>
+
+      <script is:inline>
+        // Intersection Observer for How It Works scroll animation
+        (function() {
+          var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('hiw-visible');
+              }
+            });
+          }, { threshold: 0.15 });
+
+          document.querySelectorAll('.hiw-step').forEach(function(el) {
+            observer.observe(el);
+          });
+
+          // Sync card glow with energy pulse timing
+          // Pulse animation: 3s total, pulse travels left→right
+          // Step 1 glows at start (0s), Step 2 when pulse 1 arrives (2.7s), Step 3 when pulse 2 arrives (2.7+1.5=4.2s)
+          var CYCLE = 3000;    // matches animation duration
+          var DELAY2 = 1500;   // matches .energy-pulse-delayed
+          var GLOW_DUR = 600;  // how long the glow stays
+
+          function getDesktopSteps() {
+            var grid = document.querySelector('.hiw-section .sm\\:grid');
+            if (!grid || window.innerWidth < 640) return null;
+            return grid.querySelectorAll('.hiw-step');
+          }
+          function getMobileSteps() {
+            var stack = document.querySelector('.hiw-section .sm\\:hidden');
+            if (!stack || window.innerWidth >= 640) return null;
+            return stack.querySelectorAll('.hiw-step');
+          }
+
+          function glowStep(step) {
+            step.classList.add('hiw-glow');
+            setTimeout(function() { step.classList.remove('hiw-glow'); }, GLOW_DUR);
+          }
+
+          function startGlowCycle() {
+            // Step 1 glows at t=0
+            // Pulse 1 starts at t=0, arrives at step 2 at ~t=2.7s (90% of 3s)
+            // Pulse 2 starts at t=1.5s, arrives at step 3 at ~t=1.5+2.7=4.2s
+            var steps = getDesktopSteps() || getMobileSteps();
+            if (!steps || steps.length < 3) return;
+
+            // Step 1 glows immediately
+            glowStep(steps[0]);
+
+            // Step 2 glows when pulse 1 arrives
+            setTimeout(function() { glowStep(steps[1]); }, CYCLE * 0.9);
+
+            // Step 3 glows when pulse 2 arrives
+            setTimeout(function() { glowStep(steps[2]); }, DELAY2 + CYCLE * 0.9);
+          }
+
+          // Full cycle length = max(CYCLE, DELAY2 + CYCLE) = 4.5s, add buffer
+          var fullCycle = DELAY2 + CYCLE + GLOW_DUR;
+          // Start first cycle after a short delay, then repeat
+          setTimeout(function() {
+            startGlowCycle();
+            setInterval(startGlowCycle, fullCycle);
+          }, 1000);
+        })();
+      </script>
+
+    </div>
+
+    <!-- Loading state -->
+    <div id="state-loading" class="hidden">
+      <div class="flex flex-col items-center justify-center py-20">
+        <svg class="animate-spin w-8 h-8 text-aguara-400 mb-4" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p id="loading-text" class="text-sm text-gray-300 font-medium">Loading scanner...</p>
+        <p id="loading-sub" class="text-xs text-gray-500 mt-2">First load downloads ~2 MB (cached after)</p>
+      </div>
+    </div>
+
+    <!-- Results state -->
+    <div id="state-results" class="hidden">
+      <!-- Header with grade -->
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white mb-1">Scan Results</h1>
+          <p id="result-filename" class="text-sm text-gray-400 font-mono"></p>
+          <a id="result-source-link" href="#" class="hidden inline-flex items-center gap-1 text-sm text-aguara-400 hover:text-aguara-300 mt-1 transition-colors" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" /></svg>
           </a>
         </div>
-        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
-          {categories.slice(0, 8).map((cat, i) => {
-            const maxCount = categories[0]?.count || 1;
-            const pct = Math.round((cat.count / maxCount) * 100);
-            return (
-              <a
-                href={`${base}categories/${cat.category}/`}
-                class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors group ${i > 0 ? "border-t border-gray-800/50" : ""}`}
-              >
-                <span class="flex-1 text-sm text-gray-300 group-hover:text-white transition-colors">{cat.category}</span>
-                <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden hidden sm:block">
-                  <div class="h-full bg-aguara-500/50 rounded-full animate-bar-grow origin-left" style={`width: ${pct}%`} />
-                </div>
-                <span class="text-xs font-mono text-gray-500 w-12 text-right">{cat.count}</span>
-              </a>
-            );
-          })}
+        <div class="flex items-center gap-2">
+          <div id="grade-badge" class="w-16 h-16 text-3xl rounded-lg border-2 flex items-center justify-center font-bold"></div>
+          <span id="score-label" class="text-sm text-gray-400"></span>
         </div>
       </div>
-    )}
 
-    <!-- Most compromised skills -->
-    {compromised.length > 0 && (
-      <div>
-        <h2 class="text-xl font-semibold text-white mb-4">Most Compromised Skills</h2>
-        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
-          {compromised.map((skill, i) => {
-            const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
-            const href = `${base}skills/${skill.registry_id}/${safeSlug}/`;
-            const gc = gradeColors[skill.grade] || gradeColors["F"];
-            return (
-              <a href={href} class={`flex items-center gap-3 px-5 py-3 hover:bg-gray-800/50 transition-colors ${i > 0 ? "border-t border-gray-800/50" : ""}`}>
-                <span class={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold border ${gc.css}`}>
-                  {skill.grade}
-                </span>
-                <span class="text-sm text-gray-300 truncate flex-1">{skill.name}</span>
-                <span class="text-xs text-gray-500 shrink-0">{skill.finding_count} findings</span>
-                <span class="text-xs text-gray-600 shrink-0 w-16 text-right hidden sm:inline">{skill.registry_id}</span>
-              </a>
-            );
-          })}
+      <!-- Stat cards -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+          <p class="text-xs text-gray-500 mb-1">Score</p>
+          <p id="stat-score" class="text-sm text-gray-300 font-mono"></p>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+          <p class="text-xs text-gray-500 mb-1">Findings</p>
+          <p id="stat-findings" class="text-sm text-gray-300 font-mono"></p>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+          <p class="text-xs text-gray-500 mb-1">Duration</p>
+          <p id="stat-duration" class="text-sm text-gray-300 font-mono"></p>
         </div>
       </div>
-    )}
+
+      <!-- Download report buttons -->
+      <div class="flex gap-3 mb-8">
+        <button id="download-json-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+          Download JSON
+        </button>
+        <button id="download-html-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-sm font-medium rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+          Download HTML Report
+        </button>
+      </div>
+
+      <!-- Files scanned (for repo mode) -->
+      <div id="files-scanned-section" class="hidden mb-6">
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">
+          <h2 class="text-base font-semibold text-white mb-3">
+            Files Scanned <span id="files-count" class="text-gray-500 font-normal"></span>
+          </h2>
+          <div id="files-list" class="space-y-1"></div>
+        </div>
+      </div>
+
+      <!-- Severity summary + findings list injected here by JS -->
+      <div id="results-body"></div>
+
+      <!-- Reset button -->
+      <div class="mt-8">
+        <button id="reset-btn" class="px-5 py-2 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 text-sm font-medium rounded-lg transition-colors">
+          Scan another file
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Disclaimer -->
-  <div class="text-center text-xs text-gray-600 py-6 border-t border-gray-800/50 animate-fade-in" style="animation-delay: 900ms">
-    <p>
-      Results may include false positives. Aguara is continuously improved as more public data is collected.
-      <a href={`${base}about/`} class="text-gray-500 hover:text-gray-400 underline underline-offset-2 transition-colors">Learn more</a>
-    </p>
-  </div>
+  <script is:inline>
+  (function() {
+    // --- Constants (mirrored from constants.ts) ---
+    var SEVERITY_MAP = {0:"INFO", 1:"LOW", 2:"MEDIUM", 3:"HIGH", 4:"CRITICAL"};
+    var SEVERITY_ORDER = ["CRITICAL","HIGH","MEDIUM","LOW","INFO"];
+    var SEVERITY_COLORS = {
+      CRITICAL: "bg-red-500/20 text-red-400 border-red-500/30",
+      HIGH: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+      MEDIUM: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+      LOW: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+      INFO: "bg-gray-500/20 text-gray-400 border-gray-500/30"
+    };
+    var GRADE_COLORS = {
+      A: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
+      B: "bg-green-500/20 text-green-400 border-green-500/40",
+      C: "bg-yellow-500/20 text-yellow-400 border-yellow-500/40",
+      D: "bg-orange-500/20 text-orange-400 border-orange-500/40",
+      F: "bg-red-500/20 text-red-400 border-red-500/40"
+    };
+    var SEVERITY_RANK = {CRITICAL:0, HIGH:1, MEDIUM:2, LOW:3, INFO:4};
+    var SCANNABLE_EXTS = [".md",".json",".yaml",".yml",".py",".js",".ts",".txt",".toml",".cfg",".ini",".sh",".bash"];
+    var MAX_FILES = 30;
+    var MAX_FILE_SIZE = 256 * 1024; // 256 KB per file
+
+    function scoreToGrade(score) {
+      if (score >= 90) return "A";
+      if (score >= 75) return "B";
+      if (score >= 50) return "C";
+      if (score >= 25) return "D";
+      return "F";
+    }
+
+    // --- DOM refs ---
+    var stateIdle = document.getElementById("state-idle");
+    var stateLoading = document.getElementById("state-loading");
+    var stateResults = document.getElementById("state-results");
+    var loadingText = document.getElementById("loading-text");
+    var loadingSub = document.getElementById("loading-sub");
+    var contentInput = document.getElementById("content-input");
+    var scanBtn = document.getElementById("scan-btn");
+    var fetchBtn = document.getElementById("fetch-btn");
+    var resetBtn = document.getElementById("reset-btn");
+    var dropZone = document.getElementById("drop-zone");
+    var filenameDisplay = document.getElementById("filename-display");
+    var filenameLabel = document.getElementById("filename-label");
+    var extBtns = document.querySelectorAll(".ext-btn");
+    var githubUrl = document.getElementById("github-url");
+    var tabUrl = document.getElementById("tab-url");
+    var tabPaste = document.getElementById("tab-paste");
+    var panelUrl = document.getElementById("panel-url");
+    var panelPaste = document.getElementById("panel-paste");
+    var patToggle = document.getElementById("pat-toggle");
+    var patChevron = document.getElementById("pat-chevron");
+    var patSection = document.getElementById("pat-section");
+    var patInput = document.getElementById("pat-input");
+    var patConnectBtn = document.getElementById("pat-connect-btn");
+    var patInputRow = document.getElementById("pat-input-row");
+    var patAuthenticated = document.getElementById("pat-authenticated");
+    var patRateLimit = document.getElementById("pat-rate-limit");
+    var patDisconnectBtn = document.getElementById("pat-disconnect-btn");
+    var downloadJsonBtn = document.getElementById("download-json-btn");
+    var downloadHtmlBtn = document.getElementById("download-html-btn");
+
+    var currentFilename = "skill.md";
+    var selectedExt = ".md";
+    var sourceUrl = null;
+    var wasFileUpload = false;
+    var githubPat = sessionStorage.getItem("aguara_github_pat") || "";
+    var patValidated = false;
+    var wasmLoadTimeMs = null;
+    var lastScanData = null;
+
+    // --- PAT helpers ---
+    function getAuthHeaders() {
+      if (patValidated && githubPat) return { Authorization: "token " + githubPat };
+      return {};
+    }
+
+    function updateRateLimit(resp) {
+      var remaining = resp.headers.get("x-ratelimit-remaining");
+      var limit = resp.headers.get("x-ratelimit-limit");
+      if (remaining !== null && limit !== null) {
+        patRateLimit.textContent = remaining + "/" + limit + " API calls";
+      }
+    }
+
+    function validatePat(token) {
+      return fetch("https://api.github.com/user", {
+        headers: { Authorization: "token " + token }
+      }).then(function(resp) {
+        if (!resp.ok) throw new Error("Invalid or expired token (" + resp.status + ")");
+        updateRateLimit(resp);
+        return resp.json();
+      });
+    }
+
+    var patReposList = document.getElementById("pat-repos-list");
+    var patReposLoading = document.getElementById("pat-repos-loading");
+    var patReposEmpty = document.getElementById("pat-repos-empty");
+
+    function showPatAuthenticated() {
+      patInputRow.classList.add("hidden");
+      patAuthenticated.classList.remove("hidden");
+      fetchPrivateRepos();
+    }
+
+    function resetPatUI() {
+      patInputRow.classList.remove("hidden");
+      patAuthenticated.classList.add("hidden");
+      patInput.value = "";
+      patRateLimit.textContent = "";
+      patReposList.innerHTML = "";
+      patReposLoading.classList.add("hidden");
+      patReposEmpty.classList.add("hidden");
+    }
+
+    function fetchPrivateRepos() {
+      patReposList.innerHTML = "";
+      patReposLoading.classList.remove("hidden");
+      patReposEmpty.classList.add("hidden");
+      fetch("https://api.github.com/user/repos?sort=updated&per_page=20", {
+        headers: getAuthHeaders()
+      }).then(function(resp) {
+        updateRateLimit(resp);
+        if (!resp.ok) throw new Error("Failed to fetch repos");
+        return resp.json();
+      }).then(function(repos) {
+        patReposLoading.classList.add("hidden");
+        if (!repos.length) {
+          patReposEmpty.classList.remove("hidden");
+          return;
+        }
+        patReposList.innerHTML = repos.map(function(r) {
+          var icon = r.private
+            ? '<svg class="w-3.5 h-3.5 text-yellow-500/60 group-hover:text-yellow-400/80 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>'
+            : '<svg class="w-3.5 h-3.5 text-gray-600 group-hover:text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>';
+          return '<button class="pat-repo-btn w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left hover:bg-gray-700/30 transition-colors group" data-url="' + r.html_url + '">'
+            + icon
+            + '<span class="text-sm text-gray-300 group-hover:text-white font-mono truncate">' + r.full_name + '</span>'
+            + (r.language ? '<span class="text-[10px] text-gray-600 ml-auto shrink-0 px-1.5 py-0.5 rounded bg-gray-800/50">' + r.language + '</span>' : '')
+            + '</button>';
+        }).join("");
+        patReposList.querySelectorAll(".pat-repo-btn").forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            githubUrl.value = btn.dataset.url;
+            fetchBtn.disabled = false;
+            githubUrl.scrollIntoView({ behavior: "smooth", block: "center" });
+            githubUrl.classList.add("border-aguara-500");
+            setTimeout(function() { githubUrl.classList.remove("border-aguara-500"); }, 1500);
+          });
+        });
+      }).catch(function() {
+        patReposLoading.classList.add("hidden");
+        patReposEmpty.classList.remove("hidden");
+      });
+    }
+
+    function getScanSource() {
+      if (sourceUrl) return patValidated ? "github_private" : "github_public";
+      if (wasFileUpload) return "upload";
+      return "paste";
+    }
+
+    // --- Download helpers ---
+    function triggerDownload(content, filename, mimeType) {
+      var blob = new Blob([content], { type: mimeType });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function getReportSlug() {
+      if (!lastScanData) return "scan";
+      if (lastScanData.sourceUrl) {
+        var m = lastScanData.sourceUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (m) return m[1] + "-" + m[2];
+      }
+      return lastScanData.label.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "scan";
+    }
+
+    function generateJsonReport() {
+      if (!lastScanData) return;
+      var d = lastScanData;
+      var source = d.sourceUrl
+        ? "github:" + (d.sourceUrl.match(/github\.com\/([^/]+\/[^/]+)/) || [,"unknown"])[1]
+        : "paste:" + d.label;
+      var report = {
+        aguara_version: "wasm",
+        scan_date: d.scanDate,
+        source: source,
+        score: d.score,
+        grade: d.grade,
+        files_scanned: d.scannedFiles ? d.scannedFiles.length : 1,
+        duration_ms: d.elapsed,
+        severity_counts: d.counts,
+        findings: d.findings.map(function(f) {
+          return {
+            rule_id: f.rule_id,
+            severity: f.severity,
+            category: f.category,
+            description: f.description,
+            file_path: f.file_path || d.label,
+            line: f.line,
+            matched_text: f.matched_text
+          };
+        })
+      };
+      var slug = getReportSlug();
+      var date = d.scanDate.slice(0, 10);
+      triggerDownload(JSON.stringify(report, null, 2), "aguara-report-" + slug + "-" + date + ".json", "application/json");
+      if (typeof gtag === "function") {
+        gtag("event", "wasm_report_download", { format: "json", findings_count: d.findings.length, grade: d.grade });
+      }
+    }
+
+    function generateHtmlReport() {
+      if (!lastScanData) return;
+      var d = lastScanData;
+      var sevColorsRaw = {
+        CRITICAL: { bg: "rgba(239,68,68,0.2)", text: "#f87171", border: "rgba(239,68,68,0.3)" },
+        HIGH: { bg: "rgba(249,115,22,0.2)", text: "#fb923c", border: "rgba(249,115,22,0.3)" },
+        MEDIUM: { bg: "rgba(234,179,8,0.2)", text: "#facc15", border: "rgba(234,179,8,0.3)" },
+        LOW: { bg: "rgba(59,130,246,0.2)", text: "#60a5fa", border: "rgba(59,130,246,0.3)" },
+        INFO: { bg: "rgba(107,114,128,0.2)", text: "#9ca3af", border: "rgba(107,114,128,0.3)" }
+      };
+      var gradeColorsRaw = {
+        A: { bg: "rgba(16,185,129,0.2)", text: "#34d399", border: "rgba(16,185,129,0.4)" },
+        B: { bg: "rgba(34,197,94,0.2)", text: "#4ade80", border: "rgba(34,197,94,0.4)" },
+        C: { bg: "rgba(234,179,8,0.2)", text: "#facc15", border: "rgba(234,179,8,0.4)" },
+        D: { bg: "rgba(249,115,22,0.2)", text: "#fb923c", border: "rgba(249,115,22,0.4)" },
+        F: { bg: "rgba(239,68,68,0.2)", text: "#f87171", border: "rgba(239,68,68,0.4)" }
+      };
+      var gc = gradeColorsRaw[d.grade] || gradeColorsRaw.F;
+      var source = d.sourceUrl
+        ? "github:" + (d.sourceUrl.match(/github\.com\/([^/]+\/[^/]+)/) || [,"unknown"])[1]
+        : "paste:" + d.label;
+
+      var h = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+      h += '<title>Aguara Security Report — ' + escapeHtml(source) + '</title>';
+      h += '<style>';
+      h += '*{margin:0;padding:0;box-sizing:border-box}';
+      h += 'body{background:#030712;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:2rem;max-width:900px;margin:0 auto}';
+      h += 'h1{font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:.25rem}';
+      h += '.subtitle{font-size:.875rem;color:#9ca3af;margin-bottom:1.5rem}';
+      h += '.grade-badge{display:inline-flex;align-items:center;justify-content:center;width:4rem;height:4rem;font-size:2rem;font-weight:700;border-radius:.5rem;border:2px solid ' + gc.border + ';background:' + gc.bg + ';color:' + gc.text + '}';
+      h += '.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem}';
+      h += '.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}';
+      h += '.stat{background:rgba(17,24,39,0.5);border:1px solid #1f2937;border-radius:.75rem;padding:1rem}';
+      h += '.stat-label{font-size:.75rem;color:#6b7280;margin-bottom:.25rem}';
+      h += '.stat-value{font-size:.875rem;color:#fff;font-weight:700;font-family:monospace}';
+      h += '.pills{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem}';
+      h += '.pill{display:inline-flex;align-items:center;gap:.375rem;padding:.25rem .625rem;font-size:.75rem;font-weight:500;border-radius:9999px;border:1px solid}';
+      h += '.pill-count{font-size:.875rem;font-family:monospace;color:#9ca3af}';
+      h += '.findings{background:rgba(17,24,39,0.5);border:1px solid #1f2937;border-radius:1rem;padding:1.25rem}';
+      h += '.findings h2{font-size:1rem;font-weight:600;color:#fff;margin-bottom:1rem}';
+      h += '.finding{border:1px solid rgba(31,41,55,0.5);border-radius:.75rem;overflow:hidden;margin-bottom:.5rem}';
+      h += '.finding-header{display:flex;align-items:center;gap:.75rem;padding:.625rem 1rem;background:rgba(31,41,55,0.2);flex-wrap:wrap}';
+      h += '.finding-sev{display:inline-flex;padding:.125rem .5rem;font-size:.75rem;font-weight:500;border-radius:9999px;border:1px solid}';
+      h += '.finding-rule{font-family:monospace;font-size:.75rem;color:#d1d5db}';
+      h += '.finding-cat{font-size:.75rem;color:#4b5563}';
+      h += '.finding-line{font-size:.75rem;color:#4b5563;font-family:monospace;margin-left:auto}';
+      h += '.finding-match{padding:.625rem 1rem;background:rgba(3,7,18,0.3);border-top:1px solid rgba(31,41,55,0.3);font-family:monospace;font-size:.75rem;color:#9ca3af;white-space:pre-wrap;word-break:break-all}';
+      h += '.finding-desc{padding:.5rem 1rem;border-top:1px solid rgba(31,41,55,0.3);font-size:.75rem;color:#6b7280}';
+      h += '.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #1f2937;text-align:center;font-size:.75rem;color:#4b5563}';
+      h += '.footer a{color:#6b7280;text-decoration:underline}';
+      h += '.no-findings{text-align:center;padding:3rem 1rem}';
+      h += '.no-findings svg{width:3rem;height:3rem;margin:0 auto 1rem;color:#10b981}';
+      h += '@media print{body{background:#fff;color:#111;padding:1rem}.stat{border-color:#e5e7eb;background:#f9fafb}.findings{border-color:#e5e7eb;background:#f9fafb}.finding{border-color:#e5e7eb}.finding-header{background:#f3f4f6}.finding-match{background:#f9fafb;color:#374151}.footer{color:#6b7280}}';
+      h += '</style></head><body>';
+
+      h += '<div class="header"><div>';
+      h += '<h1>Aguara Security Report</h1>';
+      h += '<p class="subtitle">' + escapeHtml(source) + ' &mdash; ' + d.scanDate.slice(0, 10) + '</p>';
+      h += '</div>';
+      h += '<div style="display:flex;align-items:center;gap:.5rem">';
+      h += '<div class="grade-badge">' + d.grade + '</div>';
+      h += '<span style="font-size:.875rem;color:#9ca3af">' + d.score + '/100</span>';
+      h += '</div></div>';
+
+      h += '<div class="stats">';
+      h += '<div class="stat"><p class="stat-label">Score</p><p class="stat-value">' + d.score + '/100</p></div>';
+      h += '<div class="stat"><p class="stat-label">Findings</p><p class="stat-value">' + d.findings.length + '</p></div>';
+      h += '<div class="stat"><p class="stat-label">Duration</p><p class="stat-value">' + d.elapsed + ' ms</p></div>';
+      h += '</div>';
+
+      if (d.findings.length > 0) {
+        h += '<div class="pills">';
+        SEVERITY_ORDER.forEach(function(sev) {
+          if (!d.counts[sev]) return;
+          var sc = sevColorsRaw[sev] || sevColorsRaw.INFO;
+          h += '<div style="display:flex;align-items:center;gap:.375rem">';
+          h += '<span class="pill" style="background:' + sc.bg + ';color:' + sc.text + ';border-color:' + sc.border + '">' + sev + '</span>';
+          h += '<span class="pill-count">' + d.counts[sev] + '</span>';
+          h += '</div>';
+        });
+        h += '</div>';
+
+        h += '<div class="findings"><h2>Findings (' + d.findings.length + ')</h2>';
+        d.findings.forEach(function(f) {
+          var sc = sevColorsRaw[f.severity] || sevColorsRaw.INFO;
+          h += '<div class="finding">';
+          h += '<div class="finding-header">';
+          h += '<span class="finding-sev" style="background:' + sc.bg + ';color:' + sc.text + ';border-color:' + sc.border + '">' + escapeHtml(f.severity) + '</span>';
+          h += '<span class="finding-rule">' + escapeHtml(f.rule_id) + '</span>';
+          if (f.category) h += '<span class="finding-cat">' + escapeHtml(f.category) + '</span>';
+          if (f.file_path) h += '<span class="finding-cat" style="font-family:monospace">' + escapeHtml(f.file_path) + '</span>';
+          if (f.line) h += '<span class="finding-line">L' + f.line + '</span>';
+          h += '</div>';
+          if (f.matched_text) h += '<div class="finding-match">' + escapeHtml(f.matched_text) + '</div>';
+          if (f.description) h += '<div class="finding-desc">' + escapeHtml(f.description) + '</div>';
+          h += '</div>';
+        });
+        h += '</div>';
+      } else {
+        h += '<div class="findings no-findings">';
+        h += '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>';
+        h += '<h2 style="font-size:1.125rem;font-weight:600;color:#fff;margin-bottom:.5rem">No Security Issues Found</h2>';
+        h += '<p style="font-size:.875rem;color:#9ca3af">Perfect 100/100 score.</p>';
+        h += '</div>';
+      }
+
+      h += '<div class="footer">Generated by <a href="https://watch.aguarascan.com" target="_blank" rel="noopener">Aguara Watch</a></div>';
+      h += '</body></html>';
+
+      var slug = getReportSlug();
+      var date = d.scanDate.slice(0, 10);
+      triggerDownload(h, "aguara-report-" + slug + "-" + date + ".html", "text/html");
+      if (typeof gtag === "function") {
+        gtag("event", "wasm_report_download", { format: "html", findings_count: d.findings.length, grade: d.grade });
+      }
+    }
+
+    // --- Web Worker for WASM scanning (keeps main thread free) ---
+    var worker = null;
+    var workerReady = false;
+    var workerCallbacks = {};
+    var workerIdCounter = 0;
+
+    function getWorker() {
+      if (worker) return worker;
+      worker = new Worker("/wasm/scan-worker.js");
+      worker.onmessage = function(e) {
+        var msg = e.data;
+        if (msg.type === "ready") {
+          wasmLoadTimeMs = msg.loadTime;
+          return;
+        }
+        var cb = workerCallbacks[msg.id];
+        if (!cb) return;
+        delete workerCallbacks[msg.id];
+        if (msg.type === "result") {
+          cb.resolve(msg.json);
+        } else {
+          cb.reject(new Error(msg.message || "Worker scan failed"));
+        }
+      };
+      return worker;
+    }
+
+    function workerScan(content, filename) {
+      return new Promise(function(resolve, reject) {
+        var id = ++workerIdCounter;
+        workerCallbacks[id] = { resolve: resolve, reject: reject };
+        getWorker().postMessage({ type: "scan", id: id, content: content, filename: filename });
+      });
+    }
+
+    // --- Tab switching ---
+    tabUrl.addEventListener("click", function() {
+      tabUrl.classList.add("bg-gray-800", "text-white");
+      tabUrl.classList.remove("text-gray-400");
+      tabPaste.classList.remove("bg-gray-800", "text-white");
+      tabPaste.classList.add("text-gray-400");
+      panelUrl.classList.remove("hidden");
+      panelPaste.classList.add("hidden");
+    });
+    tabPaste.addEventListener("click", function() {
+      tabPaste.classList.add("bg-gray-800", "text-white");
+      tabPaste.classList.remove("text-gray-400");
+      tabUrl.classList.remove("bg-gray-800", "text-white");
+      tabUrl.classList.add("text-gray-400");
+      panelPaste.classList.remove("hidden");
+      panelUrl.classList.add("hidden");
+    });
+
+    // --- Extension selector ---
+    extBtns.forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        selectedExt = btn.dataset.ext;
+        extBtns.forEach(function(b) {
+          b.classList.remove("border-aguara-500", "text-aguara-400");
+          b.classList.add("border-gray-700", "text-gray-400");
+        });
+        btn.classList.remove("border-gray-700", "text-gray-400");
+        btn.classList.add("border-aguara-500", "text-aguara-400");
+        if (!filenameDisplay.classList.contains("hidden")) {
+          var baseName = currentFilename.replace(/\.[^.]+$/, "");
+          currentFilename = baseName + selectedExt;
+          filenameLabel.textContent = currentFilename;
+        }
+      });
+    });
+    extBtns[0].classList.remove("border-gray-700", "text-gray-400");
+    extBtns[0].classList.add("border-aguara-500", "text-aguara-400");
+
+    // --- Enable/disable buttons ---
+    contentInput.addEventListener("input", function() {
+      scanBtn.disabled = !contentInput.value.trim();
+    });
+    githubUrl.addEventListener("input", function() {
+      fetchBtn.disabled = !githubUrl.value.trim();
+    });
+    githubUrl.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !fetchBtn.disabled) fetchBtn.click();
+    });
+
+    // --- Drag & drop ---
+    ["dragenter","dragover"].forEach(function(evt) {
+      dropZone.addEventListener(evt, function(e) {
+        e.preventDefault();
+        dropZone.classList.add("border-aguara-500");
+      });
+    });
+    ["dragleave","drop"].forEach(function(evt) {
+      dropZone.addEventListener(evt, function(e) {
+        e.preventDefault();
+        dropZone.classList.remove("border-aguara-500");
+      });
+    });
+    dropZone.addEventListener("drop", function(e) {
+      var file = e.dataTransfer.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        contentInput.value = ev.target.result;
+        scanBtn.disabled = false;
+        wasFileUpload = true;
+        var name = file.name;
+        var ext = name.indexOf(".") !== -1 ? "." + name.split(".").pop() : selectedExt;
+        currentFilename = name;
+        extBtns.forEach(function(b) {
+          b.classList.remove("border-aguara-500", "text-aguara-400");
+          b.classList.add("border-gray-700", "text-gray-400");
+          if (b.dataset.ext === ext) {
+            b.classList.remove("border-gray-700", "text-gray-400");
+            b.classList.add("border-aguara-500", "text-aguara-400");
+            selectedExt = ext;
+          }
+        });
+        filenameLabel.textContent = currentFilename;
+        filenameDisplay.classList.remove("hidden");
+      };
+      reader.readAsText(file);
+    });
+
+    // --- GitHub URL parsing ---
+    function parseGitHubUrl(url) {
+      url = url.trim();
+      var m;
+      m = url.match(/^https?:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)$/);
+      if (m) return { type: "file", owner: m[1], repo: m[2], branch: m[3], path: m[4] };
+      m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/);
+      if (m) return { type: "file", owner: m[1], repo: m[2], branch: m[3], path: m[4] };
+      m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)$/);
+      if (m) return { type: "dir", owner: m[1], repo: m[2], branch: m[3], path: m[4] };
+      m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/?$/);
+      if (m) return { type: "repo", owner: m[1], repo: m[2], branch: m[3] };
+      m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/?$/);
+      if (m) return { type: "repo", owner: m[1], repo: m[2], branch: null };
+      return null;
+    }
+
+    function isScannable(path) {
+      var lower = path.toLowerCase();
+      return SCANNABLE_EXTS.some(function(ext) { return lower.endsWith(ext); });
+    }
+
+    function fetchRawFile(owner, repo, branch, path) {
+      // Fine-grained PATs don't work with raw.githubusercontent.com — use the Contents API instead
+      if (patValidated && githubPat) {
+        var apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path + "?ref=" + branch;
+        return fetch(apiUrl, {
+          headers: {
+            Authorization: "token " + githubPat,
+            Accept: "application/vnd.github.raw+json"
+          }
+        }).then(function(resp) {
+          updateRateLimit(resp);
+          if (resp.status === 401 || resp.status === 403 || resp.status === 404) {
+            var err = new Error("Failed to fetch " + path + " (" + resp.status + ")");
+            err.httpStatus = resp.status;
+            throw err;
+          }
+          if (!resp.ok) throw new Error("Failed to fetch " + path + " (" + resp.status + ")");
+          var len = resp.headers.get("content-length");
+          if (len && parseInt(len, 10) > MAX_FILE_SIZE) return null;
+          return resp.text().then(function(text) {
+            return text.length > MAX_FILE_SIZE ? null : text;
+          });
+        });
+      }
+      // Public repos: use raw.githubusercontent.com (no API rate limit)
+      var rawUrl = "https://raw.githubusercontent.com/" + owner + "/" + repo + "/" + branch + "/" + path;
+      return fetch(rawUrl).then(function(resp) {
+        if (!resp.ok) throw new Error("Failed to fetch " + path + " (" + resp.status + ")");
+        var len = resp.headers.get("content-length");
+        if (len && parseInt(len, 10) > MAX_FILE_SIZE) return null;
+        return resp.text().then(function(text) {
+          return text.length > MAX_FILE_SIZE ? null : text;
+        });
+      });
+    }
+
+    function getDefaultBranch(owner, repo) {
+      return fetch("https://api.github.com/repos/" + owner + "/" + repo, { headers: getAuthHeaders() })
+        .then(function(resp) {
+          updateRateLimit(resp);
+          if (!resp.ok) throw new Error("Repository not found or not accessible (" + resp.status + ")");
+          return resp.json();
+        })
+        .then(function(data) { return data.default_branch; });
+    }
+
+    function listRepoFiles(owner, repo, branch, basePath) {
+      var url = "https://api.github.com/repos/" + owner + "/" + repo + "/git/trees/" + branch + "?recursive=1";
+      return fetch(url, { headers: getAuthHeaders() })
+        .then(function(resp) {
+          updateRateLimit(resp);
+          if (!resp.ok) throw new Error("Failed to fetch repo tree (" + resp.status + ")");
+          return resp.json();
+        })
+        .then(function(data) {
+          return (data.tree || [])
+            .filter(function(f) {
+              if (f.type !== "blob") return false;
+              // Skip files > MAX_FILE_SIZE by tree size hint
+              if (f.size && f.size > MAX_FILE_SIZE) return false;
+              return true;
+            })
+            .map(function(f) { return f.path; })
+            .filter(function(p) {
+              if (basePath) return p.startsWith(basePath + "/") || p === basePath;
+              return true;
+            })
+            .filter(isScannable);
+        });
+    }
+
+    // --- Fetch & Scan from GitHub ---
+    fetchBtn.addEventListener("click", function() {
+      var url = githubUrl.value.trim();
+      if (!url) return;
+
+      var parsed = parseGitHubUrl(url);
+      if (!parsed) {
+        alert("Please enter a valid GitHub URL.\n\nExamples:\nhttps://github.com/owner/repo\nhttps://github.com/owner/repo/blob/main/skill.md");
+        return;
+      }
+
+      sourceUrl = url;
+      wasFileUpload = false;
+      setState("loading");
+      loadingText.textContent = "Fetching from GitHub...";
+      loadingSub.textContent = "";
+
+      var t0 = performance.now();
+
+      if (parsed.type === "file") {
+        fetchRawFile(parsed.owner, parsed.repo, parsed.branch, parsed.path)
+          .then(function(content) {
+            if (!content) throw new Error("File is too large to scan (max 256 KB)");
+            var filename = parsed.path.split("/").pop();
+            loadingText.textContent = "Scanning " + filename + "...";
+            loadingSub.textContent = "First scan loads the WASM engine (~2 MB, cached after)";
+            return workerScan(content, filename);
+          })
+          .then(function(jsonStr) {
+            var elapsed = Math.round(performance.now() - t0);
+            var result = JSON.parse(jsonStr);
+            renderResults(result, parsed.path, elapsed, [parsed.path]);
+            setState("results");
+            trackScan(result, elapsed);
+          })
+          .catch(handleError);
+
+      } else {
+        var branchPromise = parsed.branch
+          ? Promise.resolve(parsed.branch)
+          : getDefaultBranch(parsed.owner, parsed.repo);
+
+        var resolvedBranch;
+        branchPromise
+          .then(function(branch) {
+            resolvedBranch = branch;
+            loadingText.textContent = "Listing repository files...";
+            return listRepoFiles(parsed.owner, parsed.repo, branch, parsed.type === "dir" ? parsed.path : null);
+          })
+          .then(function(files) {
+            if (files.length === 0) {
+              throw new Error("No scannable files found.\nSupported: " + SCANNABLE_EXTS.join(", "));
+            }
+            var capped = files.length > MAX_FILES;
+            if (capped) files = files.slice(0, MAX_FILES);
+            loadingText.textContent = "Fetching " + files.length + " file" + (files.length > 1 ? "s" : "") + "...";
+            loadingSub.textContent = capped ? "(capped at " + MAX_FILES + " files)" : "";
+            return fetchAllFiles(parsed.owner, parsed.repo, resolvedBranch, files);
+          })
+          .then(function(fileContents) {
+            if (fileContents.length === 0) throw new Error("All files were too large or failed to fetch.");
+            loadingText.textContent = "Scanning " + fileContents.length + " files...";
+            loadingSub.textContent = "First scan loads the WASM engine (~2 MB, cached after)";
+            return scanMultipleFiles(fileContents);
+          })
+          .then(function(result) {
+            var elapsed = Math.round(performance.now() - t0);
+            renderResults(result.merged, result.label, elapsed, result.files);
+            setState("results");
+            trackScan(result.merged, elapsed);
+          })
+          .catch(handleError);
+      }
+    });
+
+    function handleError(err) {
+      console.error("Scan error:", err);
+      var errorType = "scan_failed";
+      var msg = err.message || "";
+      if (msg.indexOf("401") !== -1 || msg.indexOf("Invalid or expired") !== -1) {
+        errorType = "github_auth";
+      } else if (msg.indexOf("403") !== -1 || msg.indexOf("rate limit") !== -1) {
+        errorType = "github_rate_limit";
+      } else if (msg.indexOf("404") !== -1 || msg.indexOf("not found") !== -1 || msg.indexOf("Not Found") !== -1) {
+        errorType = "github_not_found";
+      } else if (msg.indexOf("WASM") !== -1 || msg.indexOf("Worker") !== -1) {
+        errorType = "wasm_load";
+      }
+      if (typeof gtag === "function") {
+        gtag("event", "wasm_scan_error", { error_type: errorType, scan_source: getScanSource() });
+      }
+      alert("Error: " + err.message);
+      setState("idle");
+    }
+
+    // Fetch files with concurrency limit of 6, skipping nulls (oversized)
+    function fetchAllFiles(owner, repo, branch, paths) {
+      var results = [];
+      var fetched = 0;
+      var idx = 0;
+      var concurrency = 6;
+      var authError = null;
+
+      function next() {
+        if (authError || idx >= paths.length) return Promise.resolve();
+        var i = idx++;
+        var path = paths[i];
+        return fetchRawFile(owner, repo, branch, path)
+          .then(function(content) {
+            fetched++;
+            if (content) results.push({ path: path, content: content });
+            loadingSub.textContent = fetched + " / " + paths.length + " fetched";
+          })
+          .catch(function(err) {
+            fetched++;
+            if (err.httpStatus === 403 || err.httpStatus === 401) {
+              authError = new Error("Permission denied. Your token needs the Contents: Read-only permission for this repository.\n\nUpdate your token at: github.com/settings/personal-access-tokens");
+            } else if (err.httpStatus === 404 && patValidated) {
+              authError = new Error("Repository not accessible. Make sure your token has access to this repository and the Contents: Read-only permission.");
+            }
+          })
+          .then(next);
+      }
+
+      var workers = [];
+      for (var w = 0; w < Math.min(concurrency, paths.length); w++) {
+        workers.push(next());
+      }
+      return Promise.all(workers).then(function() {
+        if (authError) throw authError;
+        return results;
+      });
+    }
+
+    // Scan files sequentially via worker (worker thread does the heavy lifting)
+    function scanMultipleFiles(fileContents) {
+      var allFindings = [];
+      var filePaths = [];
+      var done = 0;
+      var chain = Promise.resolve();
+
+      fileContents.forEach(function(fc) {
+        chain = chain.then(function() {
+          var filename = fc.path.split("/").pop();
+          loadingSub.textContent = (++done) + " / " + fileContents.length + " scanned";
+          return workerScan(fc.content, filename).then(function(jsonStr) {
+            var result = JSON.parse(jsonStr);
+            filePaths.push(fc.path);
+            (result.findings || []).forEach(function(f) {
+              f.file_path = fc.path;
+              allFindings.push(f);
+            });
+          });
+        });
+      });
+
+      return chain.then(function() {
+        return {
+          merged: { findings: allFindings, files_scanned: filePaths.length },
+          files: filePaths,
+          label: filePaths.length + " files"
+        };
+      });
+    }
+
+    // --- Paste/upload scan ---
+    scanBtn.addEventListener("click", function() {
+      var content = contentInput.value.trim();
+      if (!content) return;
+
+      var filename = currentFilename || ("skill" + selectedExt);
+      sourceUrl = null;
+
+      setState("loading");
+      loadingText.textContent = "Scanning...";
+      loadingSub.textContent = "First scan loads the WASM engine (~2 MB, cached after)";
+
+      var t0 = performance.now();
+
+      workerScan(content, filename).then(function(jsonStr) {
+        var elapsed = Math.round(performance.now() - t0);
+        var result = JSON.parse(jsonStr);
+        renderResults(result, filename, elapsed, null);
+        setState("results");
+        trackScan(result, elapsed);
+      }).catch(handleError);
+    });
+
+    // --- GA4 tracking ---
+    function trackScan(result, elapsed) {
+      var findings = result.findings || [];
+      var counts = countSeverities(findings);
+      var score = computeScore(counts);
+      var grade = scoreToGrade(score);
+      var topSev = "none";
+      for (var i = 0; i < SEVERITY_ORDER.length; i++) {
+        if (counts[SEVERITY_ORDER[i]] > 0) { topSev = SEVERITY_ORDER[i]; break; }
+      }
+      var cats = {};
+      findings.forEach(function(f) { if (f.category) cats[f.category] = true; });
+      if (typeof gtag === "function") {
+        gtag("event", "wasm_scan", {
+          findings_count: findings.length,
+          score: score,
+          grade: grade,
+          duration_ms: elapsed,
+          source: sourceUrl ? "github" : "paste",
+          files_scanned: result.files_scanned || 1,
+          scan_source: getScanSource(),
+          top_severity: topSev,
+          categories_found: Object.keys(cats).join(","),
+          load_time_ms: wasmLoadTimeMs ? Math.round(wasmLoadTimeMs) : null
+        });
+      }
+    }
+
+    // --- Reset ---
+    resetBtn.addEventListener("click", function() {
+      contentInput.value = "";
+      githubUrl.value = "";
+      scanBtn.disabled = true;
+      fetchBtn.disabled = true;
+      filenameDisplay.classList.add("hidden");
+      currentFilename = "skill" + selectedExt;
+      sourceUrl = null;
+      wasFileUpload = false;
+      lastScanData = null;
+      document.getElementById("results-body").innerHTML = "";
+      document.getElementById("files-scanned-section").classList.add("hidden");
+      document.getElementById("result-source-link").classList.add("hidden");
+      setState("idle");
+    });
+
+    // --- State management ---
+    function setState(s) {
+      stateIdle.classList.toggle("hidden", s !== "idle");
+      stateLoading.classList.toggle("hidden", s !== "loading");
+      stateResults.classList.toggle("hidden", s !== "results");
+    }
+
+    // --- Score computation ---
+    function countSeverities(findings) {
+      var counts = {CRITICAL:0, HIGH:0, MEDIUM:0, LOW:0, INFO:0};
+      findings.forEach(function(f) {
+        var sev = typeof f.severity === "number" ? SEVERITY_MAP[f.severity] : f.severity;
+        if (sev && counts[sev] !== undefined) counts[sev]++;
+      });
+      return counts;
+    }
+
+    function computeScore(counts) {
+      var score = 100 - (counts.CRITICAL * 25 + counts.HIGH * 15 + counts.MEDIUM * 8);
+      return Math.max(0, Math.min(100, score));
+    }
+
+    // --- Render results ---
+    function renderResults(result, label, elapsed, scannedFiles) {
+      var findings = result.findings || [];
+
+      findings = findings.map(function(f) {
+        if (typeof f.severity === "number") {
+          f.severity = SEVERITY_MAP[f.severity] || "INFO";
+        }
+        return f;
+      });
+
+      findings.sort(function(a, b) {
+        var sa = SEVERITY_RANK[a.severity] || 4;
+        var sb = SEVERITY_RANK[b.severity] || 4;
+        if (sa !== sb) return sa - sb;
+        return (a.file_path || "").localeCompare(b.file_path || "");
+      });
+
+      var counts = countSeverities(findings);
+      var score = computeScore(counts);
+      var grade = scoreToGrade(score);
+      var gc = GRADE_COLORS[grade] || GRADE_COLORS.F;
+
+      document.getElementById("result-filename").textContent = label;
+      var gradeBadge = document.getElementById("grade-badge");
+      gradeBadge.textContent = grade;
+      gradeBadge.className = "w-16 h-16 text-3xl rounded-lg border-2 flex items-center justify-center font-bold " + gc;
+      document.getElementById("score-label").textContent = score + "/100";
+
+      var srcLink = document.getElementById("result-source-link");
+      if (sourceUrl) { srcLink.href = sourceUrl; srcLink.classList.remove("hidden"); }
+      else { srcLink.classList.add("hidden"); }
+
+      document.getElementById("stat-score").innerHTML = '<span class="font-bold text-white">' + score + '/100</span>';
+      document.getElementById("stat-findings").innerHTML = '<span class="font-bold text-white">' + findings.length + '</span>';
+      document.getElementById("stat-duration").innerHTML = '<span class="font-bold text-white">' + elapsed + ' ms</span>';
+
+      // Files scanned section (repo mode)
+      var filesSection = document.getElementById("files-scanned-section");
+      if (scannedFiles && scannedFiles.length > 1) {
+        filesSection.classList.remove("hidden");
+        document.getElementById("files-count").textContent = "(" + scannedFiles.length + ")";
+        var filesList = document.getElementById("files-list");
+        filesList.innerHTML = scannedFiles.map(function(p) {
+          var fileFindings = findings.filter(function(f) { return f.file_path === p; }).length;
+          return '<div class="flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-gray-800/30">' +
+            '<span class="text-xs font-mono text-gray-400">' + escapeHtml(p) + '</span>' +
+            (fileFindings > 0
+              ? '<span class="text-xs font-mono text-orange-400">' + fileFindings + ' finding' + (fileFindings > 1 ? 's' : '') + '</span>'
+              : '<span class="text-xs text-gray-600">clean</span>') +
+            '</div>';
+        }).join("");
+      } else {
+        filesSection.classList.add("hidden");
+      }
+
+      var body = document.getElementById("results-body");
+      var html = "";
+
+      if (findings.length > 0) {
+        html += '<div class="flex flex-wrap gap-3 mb-6">';
+        SEVERITY_ORDER.forEach(function(sev) {
+          if (!counts[sev]) return;
+          var sc = SEVERITY_COLORS[sev] || SEVERITY_COLORS.INFO;
+          html += '<div class="flex items-center gap-1.5">';
+          html += '<span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border ' + sc + '">' + sev + '</span>';
+          html += '<span class="text-sm font-mono text-gray-400">' + counts[sev] + '</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+
+        html += '<div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-5">';
+        html += '<h2 class="text-base font-semibold text-white mb-4">Findings <span class="text-gray-500 font-normal">(' + findings.length + ')</span></h2>';
+        html += '<div class="space-y-2">';
+        findings.forEach(function(f) {
+          var sc = SEVERITY_COLORS[f.severity] || SEVERITY_COLORS.INFO;
+          html += '<div class="border border-gray-800/50 rounded-xl overflow-hidden hover:border-gray-700/50 transition-colors">';
+          html += '<div class="flex items-center gap-3 px-4 py-2.5 bg-gray-800/20">';
+          html += '<span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border ' + sc + '">' + escapeHtml(f.severity) + '</span>';
+          html += '<span class="font-mono text-xs text-gray-300">' + escapeHtml(f.rule_id) + '</span>';
+          html += '<span class="text-xs text-gray-600 hidden sm:inline">' + escapeHtml(f.category || "") + '</span>';
+          if (f.file_path && scannedFiles && scannedFiles.length > 1) {
+            html += '<span class="text-xs text-gray-600 hidden sm:inline font-mono">' + escapeHtml(f.file_path) + '</span>';
+          }
+          if (f.line) html += '<span class="text-xs text-gray-600 ml-auto font-mono">L' + f.line + '</span>';
+          html += '</div>';
+          if (f.matched_text) {
+            html += '<div class="px-4 py-2.5 bg-gray-950/30 border-t border-gray-800/30">';
+            html += '<pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto leading-relaxed"><code>' + escapeHtml(f.matched_text) + '</code></pre>';
+            html += '</div>';
+          }
+          if (f.description) {
+            html += '<div class="px-4 py-2 border-t border-gray-800/30">';
+            html += '<p class="text-xs text-gray-500">' + escapeHtml(f.description) + '</p>';
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+        html += '</div></div>';
+      } else {
+        html += '<div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 text-center">';
+        html += '<svg class="w-12 h-12 mx-auto mb-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">';
+        html += '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />';
+        html += '</svg>';
+        html += '<h2 class="text-lg font-semibold text-white mb-2">No Security Issues Found</h2>';
+        html += '<p class="text-sm text-gray-400 max-w-md mx-auto">Aguara\'s static analysis detected no security findings. Perfect 100/100 score.</p>';
+        html += '</div>';
+      }
+
+      body.innerHTML = html;
+
+      // Populate lastScanData for report downloads
+      lastScanData = {
+        findings: findings,
+        counts: counts,
+        score: score,
+        grade: grade,
+        label: label,
+        elapsed: elapsed,
+        scannedFiles: scannedFiles,
+        sourceUrl: sourceUrl,
+        scanDate: new Date().toISOString()
+      };
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    // --- PAT toggle ---
+    patToggle.addEventListener("click", function() {
+      var isHidden = patSection.classList.contains("hidden");
+      patSection.classList.toggle("hidden");
+      patChevron.style.transform = isHidden ? "rotate(90deg)" : "";
+    });
+
+    // --- PAT connect ---
+    patConnectBtn.addEventListener("click", function() {
+      var token = patInput.value.trim();
+      if (!token) return;
+      patConnectBtn.disabled = true;
+      patConnectBtn.textContent = "Validating...";
+      validatePat(token).then(function() {
+        githubPat = token;
+        patValidated = true;
+        sessionStorage.setItem("aguara_github_pat", token);
+        showPatAuthenticated();
+        if (typeof gtag === "function") {
+          gtag("event", "wasm_github_auth", { action: "connect" });
+        }
+      }).catch(function(err) {
+        alert("Authentication failed: " + err.message);
+        sessionStorage.removeItem("aguara_github_pat");
+        githubPat = "";
+        patValidated = false;
+      }).then(function() {
+        patConnectBtn.disabled = false;
+        patConnectBtn.textContent = "Connect";
+      });
+    });
+
+    // --- PAT disconnect ---
+    patDisconnectBtn.addEventListener("click", function() {
+      githubPat = "";
+      patValidated = false;
+      sessionStorage.removeItem("aguara_github_pat");
+      resetPatUI();
+      if (typeof gtag === "function") {
+        gtag("event", "wasm_github_auth", { action: "disconnect" });
+      }
+    });
+
+    // --- Download buttons ---
+    downloadJsonBtn.addEventListener("click", generateJsonReport);
+    downloadHtmlBtn.addEventListener("click", generateHtmlReport);
+
+    // --- Auto-restore PAT on page load ---
+    if (githubPat) {
+      validatePat(githubPat).then(function() {
+        patValidated = true;
+        patSection.classList.remove("hidden");
+        patChevron.style.transform = "rotate(90deg)";
+        showPatAuthenticated();
+      }).catch(function() {
+        sessionStorage.removeItem("aguara_github_pat");
+        githubPat = "";
+        patValidated = false;
+      });
+    }
+  })();
+  </script>
 </Base>

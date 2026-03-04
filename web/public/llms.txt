@@ -1,16 +1,20 @@
-# Aguara Watch — AI Agent Security Observatory
+# Aguara Watch — AI Agent Security Scanner & Observatory
 
-> Continuous public security scanning of 31,000+ AI agent skills across 7 registries. Open source. Open data.
+> Scan AI agent skills and MCP servers for security vulnerabilities. 173+ detection rules, 13 threat categories. Free, open source, runs in your browser.
 
-## What It Does
+## Online Scanner
 
-Aguara Watch crawls public AI agent skill registries daily, runs the Aguara deterministic security scanner on every skill, and publishes results as open data. It detects prompt injection, credential leaks, command execution, supply-chain attacks, and 10 more threat categories using 148+ detection rules.
+Aguara Watch includes a free browser-based security scanner at https://watch.aguarascan.com. It uses WebAssembly to run the Aguara scanner locally — no code is uploaded, no account required. You can scan by GitHub URL (public or private repositories), paste content, or drag and drop files. Results include an A-F grade, severity breakdown, and downloadable JSON/HTML reports.
+
+## Observatory
+
+Aguara Watch also operates a continuous security observatory that crawls 7 public AI agent skill registries daily, scans every discovered skill, and publishes results as open data.
 
 ## Key Data
 
 - 7 registries monitored: Skills.sh, ClawHub, PulseMCP, mcp.so, LobeHub, Smithery, Glama
-- 31,000+ skills scanned daily
-- 13 threat categories, 148+ detection rules
+- 46,000+ skills and MCP servers scanned daily
+- 13 threat categories, 173+ detection rules
 - Grades A-F based on 100-point scoring (CRITICAL -25, HIGH -15, MEDIUM -8)
 - Full scan history with first-seen/last-seen timestamps
 
@@ -30,7 +34,7 @@ Aguara Watch crawls public AI agent skill registries daily, runs the Aguara dete
 
 ## Related Projects
 
-- Aguara Scanner: https://aguarascan.com — Deterministic security scanner for AI agent skills and MCP servers
-- Aguara MCP: https://github.com/garagon/aguara-mcp — MCP server for on-demand security scanning
+- Aguara Scanner: https://aguarascan.com — Deterministic security scanner CLI for AI agent skills and MCP servers
+- Aguara MCP: https://github.com/garagon/aguara-mcp — MCP server for on-demand security scanning inside AI agents
 - Oktsec: https://oktsec.com — Runtime security for AI agents
 - Source code: https://github.com/garagon/aguara-observatory

@@ -8,7 +8,7 @@ interface Props {
   jsonLd?: Record<string, unknown>;
 }
 
-const { title, description = "Scanning 31,000+ AI agent skills daily across 7 public registries. Open source. Open data.", jsonLd } = Astro.props;
+const { title, description = "Scanning 46,000+ AI agent skills and MCP servers daily across 7 public registries. 173+ detection rules, 13 security categories. Open source. Open data.", jsonLd } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
 const siteUrl = Astro.site ? new URL(base, Astro.site).href.replace(/\/$/, "") : "";
@@ -52,6 +52,7 @@ const fullTitle = `Aguara Watch — ${title}`;
     <!-- SEO -->
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#f08844" />
+    <meta name="keywords" content="AI agent security, MCP server scanner, prompt injection detection, AI skill vulnerability scanner, LLM security, agent tool security, MCP security audit, AI supply chain security" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -78,11 +79,29 @@ const fullTitle = `Aguara Watch — ${title}`;
       "@type": "WebApplication",
       "name": "Aguara Watch",
       "url": "https://watch.aguarascan.com",
-      "description": "Continuous public security scanning of AI agent skill registries. Open source. Open data.",
+      "description": "Scan AI agent skills and MCP servers for security vulnerabilities. 173+ detection rules across 13 categories. Runs in your browser via WebAssembly.",
       "applicationCategory": "SecurityApplication",
       "operatingSystem": "Web",
+      "browserRequirements": "Requires WebAssembly support",
+      "softwareVersion": "1.0",
       "license": "https://opensource.org/licenses/Apache-2.0",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "173+ security detection rules",
+        "13 threat categories",
+        "Client-side scanning via WebAssembly",
+        "GitHub repository scanning",
+        "Private repository support via PAT",
+        "Downloadable JSON and HTML reports",
+        "A-F security grading",
+        "46,000+ skills monitored daily across 7 registries"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Aguara",
+        "url": "https://aguarascan.com"
+      },
+      "isAccessibleForFree": true
     })} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 

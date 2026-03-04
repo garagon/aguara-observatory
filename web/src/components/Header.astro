@@ -3,7 +3,8 @@ const base = import.meta.env.BASE_URL;
 const currentPath = Astro.url.pathname;
 
 const nav = [
-  { label: "Overview", href: `${base}` },
+  { label: "Scanner", href: `${base}` },
+  { label: "Overview", href: `${base}overview/` },
   { label: "Registries", href: `${base}registries/` },
   { label: "Categories", href: `${base}categories/` },
   { label: "Trends", href: `${base}trends/` },
