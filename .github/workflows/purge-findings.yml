@@ -1,0 +1,31 @@
+name: "One-time: Purge historical findings"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type PURGE to confirm deletion of historical findings table"
+        required: true
+        type: string
+
+jobs:
+  purge:
+    if: ${{ inputs.confirm == 'PURGE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Purge historical findings
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python scripts/purge_findings_history.py
