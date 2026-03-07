@@ -28,4 +28,4 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: python scripts/purge_findings_history.py
+        run: PYTHONPATH=. python scripts/purge_findings_history.py
