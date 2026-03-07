@@ -18,7 +18,6 @@ from crawlers.db import (
     get_skills_by_registry,
     init_schema,
     insert_findings,
-    refresh_findings_latest,
     upsert_skill_score,
 )
 from crawlers.models import Finding, Severity, SkillScore, score_to_grade, SEVERITY_SCORE_IMPACT
@@ -165,14 +164,11 @@ def ingest_scan_results(
         # Parse findings
         findings = [parse_finding(raw) for raw in raw_findings]
 
-        # Insert findings
+        # Write findings directly to findings_latest (skip historical table)
         count = insert_findings(conn, scan_id, skill_id, findings)
         total_findings += count
 
-        # Refresh latest findings
-        refresh_findings_latest(conn, skill_id, scan_id)
-
-        # Compute and store score
+        # Compute and store score (skips write if unchanged)
         skill_score = compute_score(findings)
         skill_score.skill_id = skill_id
         upsert_skill_score(conn, skill_score, scan_id)

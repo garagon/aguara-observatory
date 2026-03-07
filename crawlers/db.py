@@ -238,41 +238,58 @@ def insert_findings(
     skill_id: str,
     findings: list[Finding],
 ) -> int:
-    """Insert findings for a skill from a scan. Returns count inserted."""
+    """Insert findings for a skill from a scan. Returns count inserted.
+
+    NOTE: Writes only to findings_latest (not historical findings table)
+    to stay within Turso free-tier write limits.
+    """
+    return refresh_findings_latest(conn, skill_id, scan_id, findings)
+
+
+def refresh_findings_latest(
+    conn: libsql.Connection,
+    skill_id: str,
+    scan_id: int,
+    findings: list[Finding] | None = None,
+) -> int:
+    """Replace latest findings for a skill. Writes directly, no historical copy.
+
+    Returns count of findings written.
+    """
+    from crawlers.models import SEVERITY_SCORE_IMPACT
+
+    conn.execute("DELETE FROM findings_latest WHERE skill_id = ?", (skill_id,))
+
+    if not findings:
+        return 0
+
     for f in findings:
-        from crawlers.models import SEVERITY_SCORE_IMPACT
         impact = SEVERITY_SCORE_IMPACT.get(f.severity, 0)
         conn.execute(
             """
-            INSERT INTO findings (scan_id, skill_id, rule_id, severity, category,
-                                 subcategory, line, matched_text, message, score_impact)
+            INSERT INTO findings_latest (skill_id, scan_id, rule_id, severity, category,
+                                        subcategory, line, matched_text, message, score_impact)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (scan_id, skill_id, f.rule_id, f.severity.value, f.category,
+            (skill_id, scan_id, f.rule_id, f.severity.value, f.category,
              f.subcategory, f.line, f.matched_text, f.message, impact),
         )
     return len(findings)
 
 
-def refresh_findings_latest(conn: libsql.Connection, skill_id: str, scan_id: int) -> None:
-    """Replace latest findings for a skill with findings from a new scan."""
-    conn.execute("DELETE FROM findings_latest WHERE skill_id = ?", (skill_id,))
-    conn.execute(
-        """
-        INSERT INTO findings_latest (skill_id, scan_id, rule_id, severity, category,
-                                    subcategory, line, matched_text, message, score_impact)
-        SELECT skill_id, scan_id, rule_id, severity, category,
-               subcategory, line, matched_text, message, score_impact
-        FROM findings WHERE skill_id = ? AND scan_id = ?
-        """,
-        (skill_id, scan_id),
-    )
-
-
 # --- Scores ---
 
 def upsert_skill_score(conn: libsql.Connection, score: SkillScore, scan_id: int) -> None:
-    """Insert or update a skill score."""
+    """Insert or update a skill score. Skips write if score is unchanged."""
+    # Check if score already exists and matches — avoid unnecessary writes
+    existing = conn.execute(
+        "SELECT score, grade, finding_count FROM skill_scores WHERE skill_id = ?",
+        (score.skill_id,),
+    ).fetchone()
+
+    if existing and existing[0] == score.score and existing[1] == score.grade.value and existing[2] == score.finding_count:
+        return  # No change, skip write
+
     conn.execute(
         """
         INSERT INTO skill_scores (skill_id, score, grade, finding_count,

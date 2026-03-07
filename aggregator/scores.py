@@ -23,7 +23,8 @@ def recompute_all_scores(conn) -> dict:
     """
     now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
 
-    # Single SQL query: compute all scores in the database
+    # Only update scores for skills that don't have a score yet
+    # (ingest phase already writes scores for scanned skills)
     conn.execute(
         """INSERT INTO skill_scores
               (skill_id, score, grade, finding_count,
@@ -71,18 +72,9 @@ def recompute_all_scores(conn) -> dict:
            FROM skills s
            LEFT JOIN findings_latest fl ON s.id = fl.skill_id
            WHERE s.deleted = 0
+             AND s.id NOT IN (SELECT skill_id FROM skill_scores)
            GROUP BY s.id
-           ON CONFLICT(skill_id) DO UPDATE SET
-              score = excluded.score,
-              grade = excluded.grade,
-              finding_count = excluded.finding_count,
-              critical_count = excluded.critical_count,
-              high_count = excluded.high_count,
-              medium_count = excluded.medium_count,
-              low_count = excluded.low_count,
-              categories = excluded.categories,
-              last_scan_id = excluded.last_scan_id,
-              updated_at = excluded.updated_at""",
+           ON CONFLICT(skill_id) DO NOTHING""",
         (now,),
     )
     conn.commit()
