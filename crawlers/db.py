@@ -416,3 +416,104 @@ def finish_crawl_run(
          changed_files, status, error, run_id),
     )
     conn.commit()
+
+
+# --- Audit Overrides ---
+
+def upsert_audit_override(
+    conn: libsql.Connection,
+    skill_id: str,
+    rule_id: str,
+    verdict: str,
+    *,
+    reason: str | None = None,
+    auditor: str = "heuristic",
+    confidence: float = 0.5,
+    matched_text_hash: str | None = None,
+) -> None:
+    """Insert or update an audit override for a specific finding."""
+    conn.execute(
+        """
+        INSERT INTO audit_overrides (skill_id, rule_id, verdict, reason, auditor,
+            confidence, matched_text_hash, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(skill_id, rule_id, matched_text_hash) DO UPDATE SET
+            verdict = excluded.verdict,
+            reason = excluded.reason,
+            auditor = excluded.auditor,
+            confidence = excluded.confidence,
+            updated_at = excluded.updated_at
+        """,
+        (skill_id, rule_id, verdict, reason, auditor, confidence,
+         matched_text_hash, _now()),
+    )
+
+
+def upsert_rule_override(
+    conn: libsql.Connection,
+    rule_id: str,
+    verdict: str,
+    *,
+    reason: str | None = None,
+    auditor: str = "heuristic",
+    confidence: float = 0.5,
+) -> None:
+    """Insert or update a blanket rule-level override."""
+    conn.execute(
+        """
+        INSERT INTO audit_rule_overrides (rule_id, verdict, reason, auditor, confidence, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(rule_id) DO UPDATE SET
+            verdict = excluded.verdict,
+            reason = excluded.reason,
+            auditor = excluded.auditor,
+            confidence = excluded.confidence,
+            updated_at = excluded.updated_at
+        """,
+        (rule_id, verdict, reason, auditor, confidence, _now()),
+    )
+
+
+def get_overrides_for_skill(
+    conn: libsql.Connection,
+    skill_id: str,
+    min_confidence: float = 0.0,
+) -> dict[tuple[str, str | None], tuple[str, float]]:
+    """Get audit overrides for a skill.
+
+    Returns dict of (rule_id, matched_text_hash) -> (verdict, confidence).
+    Merges skill-specific and rule-level overrides, with skill-specific taking precedence.
+    """
+    overrides: dict[tuple[str, str | None], tuple[str, float]] = {}
+
+    # Rule-level overrides first (lower priority)
+    rows = conn.execute(
+        "SELECT rule_id, verdict, confidence FROM audit_rule_overrides WHERE confidence >= ?",
+        (min_confidence,),
+    ).fetchall()
+    for row in rows:
+        overrides[(row[0], None)] = (row[1], row[2])
+
+    # Skill-specific overrides (higher priority)
+    rows = conn.execute(
+        """SELECT rule_id, matched_text_hash, verdict, confidence
+           FROM audit_overrides
+           WHERE skill_id = ? AND confidence >= ?""",
+        (skill_id, min_confidence),
+    ).fetchall()
+    for row in rows:
+        overrides[(row[0], row[1])] = (row[2], row[3])
+
+    return overrides
+
+
+def get_all_rule_overrides(
+    conn: libsql.Connection,
+    min_confidence: float = 0.0,
+) -> dict[str, tuple[str, float]]:
+    """Get all rule-level overrides. Returns dict of rule_id -> (verdict, confidence)."""
+    rows = conn.execute(
+        "SELECT rule_id, verdict, confidence FROM audit_rule_overrides WHERE confidence >= ?",
+        (min_confidence,),
+    ).fetchall()
+    return {row[0]: (row[1], row[2]) for row in rows}

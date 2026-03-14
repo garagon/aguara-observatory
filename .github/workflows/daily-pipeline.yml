@@ -223,11 +223,37 @@ jobs:
           done
 
   # ─────────────────────────────────────────────
+  # Phase 2.5: Audit — classify FP/TP findings
+  # ─────────────────────────────────────────────
+
+  audit:
+    needs: scan
+    if: ${{ always() && !cancelled() && (needs.scan.result == 'success' || needs.scan.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run automated auditor
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m aggregator.auditor --min-confidence 0.8
+
+  # ─────────────────────────────────────────────
   # Phase 3: Aggregate — stats, scores, export
   # ─────────────────────────────────────────────
 
   aggregate:
-    needs: scan
+    needs: [scan, audit]
     if: ${{ always() && !cancelled() && (needs.scan.result == 'success' || needs.scan.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -248,7 +274,7 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: python -m aggregator.stats
 
-      - name: Recompute skill scores
+      - name: Recompute skill scores (with audit overrides)
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}

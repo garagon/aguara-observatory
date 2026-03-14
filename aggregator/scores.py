@@ -3,6 +3,9 @@
 
 Scoring: Start at 100, -25 per CRITICAL, -15 per HIGH, -8 per MEDIUM, -3 per LOW.
 Grade: A=90-100, B=75-89, C=50-74, D=25-49, F=0-24.
+
+Findings with audit overrides (verdict='fp', confidence >= 0.8) are excluded
+from score computation.
 """
 
 from __future__ import annotations
@@ -14,19 +17,27 @@ from crawlers.models import Severity, SkillScore, score_to_grade, SEVERITY_SCORE
 
 logger = logging.getLogger("observatory.scores")
 
+# Minimum confidence for an FP override to exclude a finding from scoring
+FP_CONFIDENCE_THRESHOLD = 0.8
+
 
 def recompute_all_scores(conn) -> dict:
     """Recompute scores for all skills based on findings_latest.
+
+    Excludes findings that have been marked as false positives by the auditor
+    (audit_overrides or audit_rule_overrides with verdict='fp' and high confidence).
 
     Uses batch SQL to avoid N+1 queries against remote Turso.
     Returns summary stats.
     """
     now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
 
-    # Only update scores for skills that don't have a score yet
-    # (ingest phase already writes scores for scanned skills)
+    # Subquery: findings NOT overridden as FP
+    # Excludes findings that match:
+    #   1. Per-skill audit_overrides with verdict='fp' and confidence >= threshold
+    #   2. Rule-level audit_rule_overrides with verdict='fp' and confidence >= threshold
     conn.execute(
-        """INSERT INTO skill_scores
+        f"""INSERT INTO skill_scores
               (skill_id, score, grade, finding_count,
                critical_count, high_count, medium_count, low_count,
                categories, last_scan_id, updated_at)
@@ -36,7 +47,6 @@ def recompute_all_scores(conn) -> dict:
                 - COALESCE(SUM(CASE WHEN fl.severity = 'CRITICAL' THEN 25 ELSE 0 END), 0)
                 - COALESCE(SUM(CASE WHEN fl.severity = 'HIGH' THEN 15 ELSE 0 END), 0)
                 - COALESCE(SUM(CASE WHEN fl.severity = 'MEDIUM' THEN 8 ELSE 0 END), 0)
-                - COALESCE(SUM(CASE WHEN fl.severity = 'LOW' THEN 0 ELSE 0 END), 0)
               ) as score,
               CASE
                 WHEN MAX(0, 100
@@ -70,11 +80,35 @@ def recompute_all_scores(conn) -> dict:
               MAX(fl.scan_id) as last_scan_id,
               ? as updated_at
            FROM skills s
-           LEFT JOIN findings_latest fl ON s.id = fl.skill_id
+           LEFT JOIN (
+              SELECT f.* FROM findings_latest f
+              WHERE NOT EXISTS (
+                  SELECT 1 FROM audit_overrides ao
+                  WHERE ao.skill_id = f.skill_id
+                    AND ao.rule_id = f.rule_id
+                    AND ao.verdict = 'fp'
+                    AND ao.confidence >= {FP_CONFIDENCE_THRESHOLD}
+              )
+              AND NOT EXISTS (
+                  SELECT 1 FROM audit_rule_overrides aro
+                  WHERE aro.rule_id = f.rule_id
+                    AND aro.verdict = 'fp'
+                    AND aro.confidence >= {FP_CONFIDENCE_THRESHOLD}
+              )
+           ) fl ON s.id = fl.skill_id
            WHERE s.deleted = 0
-             AND s.id NOT IN (SELECT skill_id FROM skill_scores)
            GROUP BY s.id
-           ON CONFLICT(skill_id) DO NOTHING""",
+           ON CONFLICT(skill_id) DO UPDATE SET
+              score = excluded.score,
+              grade = excluded.grade,
+              finding_count = excluded.finding_count,
+              critical_count = excluded.critical_count,
+              high_count = excluded.high_count,
+              medium_count = excluded.medium_count,
+              low_count = excluded.low_count,
+              categories = excluded.categories,
+              last_scan_id = excluded.last_scan_id,
+              updated_at = excluded.updated_at""",
         (now,),
     )
     conn.commit()
@@ -86,14 +120,33 @@ def recompute_all_scores(conn) -> dict:
     grade_dist = {g: c for g, c in grade_rows}
     updated = sum(grade_dist.values())
 
+    # Count how many findings were excluded by overrides
+    fp_excluded = conn.execute(f"""
+        SELECT COUNT(*) FROM findings_latest f
+        WHERE EXISTS (
+            SELECT 1 FROM audit_overrides ao
+            WHERE ao.skill_id = f.skill_id AND ao.rule_id = f.rule_id
+            AND ao.verdict = 'fp' AND ao.confidence >= {FP_CONFIDENCE_THRESHOLD}
+        )
+        OR EXISTS (
+            SELECT 1 FROM audit_rule_overrides aro
+            WHERE aro.rule_id = f.rule_id
+            AND aro.verdict = 'fp' AND aro.confidence >= {FP_CONFIDENCE_THRESHOLD}
+        )
+    """).fetchone()[0]
+
     logger.info(
-        "Recomputed %d scores: A=%d B=%d C=%d D=%d F=%d",
-        updated,
+        "Recomputed %d scores (excluded %d FP findings): A=%d B=%d C=%d D=%d F=%d",
+        updated, fp_excluded,
         grade_dist.get("A", 0), grade_dist.get("B", 0), grade_dist.get("C", 0),
         grade_dist.get("D", 0), grade_dist.get("F", 0),
     )
 
-    return {"updated": updated, "grade_distribution": grade_dist}
+    return {
+        "updated": updated,
+        "fp_excluded": fp_excluded,
+        "grade_distribution": grade_dist,
+    }
 
 
 def main():
