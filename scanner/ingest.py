@@ -70,6 +70,11 @@ def parse_finding(raw: dict) -> Finding:
         line=raw.get("line"),
         matched_text=raw.get("matched_text", ""),
         message=raw.get("message", ""),
+        rule_name=raw.get("rule_name"),
+        description=raw.get("description"),
+        analyzer=raw.get("analyzer"),
+        confidence=raw.get("score"),
+        context=raw.get("context"),
     )
 
 

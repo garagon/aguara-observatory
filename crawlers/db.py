@@ -265,16 +265,22 @@ def refresh_findings_latest(
 
     for f in findings:
         impact = SEVERITY_SCORE_IMPACT.get(f.severity, 0)
+        context_json = json.dumps(f.context) if f.context else None
         conn.execute(
             """
             INSERT INTO findings_latest (skill_id, scan_id, rule_id, severity, category,
-                                        subcategory, line, matched_text, message, score_impact)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                        subcategory, line, matched_text, message, score_impact,
+                                        rule_name, description, analyzer, confidence, context)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(skill_id, rule_id, severity, COALESCE(matched_text, ''))
-            DO UPDATE SET scan_id = excluded.scan_id, updated_at = excluded.updated_at
+            DO UPDATE SET scan_id = excluded.scan_id, updated_at = excluded.updated_at,
+                rule_name = excluded.rule_name, description = excluded.description,
+                analyzer = excluded.analyzer, confidence = excluded.confidence,
+                context = excluded.context
             """,
             (skill_id, scan_id, f.rule_id, f.severity.value, f.category,
-             f.subcategory, f.line, f.matched_text, f.message, impact),
+             f.subcategory, f.line, f.matched_text, f.message, impact,
+             f.rule_name, f.description, f.analyzer, f.confidence, context_json),
         )
     return len(findings)
 

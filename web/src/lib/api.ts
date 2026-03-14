@@ -63,6 +63,10 @@ export interface SkillFinding {
   line?: number;
   matched_text?: string;
   message?: string;
+  rule_name?: string;
+  analyzer?: string;
+  confidence?: number;
+  context?: { line: number; content: string; is_match: boolean }[];
 }
 
 export interface RuleInfo {

@@ -80,6 +80,11 @@ class Finding(BaseModel):
     line: int | None = None
     matched_text: str | None = None
     message: str | None = None
+    rule_name: str | None = None
+    description: str | None = None
+    analyzer: str | None = None
+    confidence: int | None = None  # Aguara's per-finding score (0-100)
+    context: list[dict] | None = None  # Lines surrounding the match
 
 
 class ScanResult(BaseModel):
