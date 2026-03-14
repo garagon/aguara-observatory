@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import ScoreGrade from "../../components/ScoreGrade.astro";
 import { listCategoryPages, getCategorySkills } from "../../lib/api";
 import { gradeBarColors, registryNames, categoryDescriptions } from "../../lib/constants";
+import learnContent from "../../data/learn-content.json";
 
 export function getStaticPaths() {
   const categories = listCategoryPages();
@@ -49,6 +50,11 @@ const jsonLd = {
     <p class="text-gray-400">
       {data ? `${data.skill_count.toLocaleString()} skills with ${category} findings` : "No data available."}
     </p>
+    {(category! in learnContent) && (
+      <a href={`${base}learn/${category}/`} class="inline-flex items-center gap-1.5 text-sm text-aguara-400 hover:text-aguara-300 transition-colors mt-2">
+        Learn about {displayCategory.toLowerCase()} threats &rarr;
+      </a>
+    )}
   </div>
 
   {data && data.skills.length > 0 ? (
