@@ -9,7 +9,11 @@ export default defineConfig({
   base: "/",
   integrations: [
     tailwind(),
-    sitemap(),
+    sitemap({
+      changefreq: "daily",
+      lastmod: new Date(),
+      priority: 0.7,
+    }),
   ],
   build: {
     assets: "_assets",
