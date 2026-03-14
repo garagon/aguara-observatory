@@ -127,11 +127,12 @@ class PulseMCPCrawler(BaseCrawler):
 
     def _discover_via_scraper(self) -> list[dict]:
         """Fallback: scrape PulseMCP HTML pages when API key is not available."""
+        import time as _time
         all_servers = []
         page = 1
 
         while True:
-            self.rate_limiter.wait()
+            _time.sleep(0.5)  # 500ms rate limit for HTML pages
             url = f"https://www.pulsemcp.com/servers?page={page}&sort=alphabetical-asc"
             try:
                 resp = requests.get(url, timeout=30, headers={
