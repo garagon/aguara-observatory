@@ -270,6 +270,8 @@ def refresh_findings_latest(
             INSERT INTO findings_latest (skill_id, scan_id, rule_id, severity, category,
                                         subcategory, line, matched_text, message, score_impact)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(skill_id, rule_id, severity, COALESCE(matched_text, ''))
+            DO UPDATE SET scan_id = excluded.scan_id, updated_at = excluded.updated_at
             """,
             (skill_id, scan_id, f.rule_id, f.severity.value, f.category,
              f.subcategory, f.line, f.matched_text, f.message, impact),
@@ -337,8 +339,21 @@ def upsert_vendor_audit(conn: libsql.Connection, audit: VendorAudit) -> None:
 
 # --- Daily Stats ---
 
+_DAILY_STAT_COLUMNS = frozenset({
+    "total_skills", "skills_scanned", "total_findings",
+    "critical_count", "high_count", "medium_count", "low_count",
+    "avg_score", "grade_a_count", "grade_b_count", "grade_c_count",
+    "grade_d_count", "grade_f_count", "new_skills", "deleted_skills",
+})
+
+
 def upsert_daily_stat(conn: libsql.Connection, date: str, registry_id: str, **kwargs) -> None:
-    """Insert or update daily stats."""
+    """Insert or update daily stats. Only whitelisted column names are accepted."""
+    # Validate column names to prevent SQL injection
+    invalid = set(kwargs.keys()) - _DAILY_STAT_COLUMNS
+    if invalid:
+        raise ValueError(f"Invalid daily_stats columns: {invalid}")
+
     cols = ["date", "registry_id"] + list(kwargs.keys())
     placeholders = ", ".join(["?"] * len(cols))
     updates = ", ".join(f"{k} = excluded.{k}" for k in kwargs)

@@ -327,7 +327,7 @@ def _export_recent_feed(conn, output_dir: Path, limit: int = 50) -> None:
                   fl.message, fl.updated_at, s.name, s.registry_id
            FROM findings_latest fl
            JOIN skills s ON fl.skill_id = s.id
-           WHERE fl.severity IN ('CRITICAL', 'HIGH')
+           WHERE fl.severity IN ('CRITICAL', 'HIGH') AND s.deleted = 0
            ORDER BY fl.updated_at DESC
            LIMIT ?""",
         (limit,),
@@ -528,6 +528,7 @@ def _export_csv_datasets(conn, datasets_dir: Path) -> None:
                   fl.severity, fl.category, fl.message
            FROM findings_latest fl
            JOIN skills s ON fl.skill_id = s.id
+           WHERE s.deleted = 0
            ORDER BY fl.severity, s.registry_id"""
     ).fetchall()
 

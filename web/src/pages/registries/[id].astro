@@ -133,11 +133,11 @@ const jsonLd = {
         </div>
       </div>
 
-      <!-- Skills table -->
+      <!-- Skills table (paginated client-side for large registries) -->
       {skills.length > 0 && (
         <div class="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
-            <h2 class="text-base font-semibold text-white">
+          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold text-white shrink-0">
               Skills <span class="text-gray-500 font-normal">({skills.length.toLocaleString()})</span>
             </h2>
             <input
@@ -160,7 +160,7 @@ const jsonLd = {
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-800/30" id="skills-tbody">
-                {skills.map((skill) => {
+                {skills.slice(0, 200).map((skill) => {
                   const safeSlug = skill.slug.replace(/\//g, "_").replace(/:/g, "_");
                   return (
                     <tr class="hover:bg-gray-800/30 transition-colors skill-row" data-name={(skill.name || skill.slug).toLowerCase()}>
@@ -196,18 +196,53 @@ const jsonLd = {
               </tbody>
             </table>
           </div>
+          {skills.length > 200 && (
+            <div class="px-5 py-3 border-t border-gray-800 text-center">
+              <button id="load-more-btn" class="text-sm text-aguara-400 hover:text-aguara-300 transition-colors font-medium">
+                Show more ({(skills.length - 200).toLocaleString()} remaining)
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      <script>
-        const filterInput = document.getElementById("skill-filter") as HTMLInputElement;
-        if (filterInput) {
-          filterInput.addEventListener("input", () => {
-            const q = filterInput.value.toLowerCase();
-            document.querySelectorAll<HTMLElement>(".skill-row").forEach((row) => {
-              const name = row.dataset.name ?? "";
-              row.style.display = name.includes(q) ? "" : "none";
-            });
+      <script define:vars={{ remainingSkills: skills.slice(200).map(s => ({
+        s: s.slug.replace(/\//g, "_").replace(/:/g, "_"),
+        n: s.name || s.slug,
+        g: s.grade, sc: s.score, f: s.finding_count, c: s.critical_count, h: s.high_count,
+      })), rid: id, bp: base }}>
+        const PAGE = 500;
+        let off = 0;
+        const gc = { A: "bg-emerald-500", B: "bg-green-500", C: "bg-yellow-500", D: "bg-orange-500", F: "bg-red-500" };
+        function addRows(items) {
+          const tb = document.getElementById("skills-tbody");
+          if (!tb) return;
+          const f = document.createDocumentFragment();
+          for (const sk of items) {
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-gray-800/30 transition-colors skill-row";
+            tr.dataset.name = sk.n.toLowerCase();
+            tr.innerHTML = `<td class="px-5 py-2.5"><a href="${bp}skills/${rid}/${sk.s}/" class="text-aguara-400 hover:text-aguara-300 transition-colors">${sk.n}</a></td><td class="px-4 py-2.5 text-center"><span class="inline-block w-7 text-center font-bold text-xs rounded-md ${gc[sk.g]||gc.F} text-white py-0.5">${sk.g}</span></td><td class="px-4 py-2.5 text-right text-gray-300 font-mono text-xs">${sk.sc}</td><td class="px-4 py-2.5 text-right text-gray-400">${sk.f||"\u2014"}</td><td class="px-4 py-2.5 text-right">${sk.c>0?`<span class="text-red-400 font-medium">${sk.c}</span>`:'<span class="text-gray-700">&mdash;</span>'}</td><td class="px-4 py-2.5 text-right">${sk.h>0?`<span class="text-orange-400 font-medium">${sk.h}</span>`:'<span class="text-gray-700">&mdash;</span>'}</td>`;
+            f.appendChild(tr);
+          }
+          tb.appendChild(f);
+        }
+        const btn = document.getElementById("load-more-btn");
+        if (btn && remainingSkills.length > 0) {
+          btn.addEventListener("click", () => {
+            addRows(remainingSkills.slice(off, off + PAGE));
+            off += PAGE;
+            const left = remainingSkills.length - off;
+            if (left <= 0) btn.parentElement?.remove();
+            else btn.textContent = `Show more (${left.toLocaleString()} remaining)`;
+          });
+        }
+        const fi = document.getElementById("skill-filter") as HTMLInputElement;
+        if (fi) {
+          fi.addEventListener("input", () => {
+            if (off < remainingSkills.length) { addRows(remainingSkills.slice(off)); off = remainingSkills.length; btn?.parentElement?.remove(); }
+            const q = fi.value.toLowerCase();
+            document.querySelectorAll<HTMLElement>(".skill-row").forEach(r => { r.style.display = (r.dataset.name??"").includes(q) ? "" : "none"; });
           });
         }
       </script>
