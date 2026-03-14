@@ -143,6 +143,8 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          PULSEMCP_API_KEY: ${{ secrets.PULSEMCP_API_KEY }}
+          PULSEMCP_TENANT_ID: ${{ secrets.PULSEMCP_TENANT_ID }}
         run: python -m ${{ matrix.module }} --output-dir data/${{ matrix.name }}/ --mode full
 
       - uses: actions/upload-artifact@v4

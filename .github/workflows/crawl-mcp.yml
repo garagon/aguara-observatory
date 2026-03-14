@@ -11,6 +11,8 @@ on:
           - mcp-registry
           - mcp-so
           - lobehub
+          - smithery
+          - glama
 
 jobs:
   crawl:
@@ -39,10 +41,14 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          PULSEMCP_API_KEY: ${{ secrets.PULSEMCP_API_KEY }}
+          PULSEMCP_TENANT_ID: ${{ secrets.PULSEMCP_TENANT_ID }}
         run: |
           case "${{ inputs.registry }}" in
             mcp-registry) MODULE=crawlers.mcp_registry ;;
             mcp-so) MODULE=crawlers.mcp_so ;;
             lobehub) MODULE=crawlers.lobehub ;;
+            smithery) MODULE=crawlers.smithery ;;
+            glama) MODULE=crawlers.glama ;;
           esac
           python -m $MODULE --output-dir data/${{ inputs.registry }}/

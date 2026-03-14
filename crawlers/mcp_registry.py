@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 
 import requests
+from bs4 import BeautifulSoup
 
 from crawlers.base import BaseCrawler
 from crawlers.models import CrawlResult
@@ -47,8 +49,8 @@ class PulseMCPCrawler(BaseCrawler):
         """
         headers = self._api_headers()
         if "X-API-Key" not in headers:
-            logger.warning("PULSEMCP_API_KEY not set — skipping PulseMCP crawl")
-            return []
+            logger.warning("PULSEMCP_API_KEY not set — falling back to HTML scraper")
+            return self._discover_via_scraper()
 
         max_updated_at = None
         if self.crawl_mode == "incremental":
@@ -121,6 +123,61 @@ class PulseMCPCrawler(BaseCrawler):
         if new_max_updated_at:
             self.set_state("max_updated_at", new_max_updated_at)
 
+        return all_servers
+
+    def _discover_via_scraper(self) -> list[dict]:
+        """Fallback: scrape PulseMCP HTML pages when API key is not available."""
+        all_servers = []
+        page = 1
+
+        while True:
+            self.rate_limiter.wait()
+            url = f"https://www.pulsemcp.com/servers?page={page}&sort=alphabetical-asc"
+            try:
+                resp = requests.get(url, timeout=30, headers={
+                    "User-Agent": "AguaraObservatory/0.1",
+                })
+                resp.raise_for_status()
+            except Exception as e:
+                logger.error("PulseMCP scraper page %d error: %s", page, e)
+                break
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            cards = soup.find_all("div", attrs={"data-test-id": re.compile(r"^mcp-server-grid-card")})
+            if not cards:
+                break
+
+            for card in cards:
+                link = card.find("a", href=re.compile(r"^/servers/"))
+                if not link:
+                    continue
+                slug = link["href"].replace("/servers/", "").strip("/")
+                if not slug:
+                    continue
+
+                title_el = card.find("h3")
+                desc_el = card.find("p", class_=re.compile(r"text-15.*text-pulse"))
+                name = title_el.text.strip() if title_el else slug
+                description = desc_el.text.strip() if desc_el else None
+
+                metadata = {}
+                if description:
+                    metadata["description"] = description
+
+                all_servers.append({
+                    "slug": slug,
+                    "name": name,
+                    "url": f"https://www.pulsemcp.com/servers/{slug}",
+                    "metadata": metadata,
+                })
+
+            if page % 10 == 0:
+                logger.info("Scraped %d servers (page %d)...", len(all_servers), page)
+            page += 1
+            if page > 250:
+                break
+
+        logger.info("HTML scraper discovered %d servers", len(all_servers))
         return all_servers
 
     def download(self, slug: str, **kwargs) -> CrawlResult:
