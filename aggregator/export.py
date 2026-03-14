@@ -369,12 +369,23 @@ def _export_skill_reports(conn, output_dir: Path) -> tuple[int, dict[str, str]]:
     ).fetchall()
 
     # 2. Fetch ALL findings in one query, group by skill_id in Python
-    finding_rows = conn.execute(
-        """SELECT skill_id, rule_id, severity, category, subcategory, line,
-                  matched_text, message, rule_name, analyzer, confidence, context
-           FROM findings_latest
-           ORDER BY skill_id"""
-    ).fetchall()
+    # Try extended columns first, fall back to basic if new columns don't exist yet
+    try:
+        finding_rows = conn.execute(
+            """SELECT skill_id, rule_id, severity, category, subcategory, line,
+                      matched_text, message, rule_name, analyzer, confidence, context
+               FROM findings_latest
+               ORDER BY skill_id"""
+        ).fetchall()
+        has_extra = True
+    except Exception:
+        finding_rows = conn.execute(
+            """SELECT skill_id, rule_id, severity, category, subcategory, line,
+                      matched_text, message
+               FROM findings_latest
+               ORDER BY skill_id"""
+        ).fetchall()
+        has_extra = False
 
     findings_by_skill: dict[str, list] = {}
     for row in finding_rows:
@@ -390,18 +401,18 @@ def _export_skill_reports(conn, output_dir: Path) -> tuple[int, dict[str, str]]:
             "matched_text": row[6],
             "message": row[7],
         }
-        # Include extra fields if populated
-        if row[8]:
-            finding["rule_name"] = row[8]
-        if row[9]:
-            finding["analyzer"] = row[9]
-        if row[10] is not None:
-            finding["confidence"] = row[10]
-        if row[11]:
-            try:
-                finding["context"] = json.loads(row[11])
-            except (json.JSONDecodeError, TypeError):
-                pass
+        if has_extra:
+            if row[8]:
+                finding["rule_name"] = row[8]
+            if row[9]:
+                finding["analyzer"] = row[9]
+            if row[10] is not None:
+                finding["confidence"] = row[10]
+            if row[11]:
+                try:
+                    finding["context"] = json.loads(row[11])
+                except (json.JSONDecodeError, TypeError):
+                    pass
         findings_by_skill[sid].append(finding)
 
     # 3. Fetch ALL scores in one query

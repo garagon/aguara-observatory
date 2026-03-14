@@ -102,16 +102,27 @@ def connect(
 
 
 def init_schema(conn: libsql.Connection) -> None:
-    """Run all schema SQL files in order."""
+    """Run all schema SQL files in order.
+
+    Idempotent: safely handles already-applied migrations (duplicate columns,
+    existing indexes/tables) without wasting Turso write quota.
+    """
     schema_files = sorted(SCHEMA_DIR.glob("*.sql"))
     for schema_file in schema_files:
         logger.info("Applying schema: %s", schema_file.name)
         sql = schema_file.read_text()
-        # Execute each statement separately (SQLite doesn't support multi-statement)
         for statement in sql.split(";"):
             statement = statement.strip()
             if statement:
-                conn.execute(statement)
+                try:
+                    conn.execute(statement)
+                except Exception as exc:
+                    msg = str(exc).lower()
+                    # Skip safe-to-ignore errors from re-running migrations
+                    if "duplicate column" in msg or "already exists" in msg:
+                        logger.debug("Skipping (already applied): %s", statement[:60])
+                        continue
+                    raise
     conn.commit()
 
 
