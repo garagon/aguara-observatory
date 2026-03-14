@@ -1,0 +1,173 @@
+---
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ResearchOrganization",
+      "name": "Aguara Watch Research",
+      "url": "https://watch.aguarascan.com/research/",
+      "description": "Open research initiative scanning AI agent skills and MCP servers for security vulnerabilities.",
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "Aguara",
+        "url": "https://aguarascan.com",
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://watch.aguarascan.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Research" },
+      ],
+    },
+  ],
+};
+
+const methodology = [
+  {
+    phase: "Crawl",
+    desc: "Every 12 hours, crawlers discover and download skills from 7 public registries. Content hashing ensures only changed files are reprocessed.",
+  },
+  {
+    phase: "Scan",
+    desc: "The Aguara binary runs 188+ detection rules across pattern matching, NLP semantic analysis, and taint tracking. Each finding includes severity, matched text, and surrounding code context.",
+  },
+  {
+    phase: "Audit",
+    desc: "An automated auditor classifies findings as true positives, false positives, or needs-review using heuristic rules with confidence scores. FP findings above 80% confidence are excluded from grades.",
+  },
+  {
+    phase: "Score",
+    desc: "Skills start at 100 points. CRITICAL findings subtract 25, HIGH subtracts 15, MEDIUM subtracts 8. LOW and INFO are tracked but do not affect the score. Grades map to ranges: A (90-100), B (75-89), C (50-74), D (25-49), F (0-24).",
+  },
+  {
+    phase: "Publish",
+    desc: "Results are exported as a static JSON API and built into individual skill report pages. All data is public and downloadable as CSV datasets.",
+  },
+];
+
+const principles = [
+  {
+    title: "Deterministic analysis",
+    desc: "No LLM in the detection loop. Every finding is reproducible. Run the same scan twice, get the same results. The NLP analyzer uses embedding similarity, not generative models.",
+  },
+  {
+    title: "Open data, open methodology",
+    desc: "All findings, scores, and datasets are public. The scanner is open source (Apache-2.0). Anyone can verify our results by running Aguara on the same files.",
+  },
+  {
+    title: "False positive transparency",
+    desc: "We show FP hints on every finding. The audit system classifies findings with confidence scores. We would rather flag something and explain why it might be a false positive than silently suppress it.",
+  },
+  {
+    title: "Severity reflects impact, not probability",
+    desc: "A CRITICAL finding means the impact would be severe if exploited, regardless of how likely exploitation is. Context (is this documentation or real code?) is handled by the audit layer, not the severity rating.",
+  },
+];
+---
+
+<Base title="Research Methodology" description="How Aguara Watch scans 58,000+ AI agent skills for security vulnerabilities. Open methodology, open data, deterministic analysis." jsonLd={jsonLd}>
+  <div class="max-w-3xl">
+    <!-- Header -->
+    <div class="mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">Research Methodology</h1>
+      <p class="text-lg text-gray-400">
+        Aguara Watch is an open research initiative that continuously scans public AI agent skill registries for security vulnerabilities. This page explains how we collect, analyze, and publish our data.
+      </p>
+    </div>
+
+    <!-- Pipeline -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-white mb-5">The scanning pipeline</h2>
+      <div class="space-y-4">
+        {methodology.map((step, i) => (
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="w-8 h-8 rounded-full bg-aguara-500/20 border border-aguara-500/40 flex items-center justify-center text-sm font-bold text-aguara-400 shrink-0">
+                {i + 1}
+              </div>
+              {i < methodology.length - 1 && <div class="w-px flex-1 bg-gray-800 mt-2" />}
+            </div>
+            <div class="pb-6">
+              <h3 class="text-base font-semibold text-white mb-1">{step.phase}</h3>
+              <p class="text-sm text-gray-400 leading-relaxed">{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Principles -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-white mb-5">Research principles</h2>
+      <div class="grid gap-4">
+        {principles.map((p) => (
+          <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
+            <h3 class="text-base font-semibold text-white mb-2">{p.title}</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">{p.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Limitations -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-white mb-5">Known limitations</h2>
+      <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-5 space-y-3">
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Aguara is a static analysis tool. It reads skill definitions and configuration files as text. It does not execute code, observe runtime behavior, or test actual API endpoints. Some threats (like a server that behaves differently after installation) are outside its detection scope.
+        </p>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          The scanner produces false positives. Documentation that describes security threats (like a tutorial about prompt injection) will trigger the same rules that detect actual attacks. The audit system mitigates this, but manual review is still needed for borderline cases.
+        </p>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Content quality varies by registry. Registries that expose full source code (Skills.sh, ClawHub) produce more accurate scans than registries where only metadata or HTML descriptions are available (mcp.so). A clean score on a registry with limited content does not guarantee the skill is safe.
+        </p>
+      </div>
+    </section>
+
+    <!-- Advisory -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-white mb-5">Advisory board</h2>
+      <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+          We are building an advisory board of security researchers, AI safety practitioners, and registry operators to review detection rules, validate findings, and guide the research direction.
+        </p>
+        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+          The board will help with false positive review, rule calibration, and identifying emerging threat patterns in the AI agent ecosystem. Members get early access to findings data and contribute to the open-source scanner.
+        </p>
+        <p class="text-sm text-gray-300 font-medium">
+          Interested in joining?
+          <a href="mailto:gustavo@oktsec.com" class="text-aguara-400 hover:text-aguara-300 transition-colors">gustavo@oktsec.com</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Open source -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold text-white mb-5">Open source</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a href="https://github.com/garagon/aguara" class="block bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/40 transition-colors group" target="_blank" rel="noopener noreferrer">
+          <h3 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors mb-1">Aguara Scanner</h3>
+          <p class="text-xs text-gray-500">Go binary. 188+ rules. Pattern matching + NLP + taint tracking.</p>
+        </a>
+        <a href="https://github.com/garagon/aguara-observatory" class="block bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/40 transition-colors group" target="_blank" rel="noopener noreferrer">
+          <h3 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors mb-1">Aguara Observatory</h3>
+          <p class="text-xs text-gray-500">This site. Crawlers, pipeline, web dashboard. Python + Astro.</p>
+        </a>
+        <a href="https://github.com/garagon/aguara-mcp" class="block bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/40 transition-colors group" target="_blank" rel="noopener noreferrer">
+          <h3 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors mb-1">Aguara MCP Server</h3>
+          <p class="text-xs text-gray-500">Run security scans from any MCP-compatible agent.</p>
+        </a>
+        <a href={`${base}datasets/`} class="block bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-aguara-500/40 transition-colors group">
+          <h3 class="text-base font-semibold text-white group-hover:text-aguara-400 transition-colors mb-1">Open Datasets</h3>
+          <p class="text-xs text-gray-500">CSV exports of all findings, scores, and skill metadata. Updated daily.</p>
+        </a>
+      </div>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,166 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getRegistries, getRegistryStats, getRegistrySkills } from "../../lib/api";
+import { registryNames, severityColors, gradeBarColors, gradeOrder } from "../../lib/constants";
+import registryReports from "../../data/registry-reports.json";
+
+export function getStaticPaths() {
+  return Object.keys(registryReports).map((registry) => ({
+    params: { registry },
+  }));
+}
+
+const { registry } = Astro.params;
+const report = registryReports[registry as keyof typeof registryReports];
+const registries = getRegistries();
+const regData = registries.find((r) => r.id === registry);
+const stats = getRegistryStats(registry!);
+const skills = getRegistrySkills(registry!);
+const base = import.meta.env.BASE_URL;
+
+if (!report) {
+  return Astro.redirect("/registries/");
+}
+
+const displayName = registryNames[registry!] ?? registry;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": report.title,
+      "description": report.tagline,
+      "url": `https://watch.aguarascan.com/reports/${registry}/`,
+      "author": { "@type": "Organization", "name": "Aguara Watch", "url": "https://watch.aguarascan.com" },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://watch.aguarascan.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Reports", "item": "https://watch.aguarascan.com/reports/" },
+        { "@type": "ListItem", "position": 3, "name": displayName },
+      ],
+    },
+  ],
+};
+
+// Skills with findings (score < 100)
+const skillsWithFindings = skills.filter((s) => s.finding_count > 0);
+const findingsRate = skills.length > 0 ? Math.round((skillsWithFindings.length / skills.length) * 100) : 0;
+---
+
+<Base title={report.title} description={report.tagline} jsonLd={jsonLd}>
+  <div class="max-w-3xl">
+    <!-- Breadcrumb -->
+    <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+      <a href={`${base}reports/`} class="hover:text-aguara-400 transition-colors">Reports</a>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+      <span class="text-gray-300">{displayName}</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">{report.title}</h1>
+      <p class="text-lg text-gray-400">{report.tagline}</p>
+      <div class="flex flex-wrap gap-4 mt-4 text-sm">
+        <a href={`${base}registries/${registry}/`} class="text-aguara-400 hover:text-aguara-300 transition-colors">
+          View all {displayName} skills &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    {stats && (
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-white">{(stats.total_skills as number)?.toLocaleString()}</p>
+          <p class="text-xs text-gray-500 mt-1">Total skills</p>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-white">{(stats.total_findings as number)?.toLocaleString()}</p>
+          <p class="text-xs text-gray-500 mt-1">Findings</p>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-white">{findingsRate}%</p>
+          <p class="text-xs text-gray-500 mt-1">Skills with findings</p>
+        </div>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <p class="text-2xl font-bold text-white">{stats.avg_score}</p>
+          <p class="text-xs text-gray-500 mt-1">Avg score</p>
+        </div>
+      </div>
+    )}
+
+    <!-- Overview -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Overview</h2>
+      {report.overview.split("\n\n").map((p: string) => (
+        <p class="text-gray-300 text-[15px] leading-relaxed mb-4">{p}</p>
+      ))}
+    </section>
+
+    <!-- How we scan this registry -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-4">How we scan {displayName}</h2>
+      {report.methodology.split("\n\n").map((p: string) => (
+        <p class="text-gray-300 text-[15px] leading-relaxed mb-4">{p}</p>
+      ))}
+    </section>
+
+    <!-- Key findings -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Key findings</h2>
+      <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
+        {report.key_findings.split("\n\n").map((p: string) => (
+          <p class="text-gray-300 text-[15px] leading-relaxed mb-4 last:mb-0">{p}</p>
+        ))}
+      </div>
+    </section>
+
+    <!-- Recommendations -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-white mb-4">Recommendations</h2>
+      {report.recommendations.split("\n\n").map((p: string) => (
+        <p class="text-gray-300 text-[15px] leading-relaxed mb-4">{p}</p>
+      ))}
+    </section>
+
+    <!-- Grade distribution -->
+    {stats && (
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4">Grade distribution</h2>
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-5">
+          <div class="space-y-3">
+            {gradeOrder.map((grade) => {
+              const key = `grade_${grade.toLowerCase()}_count`;
+              const count = (stats[key] as number) ?? 0;
+              const total = (stats.total_skills as number) || 1;
+              const pct = Math.round((count / total) * 100);
+              return (
+                <div class="flex items-center gap-3">
+                  <span class={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${gradeBarColors[grade]} text-white`}>{grade}</span>
+                  <div class="flex-1">
+                    <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                      <div class={`h-full ${gradeBarColors[grade]} rounded-full`} style={`width: ${pct}%`} />
+                    </div>
+                  </div>
+                  <span class="text-sm text-gray-400 font-mono w-16 text-right">{count.toLocaleString()}</span>
+                  <span class="text-xs text-gray-500 w-10 text-right">{pct}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA -->
+    <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6 text-center">
+      <p class="text-gray-300 mb-3">Want to scan a specific {displayName} skill?</p>
+      <a href={base} class="inline-flex items-center gap-2 px-5 py-2.5 bg-aguara-500 hover:bg-aguara-600 text-white text-sm font-medium rounded-lg transition-colors">
+        Scan now (free, runs in your browser)
+      </a>
+    </div>
+  </div>
+</Base>
