@@ -1,8 +1,10 @@
 ---
 import Base from "../../../layouts/Base.astro";
-import { listAllSkills, getSkillReport } from "../../../lib/api";
+import { listAllSkills, getSkillReport, getRulesKB } from "../../../lib/api";
 import type { SkillReport, SkillFinding } from "../../../lib/api";
 import { gradeColors, severityColors, severityOrder, severityRank, registryNames } from "../../../lib/constants";
+
+const rulesKB = getRulesKB();
 
 export function getStaticPaths() {
   return listAllSkills().map(({ registry, slug }) => ({
@@ -152,25 +154,54 @@ const jsonLd = {
         <h2 class="text-base font-semibold text-white mb-4">
           Findings <span class="text-gray-500 font-normal">({report.findings.length})</span>
         </h2>
-        <div class="space-y-2">
+        <div class="space-y-3">
           {sortedFindings.map((f) => {
             const sc = severityColors[f.severity.toUpperCase()] || severityColors.INFO;
+            const rule = rulesKB[f.rule_id];
             return (
               <div class="border border-gray-800/50 rounded-xl overflow-hidden hover:border-gray-700/50 transition-colors">
+                {/* Header: severity + rule name + category */}
                 <div class="flex items-center gap-3 px-4 py-2.5 bg-gray-800/20">
-                  <span class={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border ${sc}`}>{f.severity.toUpperCase()}</span>
-                  <span class="font-mono text-xs text-gray-300">{f.rule_id}</span>
-                  <span class="text-xs text-gray-600 hidden sm:inline">{f.category}</span>
-                  {f.line && <span class="text-xs text-gray-600 ml-auto font-mono">L{f.line}</span>}
+                  <span class={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full border shrink-0 ${sc}`}>{f.severity.toUpperCase()}</span>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-sm text-gray-200 font-medium">{rule?.name || f.rule_id}</span>
+                    <span class="text-xs text-gray-600 ml-2 hidden sm:inline">{f.rule_id}</span>
+                  </div>
+                  <span class="text-xs text-gray-600 shrink-0 hidden sm:inline">
+                    <a href={`/categories/${f.category}/`} class="hover:text-aguara-400 transition-colors">{f.category}</a>
+                  </span>
+                  {f.line && <span class="text-xs text-gray-600 shrink-0 font-mono">L{f.line}</span>}
                 </div>
+
+                {/* Description: what this rule detects */}
+                {rule?.description && (
+                  <div class="px-4 py-2 border-t border-gray-800/30">
+                    <p class="text-xs text-gray-400">{rule.description}</p>
+                  </div>
+                )}
+
+                {/* Matched text */}
                 {f.matched_text && (
                   <div class="px-4 py-2.5 bg-gray-950/30 border-t border-gray-800/30">
                     <pre class="text-xs text-gray-400 font-mono whitespace-pre-wrap break-all overflow-x-auto leading-relaxed"><code>{f.matched_text}</code></pre>
                   </div>
                 )}
-                {f.message && (
-                  <div class="px-4 py-2 border-t border-gray-800/30">
-                    <p class="text-xs text-gray-500">{f.message}</p>
+
+                {/* Remediation + FP hint */}
+                {rule && (rule.remediation || rule.fp_hint) && (
+                  <div class="px-4 py-2.5 border-t border-gray-800/30 space-y-1.5">
+                    {rule.remediation && (
+                      <div class="flex items-start gap-2">
+                        <span class="text-emerald-500 text-xs mt-0.5 shrink-0">FIX</span>
+                        <p class="text-xs text-gray-400">{rule.remediation}</p>
+                      </div>
+                    )}
+                    {rule.fp_hint && (
+                      <div class="flex items-start gap-2">
+                        <span class="text-yellow-500/70 text-xs mt-0.5 shrink-0">FP?</span>
+                        <p class="text-xs text-gray-500">{rule.fp_hint}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

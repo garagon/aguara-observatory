@@ -1,0 +1,1073 @@
+{
+  "PROMPT_INJECTION_011": {
+    "name": "Jailbreak template",
+    "description": "Detects common jailbreak prompt patterns",
+    "category": "prompt-injection",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove directives that attempt to exfiltrate data through the agent's response (e.g., asking the agent to embed credentials in URLs or include secret values in output).",
+    "fp_hint": "Likely FP if the text is a legitimate tool instruction about displaying configuration to the user (e.g., show current settings) without external transmission."
+  },
+  "PROMPT_INJECTION_010": {
+    "name": "Fake system prompt",
+    "description": "Detects content pretending to be a system prompt",
+    "category": "prompt-injection",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove encoded or obfuscated directives (base64, ROT13, unicode escapes, hex-encoded text). All text should be in plaintext and human-readable.",
+    "fp_hint": "Likely FP if the encoded content is legitimate data (e.g., a base64-encoded image, a hex-encoded binary hash) rather than concealed directives."
+  },
+  "NLP_CRED_EXFIL_COMBO": {
+    "name": "Text combines credential access with network transmission",
+    "description": "Text combines credential access with network transmission",
+    "category": "exfiltration",
+    "severity": "CRITICAL",
+    "analyzer": "nlp-injection",
+    "remediation": "Remove the combination of credential access and network transmission from the tool. If the tool needs credentials, access them via a secrets manager and never transmit them externally.",
+    "fp_hint": "Likely FP if the tool legitimately uses credentials for API authentication (e.g., reading an API key to make authenticated requests to the same service)."
+  },
+  "PROMPT_INJECTION_001": {
+    "name": "Instruction override attempt",
+    "description": "Detects attempts to override or ignore previous instructions",
+    "category": "prompt-injection",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove the injection payload from the skill definition. Text that attempts to reset agent context or override prior directives is a direct attack vector.",
+    "fp_hint": "Likely FP if the text is in a security tutorial or research paper discussing injection techniques as examples, not in an active skill description."
+  },
+  "PROMPT_INJECTION_006": {
+    "name": "Delimiter injection",
+    "description": "Detects injection of system/user/assistant delimiters",
+    "category": "prompt-injection",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove text that instructs the agent to disregard its safety guidelines, system prompt, or ethical constraints. This is a strong indicator of a jailbreak attempt.",
+    "fp_hint": "Likely FP if the text appears in security research content, a CTF challenge description, or educational material about AI safety clearly labeled as such."
+  },
+  "NLP_OVERRIDE_DANGEROUS": {
+    "name": "Instruction override combined with dangerous operations",
+    "description": "Instruction override combined with dangerous operations",
+    "category": "prompt-injection",
+    "severity": "CRITICAL",
+    "analyzer": "nlp-injection",
+    "remediation": "Remove language that attempts to override safety guidelines or bypass system-level controls. This pattern is a strong indicator of a jailbreak attempt.",
+    "fp_hint": "Likely FP if the matched text is in a security research document or educational content clearly marked as an example rather than an active payload."
+  },
+  "CRED_005": {
+    "name": "Private key block",
+    "description": "Detects PEM-encoded private keys",
+    "category": "credential-leak",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove the private key block from the skill definition. Store private keys in a secrets manager or encrypted volume and reference them via environment variables.",
+    "fp_hint": "Likely FP if the match is a documentation example showing the format of a PEM block without a real key body."
+  },
+  "SUPPLY_003": {
+    "name": "Download-and-execute",
+    "description": "Detects patterns of downloading and piping to shell execution",
+    "category": "external-download",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Download the file first, verify its integrity (checksum, signature), inspect it, then run it. Prefer package managers over raw downloads. Never fetch-and-run in one step.",
+    "fp_hint": "Likely FP if the target is a well-known installer (e.g., rustup, Homebrew) from its canonical HTTPS domain, though the pattern is inherently risky."
+  },
+  "EXTDL_013": {
+    "name": "Curl or wget piped to shell",
+    "description": "Detects downloading scripts piped directly to a shell interpreter",
+    "category": "external-download",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Download the script first, inspect it, verify its checksum, then run it. Do not pipe curl/wget output directly to sh/bash. Prefer package manager installs.",
+    "fp_hint": "Likely FP if the download is from a well-known installer domain (e.g., brew.sh, rustup.rs), though this pattern is inherently risky even with trusted sources."
+  },
+  "MCP_005": {
+    "name": "Hidden tool registration",
+    "description": "Detects dynamic tool registration patterns that could inject malicious tools",
+    "category": "mcp-attack",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove or restrict the tool's ability to run arbitrary code. Implement sandboxing, input validation, and output filtering. Require user confirmation for any code execution.",
+    "fp_hint": "Likely FP if the tool is a code execution sandbox (e.g., REPL, notebook) that is explicitly designed for this purpose with documented security boundaries."
+  },
+  "SSRF_007": {
+    "name": "Cloud credential endpoint",
+    "description": "Detects cloud provider token and credential endpoints",
+    "category": "ssrf-cloud",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Block access to cloud instance metadata services using IMDSv2 token requirements, network rules, or iptables. This is a critical vector for credential theft in cloud environments.",
+    "fp_hint": "Likely FP if the match is in security documentation explaining how to protect against SSRF/IMDS attacks rather than code that accesses the metadata service."
+  },
+  "SSRF_001": {
+    "name": "Cloud metadata URL",
+    "description": "Detects cloud provider metadata endpoint URLs used for SSRF attacks",
+    "category": "ssrf-cloud",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Block requests to cloud metadata endpoints (169.254.169.254, metadata.google.internal). Implement URL validation that rejects private IP ranges and cloud metadata addresses.",
+    "fp_hint": "Likely FP if the match is in documentation explaining cloud security concepts or SSRF prevention rather than actual code making metadata requests."
+  },
+  "EXFIL_003": {
+    "name": "Data transmission pattern",
+    "description": "Detects patterns indicating sensitive data being sent to external services",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict file reading to the project directory and block outbound network calls that include file contents. Implement file path validation to prevent directory traversal.",
+    "fp_hint": "Likely FP if the tool legitimately reads project files and displays them to the user locally, without sending data to external services."
+  },
+  "PROMPT_INJECTION_017": {
+    "name": "Autonomous agent spawning",
+    "description": "Detects autonomous sub-agent or cron-based execution without human oversight",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove directives that force the agent to call specific tools or APIs not required for the skill's stated functionality. Tool calls should be determined by user intent, not embedded directives.",
+    "fp_hint": "Likely FP if the skill legitimately needs to call other tools as part of its workflow (e.g., a deployment skill that calls git and cloud CLI tools)."
+  },
+  "INDIRECT_001": {
+    "name": "Fetch URL and use as instructions",
+    "description": "Detects fetching external URLs and using the content as agent instructions or rules",
+    "category": "indirect-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Sanitize or validate all external inputs (file contents, API responses, user messages) before including them in prompts or tool calls. Implement input/output boundaries between trusted and untrusted data.",
+    "fp_hint": "Likely FP if the matched text is the skill's own instruction set describing how to handle user input, not an actual injection payload."
+  },
+  "MCP_011": {
+    "name": "Arbitrary MCP server execution",
+    "description": "Detects execution of MCP servers from arbitrary paths, URLs, or user-controlled commands",
+    "category": "mcp-attack",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Block MCP tools from shadowing or overriding built-in tools. Implement tool name uniqueness validation and prevent tools from registering names that conflict with system tools.",
+    "fp_hint": "Likely FP if the tool has a name similar to a built-in tool by coincidence (e.g., a search tool) without malicious intent to override system behavior."
+  },
+  "NLP_CODE_MISMATCH": {
+    "name": "Code block labeled \"markdown\" contains executable content",
+    "description": "Code block labeled \"markdown\" contains executable content",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "nlp-injection",
+    "remediation": "Align the tool description with what the code actually does. If the description says one thing but the code does another, update the description to be accurate or fix the code.",
+    "fp_hint": "Likely FP if the NLP analyzer misinterpreted technical jargon or the description accurately describes behavior through domain-specific terminology."
+  },
+  "PROMPT_INJECTION_016": {
+    "name": "Self-modifying agent instructions",
+    "description": "Detects skills that write or promote content into agent instruction files",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove or restrict the skill's ability to modify CLAUDE.md or agent configuration files. Self-modifying agent configurations can be exploited for persistent attacks.",
+    "fp_hint": "Likely FP if the skill is a project management tool where updating CLAUDE.md is an intended workflow feature (e.g., appending project notes), though the risk remains."
+  },
+  "CRED_002": {
+    "name": "AWS access key",
+    "description": "Detects AWS access key IDs",
+    "category": "credential-leak",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove the AWS access key from the skill definition and use environment variables or IAM roles instead. Rotate the exposed key immediately via the AWS console.",
+    "fp_hint": "Likely FP if the matched string is a placeholder (e.g., AKIAEXAMPLE), a documentation example, or a test fixture key that is not valid."
+  },
+  "CRED_006": {
+    "name": "Database connection string",
+    "description": "Detects database connection strings with credentials",
+    "category": "credential-leak",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove the database connection string and replace it with an environment variable reference. Rotate the database password if the connection string was exposed publicly.",
+    "fp_hint": "Likely FP if the connection string uses localhost with no password (e.g., mongodb://localhost:27017/mydb) or is a documented example URI."
+  },
+  "PROMPT_INJECTION_009": {
+    "name": "Base64-encoded instructions",
+    "description": "Detects instructions to decode and execute base64 content",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove text that simulates multi-turn conversations or fake user/assistant message pairs. These patterns attempt to manipulate the agent by fabricating conversation history.",
+    "fp_hint": "Likely FP if the matched text is documentation showing example conversations or API request/response formats for illustration purposes."
+  },
+  "EXTDL_001": {
+    "name": "Runtime URL controls agent behavior",
+    "description": "Detects skills fetching external URLs to use as runtime instructions",
+    "category": "external-download",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Pin the downloaded resource to a specific version or commit hash, and verify its integrity with a checksum (SHA-256). Avoid fetching scripts or binaries from arbitrary URLs at runtime.",
+    "fp_hint": "Likely FP if the download URL points to a well-known CDN or package registry (e.g., npmjs.com, pypi.org) and is pinned to a specific version."
+  },
+  "EXTDL_007": {
+    "name": "Binary download and execute",
+    "description": "Detects downloading a binary file followed by making it executable",
+    "category": "external-download",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Pin the download to a specific version tag or commit hash. Verify the downloaded file's checksum before using it. Avoid piping curl output directly to a shell.",
+    "fp_hint": "Likely FP if downloading from an official, well-known domain (e.g., deno.land, rustup.rs) with HTTPS, though this pattern remains risky even with trusted sources."
+  },
+  "CMDEXEC_007": {
+    "name": "PowerShell command execution",
+    "description": "Detects PowerShell Invoke-Expression, Start-Process, and related execution commands",
+    "category": "command-execution",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict PowerShell execution to specific allowlisted commands. Use -ExecutionPolicy Restricted and avoid Invoke-Expression with dynamic strings.",
+    "fp_hint": "Likely FP if the match is in documentation showing PowerShell setup for a legitimate tool (e.g., installing a module via Install-Module)."
+  },
+  "NLP_HIDDEN_INSTRUCTION": {
+    "name": "Hidden HTML comment contains action verbs",
+    "description": "Hidden HTML comment contains action verbs",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "nlp-injection",
+    "remediation": "Remove hidden text (e.g., HTML comments with directives, zero-width characters, white-on-white text). All content should be visible and explicit in the skill definition.",
+    "fp_hint": "Likely FP if the match is a standard HTML comment used for code documentation, or base64 content used for legitimate data encoding (e.g., images)."
+  },
+  "MCP_003": {
+    "name": "Resource URI manipulation",
+    "description": "Detects dangerous URI schemes or path traversal in resource fields",
+    "category": "mcp-attack",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Implement strict input validation on the MCP tool's parameters. Block tool calls that attempt to modify the agent's system prompt, configuration, or tool definitions.",
+    "fp_hint": "Likely FP if the match is a tool that legitimately updates configuration (e.g., a settings manager) and mentions prompt editing only for user-facing customization."
+  },
+  "SUPPLY_009": {
+    "name": "Path traversal attempt",
+    "description": "Detects path traversal patterns targeting sensitive files, including URL-encoded variants",
+    "category": "supply-chain",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Pin Git dependencies to specific commit hashes instead of branch names or tags. Branches and tags are mutable and can be updated to point to malicious code.",
+    "fp_hint": "Likely FP if the Git reference points to a tagged release of a well-known repository, though tags are technically mutable."
+  },
+  "PROMPT_INJECTION_002": {
+    "name": "Role switching attempt",
+    "description": "Detects attempts to make the AI assume a different role",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove directives that attempt to alter the agent's behavior or persona. Skill descriptions should describe tool functionality, not contain behavioral commands for the agent.",
+    "fp_hint": "Likely FP if the matched text is part of the skill's legitimate system prompt configuration that defines the tool's behavior for the user, not an attack."
+  },
+  "TOXIC_003": {
+    "name": "Destructive actions with code execution",
+    "description": "Skill has destructive capabilities AND can execute arbitrary code. This combination enables ransomware-like attacks.",
+    "category": "toxic-flow",
+    "severity": "HIGH",
+    "analyzer": "toxicflow",
+    "remediation": "Isolate security-sensitive operations from untrusted data flows. Use separate execution contexts or privilege levels for operations that handle both user input and sensitive resources.",
+    "fp_hint": "Likely FP if the toxic flow analysis connected two unrelated code paths, or if the data undergoes transformation that removes the taint (e.g., parsed as a known enum value)."
+  },
+  "TOXIC_002": {
+    "name": "Private data read with code execution",
+    "description": "Skill can read private data AND execute arbitrary code. This combination enables credential theft via dynamic code.",
+    "category": "toxic-flow",
+    "severity": "HIGH",
+    "analyzer": "toxicflow",
+    "remediation": "Add input validation between the user-controlled data source and the security-sensitive sink (e.g., file writes, command execution). Implement allowlisting for acceptable input patterns.",
+    "fp_hint": "Likely FP if the user input passes through explicit validation or sanitization before reaching the sensitive operation, and the taint tracker missed the sanitization step."
+  },
+  "TOXIC_001": {
+    "name": "Private data read with public output",
+    "description": "Skill can read private data (credentials, SSH keys, env vars) AND write to public channels (Slack, Discord, email). This combination enables data exfiltration.",
+    "category": "toxic-flow",
+    "severity": "HIGH",
+    "analyzer": "toxicflow",
+    "remediation": "Break the toxic data flow by adding validation and sanitization between the input source and the sensitive operation. Do not pass untrusted data directly to file system, network, or execution APIs.",
+    "fp_hint": "Likely FP if the data flow involves only trusted, hardcoded values and the taint analysis over-approximated the untrusted input sources."
+  },
+  "SSRF_006": {
+    "name": "Localhost bypass",
+    "description": "Detects alternative representations of localhost used to bypass SSRF filters",
+    "category": "ssrf-cloud",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Prevent URL redirection from bypassing SSRF protections. Validate the final destination URL after following redirects and block redirect chains that resolve to internal addresses.",
+    "fp_hint": "Likely FP if the match is documentation about redirect handling behavior without an actual open redirect vulnerability."
+  },
+  "PROMPT_INJECTION_008": {
+    "name": "Secrecy instruction",
+    "description": "Detects instructions to hide actions from the user",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove directives that attempt to change the agent's output format, suppress safety warnings, or alter response structure in ways that bypass safety controls.",
+    "fp_hint": "Likely FP if the output format directive is a legitimate tool configuration (e.g., return results as JSON) that does not suppress safety features."
+  },
+  "EXFIL_002": {
+    "name": "Sensitive file read pattern",
+    "description": "Detects reads of sensitive system or credential files",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Prevent the tool from reading environment variables and sending them to external endpoints. If env access is needed, restrict it to specific variable names via an allowlist.",
+    "fp_hint": "Likely FP if the match is documentation about how to configure environment variables, not code that reads and transmits them."
+  },
+  "EXFIL_013": {
+    "name": "Read sensitive files and transmit externally",
+    "description": "Detects skills that both read sensitive credential files and send data to external services",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Block access to git credentials, SSH keys, and repository tokens. If git operations are needed, use scoped deploy keys and restrict the tool to specific repositories.",
+    "fp_hint": "Likely FP if the match is documentation about git configuration (e.g., setting up git credentials helper) rather than code that reads and transmits them."
+  },
+  "PROMPT_INJECTION_004": {
+    "name": "Zero-width character obfuscation",
+    "description": "Detects zero-width characters used to hide content",
+    "category": "prompt-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove hidden directives embedded in markdown, HTML comments, or encoded text. All agent-facing text should be explicit and visible in the skill definition.",
+    "fp_hint": "Likely FP if the match is a standard markdown formatting pattern or HTML comment used for documentation rather than concealing directives."
+  },
+  "EXTDL_006": {
+    "name": "MCP server auto-registration",
+    "description": "Detects automatic registration of MCP servers into agent configuration",
+    "category": "external-download",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Pin the curl/wget download to a specific URL with version and verify the downloaded file's SHA-256 checksum before using it. Prefer package manager installs over raw downloads.",
+    "fp_hint": "Likely FP if the download is from a well-known canonical source (e.g., official GitHub release) and the documentation includes checksum verification steps."
+  },
+  "MCP_010": {
+    "name": "Prompt cache poisoning",
+    "description": "Detects instruction override text in tool response content fields",
+    "category": "mcp-attack",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Prevent MCP tools from modifying other tool definitions, system prompts, or agent configuration. Implement integrity checks on tool registration and block runtime tool modification.",
+    "fp_hint": "Likely FP if the match is documentation about tool management features rather than a tool that actually tampers with other tools at runtime."
+  },
+  "SUPPLY_007": {
+    "name": "Privilege escalation",
+    "description": "Detects privilege escalation patterns like setuid, chown root, or sudo with shell commands",
+    "category": "supply-chain",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Avoid depending on packages that could be subject to typosquatting or name confusion. Verify package ownership, check download counts, and audit the package source before adding dependencies.",
+    "fp_hint": "Likely FP if the flagged package is a well-known, high-download-count package from a verified publisher."
+  },
+  "SSRF_005": {
+    "name": "Docker socket access",
+    "description": "Detects attempts to access the Docker daemon socket",
+    "category": "ssrf-cloud",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Block access to cloud provider IAM and credential endpoints from agent tools. Implement egress filtering to prevent requests to cloud control plane APIs.",
+    "fp_hint": "Likely FP if the match is documentation about cloud IAM setup rather than code that programmatically accesses IAM endpoints."
+  },
+  "MCP_009": {
+    "name": "Capability escalation",
+    "description": "Detects excessive or dangerous capability requests in MCP configurations",
+    "category": "mcp-attack",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict the tool to well-defined scopes and prevent it from requesting all permissions. Implement least-privilege access controls and audit permission grants.",
+    "fp_hint": "Likely FP if the match is a tool description documenting available permission scopes, not a tool that actually requests overly broad access."
+  },
+  "MCPCFG_002": {
+    "name": "Shell metacharacters in MCP config args",
+    "description": "Detects shell metacharacters (pipes, backticks, subshells) in MCP server command arguments",
+    "category": "mcp-config",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove credentials (API keys, tokens, passwords) from MCP server configuration. Use environment variable references (e.g., ${API_KEY}) or a secrets manager instead of inline values.",
+    "fp_hint": "Likely FP if the credential value is a placeholder (e.g., your-api-key-here, sk_test_xxx) in example configuration."
+  },
+  "SSRF_004": {
+    "name": "AWS IMDS token request",
+    "description": "Detects AWS Instance Metadata Service token requests",
+    "category": "ssrf-cloud",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Block requests to internal service discovery endpoints (consul, etcd, kubernetes API). Implement network segmentation between the agent and internal infrastructure services.",
+    "fp_hint": "Likely FP if the match is documentation about service discovery architecture without actual code that queries these endpoints."
+  },
+  "SUPPLY_005": {
+    "name": "Conditional CI execution",
+    "description": "Detects conditional execution based on CI environment variables combined with dangerous commands",
+    "category": "supply-chain",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Pin all dependencies to exact versions with integrity hashes. Use lock files (package-lock.json, poetry.lock) and enable checksum verification in your package manager.",
+    "fp_hint": "Likely FP if the match is documentation about dependency management best practices rather than actual unpinned dependency declarations."
+  },
+  "SUPPLY_008": {
+    "name": "Reverse shell pattern",
+    "description": "Detects common reverse shell patterns across multiple languages",
+    "category": "supply-chain",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Audit post-install scripts (postinstall, preinstall hooks) in dependencies. Block or sandbox post-install script execution, especially for packages added by skill instructions.",
+    "fp_hint": "Likely FP if the post-install hook runs a standard build step (e.g., compiling native modules with node-gyp) for a well-known package."
+  },
+  "SSRF_002": {
+    "name": "Internal IP range access",
+    "description": "Detects references to private/internal IP ranges in URL context",
+    "category": "ssrf-cloud",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Implement URL allowlisting for all outbound requests. Block requests to private IP ranges (10.x, 172.16-31.x, 192.168.x), localhost, and link-local addresses.",
+    "fp_hint": "Likely FP if the match is a localhost URL used for local development (e.g., http://localhost:3000) in setup documentation."
+  },
+  "SUPPLY_011": {
+    "name": "Unattended auto-update",
+    "description": "Detects automatic package or skill updates via cron or scheduled tasks without verification",
+    "category": "supply-chain",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Avoid installing packages from private or unofficial registries specified in skill instructions. Verify the registry URL is legitimate and use scoped packages with registry configuration.",
+    "fp_hint": "Likely FP if the private registry is a well-known enterprise registry (e.g., GitHub Packages, Artifactory) documented in the project setup."
+  },
+  "THIRDPARTY_005": {
+    "name": "Remote template or prompt loaded at runtime",
+    "description": "Detects loading of prompt templates or agent instructions from remote URLs at runtime",
+    "category": "third-party-content",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Avoid loading and running third-party plugins or extensions at runtime without integrity verification. Implement code signing, checksum verification, and sandboxing for dynamically loaded code.",
+    "fp_hint": "Likely FP if the third-party content is a well-known, established plugin loaded from a verified marketplace with code signing."
+  },
+  "CMDEXEC_008": {
+    "name": "Terminal multiplexer command injection",
+    "description": "Detects tmux/screen send-keys used to inject commands into terminal sessions",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Avoid sending unsanitized user input to tmux/screen sessions via send-keys. Use a controlled command dispatch mechanism instead of injecting commands into terminal multiplexers.",
+    "fp_hint": "Likely FP if the match is in documentation describing tmux/screen workflow automation for the user themselves, not controlled by an external agent."
+  },
+  "INDIRECT_009": {
+    "name": "External API response drives agent behavior",
+    "description": "Detects skills where external API responses control agent decisions or actions",
+    "category": "indirect-injection",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Do not include content from MCP tool responses verbatim in system prompts or tool descriptions. Sanitize all dynamic content before incorporating it into prompt context.",
+    "fp_hint": "Likely FP if the match is a static tool description that mentions dynamic content handling in its documentation, not an actual injection vector."
+  },
+  "MCP_002": {
+    "name": "Tool name shadowing",
+    "description": "Detects tool names impersonating system or privileged tools",
+    "category": "mcp-attack",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict the MCP tool's access to only the resources it needs. Implement input validation on all tool parameters and prevent the tool from accessing files or APIs outside its scope.",
+    "fp_hint": "Likely FP if the match is a tool description listing its capabilities for documentation purposes, not an actual exploit of cross-tool access."
+  },
+  "CMDEXEC_004": {
+    "name": "Node.js child process execution",
+    "description": "Detects Node.js child_process methods for command execution",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Use execFile() or spawn() with explicit argument arrays instead of exec() with a shell string. Validate all inputs before passing to child_process methods.",
+    "fp_hint": "Likely FP if the match is in a README code example or package.json script field that runs a well-known CLI tool (e.g., eslint, tsc)."
+  },
+  "SSRF_003": {
+    "name": "Kubernetes service discovery",
+    "description": "Detects Kubernetes internal service URLs and secret paths",
+    "category": "ssrf-cloud",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Validate and sanitize all user-provided URLs before making server-side requests. Resolve DNS and verify the IP is not in a private range before connecting.",
+    "fp_hint": "Likely FP if the URL fetch is for a well-known public API endpoint that is hardcoded (not user-controlled) in the tool configuration."
+  },
+  "EXTDL_016": {
+    "name": "Download binary or archive from URL",
+    "description": "Detects downloading binary, archive, or installer files from remote URLs",
+    "category": "external-download",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Verify the integrity of downloaded binaries or archives using SHA-256 checksums or GPG signatures. Pin download URLs to specific versions and avoid fetching from unverified sources.",
+    "fp_hint": "Likely FP if the download is from github.com or githubusercontent.com for a specific tagged release with documented checksums."
+  },
+  "CMDEXEC_002": {
+    "name": "Dynamic code evaluation",
+    "description": "Detects eval() or exec() used for dynamic code execution",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Replace eval()/exec() with a safer alternative such as json.loads(), ast.literal_eval(), or a purpose-built parser.",
+    "fp_hint": "Likely FP if the matched text contains 'exec' as part of a word (e.g., 'execute', 'execution') rather than an actual eval() or exec() call."
+  },
+  "EXTDL_002": {
+    "name": "Remote SDK or script fetch as agent input",
+    "description": "Detects fetching remote documentation or code to load as agent context",
+    "category": "external-download",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Pin the SDK or script to a specific version and verify its checksum after download. Prefer installing SDKs via a package manager instead of fetching remote scripts directly.",
+    "fp_hint": "Likely FP if the match is documentation showing how to install an official SDK (e.g., Google Cloud SDK, AWS CLI) from its canonical URL."
+  },
+  "MCPCFG_008": {
+    "name": "Auto-confirm flag bypassing user verification",
+    "description": "Detects -y, --yes, or --auto-approve flags in MCP/skill install commands that bypass user confirmation",
+    "category": "mcp-config",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove the -y/--yes auto-confirm flag from MCP server launch arguments. This flag bypasses user confirmation prompts and allows unattended execution of potentially dangerous operations.",
+    "fp_hint": "Likely FP if the matched text is an isolated flag (-y or --yes) in documentation describing command-line options, not in an actual MCP config."
+  },
+  "EXFIL_012": {
+    "name": "Unrestricted email or messaging access",
+    "description": "Detects CLI tools granting unrestricted send/read access to email or messaging",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict email and messaging API access to user-initiated actions. Prevent automated sending that could exfiltrate data via email body or attachments.",
+    "fp_hint": "Likely FP if the skill is an email client or messaging tool whose documented purpose is to send messages on behalf of the user."
+  },
+  "EXTDL_014": {
+    "name": "Conditional download and install",
+    "description": "Detects patterns that check for tool existence and install if missing",
+    "category": "external-download",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Replace conditional download-and-install logic with explicit dependency declarations in a manifest file (package.json, requirements.txt). Verify checksums for any runtime downloads.",
+    "fp_hint": "Likely FP if the conditional install is documentation showing standard prerequisite checks (e.g., checking if a tool is installed before installing it)."
+  },
+  "CMDEXEC_010": {
+    "name": "MCP code execution tool",
+    "description": "Detects MCP tools that execute arbitrary code",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict code execution tools to specific languages and sandbox the runtime environment. Use a container or VM-based sandbox instead of running code directly on the host.",
+    "fp_hint": "Likely FP if the MCP tool is a dedicated code runner (e.g., Jupyter kernel) with documented sandboxing and no network access."
+  },
+  "EXTDL_005": {
+    "name": "Shell profile modification for persistence",
+    "description": "Detects instructions to modify shell config files for environment persistence",
+    "category": "external-download",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Avoid modifying shell profiles (.bashrc, .zshrc, .profile) programmatically. Instruct users to add PATH entries manually, or use a version manager (nvm, pyenv) instead.",
+    "fp_hint": "Likely FP if the match is documentation showing how to add a tool to PATH manually, especially if it only appends to PATH without modifying other settings."
+  },
+  "EXFIL_010": {
+    "name": "Non-standard port communication",
+    "description": "Detects outbound connections to non-standard ports",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict network connections to standard ports (80, 443) and explicitly allowlisted service ports. Block connections to unusual ports that could indicate covert channels.",
+    "fp_hint": "Likely FP if the non-standard port is localhost (127.0.0.1) used for local development servers (e.g., port 3000, 8080, 5432 for a local database)."
+  },
+  "CMDEXEC_009": {
+    "name": "Agent shell tool usage",
+    "description": "Detects skills instructing agents to use Bash/shell tools for command execution",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict the shell tool to specific allowlisted commands using a command prefix or regex filter. Avoid granting broad shell access in agent tool definitions.",
+    "fp_hint": "Likely FP if the skill is a development environment tool where shell access is the intended and documented core feature."
+  },
+  "EXFIL_015": {
+    "name": "Screenshot or screen capture with transmission",
+    "description": "Detects screenshot/screen capture tools combined with upload or transmission",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Block the ability to read and transmit contents of configuration files (.env, config.json, settings.yaml). Implement file path validation to prevent access to sensitive config files.",
+    "fp_hint": "Likely FP if the skill reads config files to configure itself locally without transmitting the contents externally."
+  },
+  "PROMPT_INJECTION_007": {
+    "name": "Conversation history poisoning",
+    "description": "Detects fake conversation history injection",
+    "category": "prompt-injection",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove social engineering language that attempts to manipulate the agent through urgency, emotional appeals, or authority claims.",
+    "fp_hint": "Likely FP if the matched text is part of a legitimate skill description that uses urgency language for user-facing features (e.g., an incident response tool)."
+  },
+  "SUPPLY_012": {
+    "name": "Git clone and execute chain",
+    "description": "Detects git clone of repositories followed by execution of cloned content",
+    "category": "supply-chain",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Review the dependency tree for nested or transitive dependencies that introduce risk. Use tools like npm audit or pip-audit to identify known vulnerabilities in the dependency chain.",
+    "fp_hint": "Likely FP if the flagged dependency is a standard, widely-used library with no known vulnerabilities at the time of scanning."
+  },
+  "EXTDL_015": {
+    "name": "Docker pull and run untrusted image",
+    "description": "Detects pulling and running Docker images from external registries",
+    "category": "external-download",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Pin Docker images to a specific digest (e.g., image@sha256:abc...) instead of using mutable tags like :latest. Use trusted base images from verified publishers.",
+    "fp_hint": "Likely FP if the Docker command pulls a well-known official image (e.g., docker pull python:3.11) in setup documentation."
+  },
+  "MCP_007": {
+    "name": "Cross-tool data leakage",
+    "description": "Detects patterns where credential or secret reads are combined with external data transmission",
+    "category": "mcp-attack",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Prevent credentials and sensitive data obtained by one MCP tool from being passed to other tools. Implement data isolation between tools and restrict cross-tool data flow for secrets.",
+    "fp_hint": "Likely FP if the cross-tool data flow is intentional API authentication (e.g., a tool fetches an auth token that another tool uses for the same service)."
+  },
+  "CRED_016": {
+    "name": "SSH private key in command",
+    "description": "Detects SSH or SCP commands referencing private key files",
+    "category": "credential-leak",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove the SSH private key path from command-line arguments. Use SSH agent forwarding or an SSH config file (~/.ssh/config) with restricted key file permissions (chmod 600).",
+    "fp_hint": "Likely FP if the command references a well-known default key path (e.g., ~/.ssh/id_rsa) in documentation about SSH configuration, without exposing key contents."
+  },
+  "CMDEXEC_001": {
+    "name": "Shell subprocess with shell=True",
+    "description": "Detects subprocess calls with shell=True which enables shell injection",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Replace shell=True with shell=False and pass command arguments as a list. Validate and sanitize all inputs before passing to the shell.",
+    "fp_hint": "Likely FP if the match is in documentation describing how subprocess works, or in a comment explaining shell risks rather than actual code."
+  },
+  "CMDEXEC_003": {
+    "name": "Python subprocess execution",
+    "description": "Detects Python subprocess and os.system calls for command execution in skill descriptions",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Pass arguments as an explicit list instead of a shell string. Set shell=False and validate all user-supplied values before inclusion.",
+    "fp_hint": "Likely FP if the match is in documentation explaining Python subprocess usage or in a description mentioning it as a topic."
+  },
+  "EXFIL_006": {
+    "name": "Clipboard access with network",
+    "description": "Detects clipboard access combined with network operations",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Restrict DNS queries to legitimate resolution. Block the construction of DNS names that encode arbitrary data (DNS tunneling). Monitor for unusually long or high-entropy subdomains.",
+    "fp_hint": "Likely FP if the match is a documentation reference to DNS lookup functionality for legitimate hostname resolution."
+  },
+  "CRED_015": {
+    "name": "CLI credential flags",
+    "description": "Detects command-line flags passing credentials with real-looking values",
+    "category": "credential-leak",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove credential values from CLI flags (e.g., --password, --token). Use environment variables, config files with restricted permissions, or interactive prompts instead.",
+    "fp_hint": "Likely FP if the CLI flag is shown in a help text example (e.g., --token YOUR_TOKEN) without an actual credential value."
+  },
+  "EXFIL_016": {
+    "name": "Git history or diff access with transmission",
+    "description": "Detects accessing git history, diffs, or repo data combined with external transmission",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Prevent the tool from accessing and transmitting database contents. If database access is needed, restrict queries to specific tables and block bulk data export.",
+    "fp_hint": "Likely FP if the skill is a database management tool where querying and displaying data to the user is the documented core feature."
+  },
+  "NLP_AUTHORITY_CLAIM": {
+    "name": "Section claims authority and urgency with dangerous instructions",
+    "description": "Section claims authority and urgency with dangerous instructions",
+    "category": "prompt-injection",
+    "severity": "MEDIUM",
+    "analyzer": "nlp-injection",
+    "remediation": "Remove false authority claims (e.g., claiming administrator or root-level access) from tool descriptions. Tool descriptions should describe capabilities, not claim elevated roles.",
+    "fp_hint": "Likely FP if the matched text is documentation explaining role-based access control concepts or describing user personas, not impersonating a system role."
+  },
+  "NLP_HEADING_MISMATCH": {
+    "name": "Benign heading \"'@openai/agents:*'\\n;\\n// Verbose logging\\n...\" followed by dangerous content (category: credential_access)",
+    "description": "Benign heading \"'@openai/agents:*'\\n;\\n// Verbose logging\\n...\" followed by dangerous content (category: credential_access)",
+    "category": "prompt-injection",
+    "severity": "MEDIUM",
+    "analyzer": "nlp-injection",
+    "remediation": "Ensure section headings accurately reflect the content that follows. Remove headings that could mislead an LLM into treating content differently than intended.",
+    "fp_hint": "Likely FP if the heading mismatch is due to inconsistent markdown formatting or a benign section title that happens to contain keywords like system or config."
+  },
+  "PROMPT_INJECTION_015": {
+    "name": "Prompt leaking attempt",
+    "description": "Detects attempts to extract the system prompt",
+    "category": "prompt-injection",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove directives that attempt to make the agent act autonomously without user confirmation (e.g., automatically running commands, skipping confirmation prompts).",
+    "fp_hint": "Likely FP if the matched text is in a CI/CD tool description where automated execution is the intended behavior in a controlled environment."
+  },
+  "EXFIL_009": {
+    "name": "Base64 encode and send",
+    "description": "Detects base64 encoding of content followed by transmission",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Block patterns that base64-encode data and immediately transmit it. If base64 encoding is needed, ensure the encoded data does not contain secrets and destinations are allowlisted.",
+    "fp_hint": "Likely FP if base64 encoding is used for legitimate purposes like encoding images for display or constructing data URIs, with no network transmission."
+  },
+  "CMDEXEC_011": {
+    "name": "Cron or scheduled command execution",
+    "description": "Detects cron jobs or scheduled tasks that execute commands",
+    "category": "command-execution",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Validate cron expressions and scheduled commands against an allowlist. Ensure scheduled tasks cannot be modified by untrusted input and log all cron job changes.",
+    "fp_hint": "Likely FP if the match is a documentation reference to crontab syntax or a short mention of cron in a description of scheduling concepts."
+  },
+  "EXFIL_004": {
+    "name": "DNS exfiltration pattern",
+    "description": "Detects DNS-based data exfiltration techniques",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Limit clipboard access to write-only operations or require explicit user confirmation before reading clipboard contents. Block transmission of clipboard data to external endpoints.",
+    "fp_hint": "Likely FP if the skill is a clipboard manager whose documented purpose is to sync clipboard content with the user's own devices."
+  },
+  "MCPCFG_007": {
+    "name": "Docker privileged or host mount in MCP config",
+    "description": "Detects Docker containers in MCP configs with privileged mode or dangerous host mounts",
+    "category": "mcp-config",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove the auto-approve or auto-confirm flag from the MCP configuration. Require explicit user confirmation for tool executions, especially those with side effects.",
+    "fp_hint": "Likely FP if the auto-confirm flag is in a CI/CD configuration where automated approval is intentional and the environment is controlled."
+  },
+  "CRED_011": {
+    "name": "Credential in shell export",
+    "description": "Detects API keys or tokens exposed in shell export commands",
+    "category": "credential-leak",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove credentials from shell export statements. Use a .env file (excluded from version control) or a secrets manager, and load secrets at runtime.",
+    "fp_hint": "Likely FP if the export line uses a placeholder value (e.g., export API_KEY=your-key-here) or is in documentation describing environment setup."
+  },
+  "EXTDL_011": {
+    "name": "System package manager install",
+    "description": "Detects system-level package installation via brew, apt, yum, or dnf",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin system packages to specific versions where the package manager supports it. Document the exact packages required and prefer containerized environments to avoid system-wide changes.",
+    "fp_hint": "Likely FP if the match is standard setup documentation listing well-known system packages (e.g., apt install git curl) that are prerequisites."
+  },
+  "CMDEXEC_012": {
+    "name": "Chained shell command execution",
+    "description": "Detects chained commands using shell operators with dangerous operations",
+    "category": "command-execution",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Break chained commands into discrete, individually validated steps. Avoid piping untrusted output directly into a shell interpreter.",
+    "fp_hint": "Likely FP if the matched text is a documentation example showing a common installer one-liner for a well-known tool with a canonical URL."
+  },
+  "MCPCFG_004": {
+    "name": "Non-localhost remote MCP server URL",
+    "description": "Detects MCP server configurations connecting to non-localhost remote URLs",
+    "category": "mcp-config",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Change the MCP server URL to localhost or a trusted internal endpoint. If a remote server is required, verify the domain ownership and use HTTPS with certificate validation.",
+    "fp_hint": "Likely FP if the URL points to example.com, a documentation domain, or a well-known SaaS API endpoint (e.g., api.openai.com)."
+  },
+  "THIRDPARTY_001": {
+    "name": "Runtime URL controlling behavior",
+    "description": "Detects URLs fetched at runtime that control or influence agent behavior without pinning",
+    "category": "third-party-content",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Avoid loading configuration or behavior-controlling content from runtime URLs. Bundle required configurations locally or pin remote config to versioned, integrity-verified endpoints.",
+    "fp_hint": "Likely FP if the URL in the match is a documentation link or example URL (e.g., example.com) rather than an actual runtime-fetched configuration endpoint."
+  },
+  "EXTDL_009": {
+    "name": "pip install arbitrary package",
+    "description": "Detects pip install of arbitrary packages that modify the host environment",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin all pip packages to exact versions (e.g., pip install package==1.2.3). Use a requirements.txt or pyproject.toml with pinned versions and hash verification.",
+    "fp_hint": "Likely FP if the match is in documentation showing how to install the skill's own PyPI package."
+  },
+  "THIRDPARTY_002": {
+    "name": "Mutable GitHub raw content reference",
+    "description": "Detects references to raw.githubusercontent.com on mutable branches like main/master",
+    "category": "third-party-content",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Replace GitHub raw.githubusercontent.com references with pinned commit SHAs instead of branch names (e.g., /commit-sha/file instead of /main/file). Branch references are mutable.",
+    "fp_hint": "Likely FP if the raw GitHub URL points to a versioned release tag in a well-known repository, though even tags are technically mutable."
+  },
+  "CMDEXEC_013": {
+    "name": "Shell script file execution",
+    "description": "Detects execution of shell script files via bash/sh command or direct invocation",
+    "category": "command-execution",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Replace direct shell script execution with a language-native implementation or a sandboxed executor. If shell scripts must run, restrict them to a vetted allowlist with integrity checks.",
+    "fp_hint": "Likely FP if the match references running a script that is part of the skill's own repository (e.g., ./setup.sh) with clear, auditable contents."
+  },
+  "THIRDPARTY_004": {
+    "name": "External API response used without validation",
+    "description": "Detects patterns where external API responses are used directly without validation or sanitization",
+    "category": "third-party-content",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Validate and sanitize all data received from external APIs before using it in tool operations or agent prompts. Implement schema validation and treat API responses as untrusted input.",
+    "fp_hint": "Likely FP if the match is a truncated table cell or documentation fragment that mentions API responses in a descriptive context, not actual unvalidated data processing."
+  },
+  "INDIRECT_010": {
+    "name": "Unscoped Bash tool in allowed tools",
+    "description": "Detects skills that include unscoped Bash in their allowed tools list (not Bash(cmd:*) scoped)",
+    "category": "command-execution",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Scope the Bash tool to specific commands using allowedTools patterns (e.g., Bash(git *) instead of bare Bash). Remove blanket Bash access from allowed_tools lists.",
+    "fp_hint": "Likely FP if the Bash entry in allowed_tools is part of a constrained configuration that limits commands elsewhere (e.g., via system prompt restrictions)."
+  },
+  "EXTDL_003": {
+    "name": "npx auto-install without confirmation",
+    "description": "Detects npx with -y flag that bypasses user confirmation for package installation",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Replace npx -y with an explicit npm install step that pins the package to a specific version, then run it. Remove the -y flag to require user confirmation.",
+    "fp_hint": "Likely FP if the npx command runs a well-known, trusted tool (e.g., create-react-app) in documentation context with no version pinning concern."
+  },
+  "EXTDL_008": {
+    "name": "Unverified npx package execution",
+    "description": "Detects npx executing packages from unverified sources without pinned versions",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin the npx package to an exact version (e.g., npx @scope/package@1.2.3). Unversioned npx commands can silently install a different or malicious package version.",
+    "fp_hint": "Likely FP if the npx command targets a well-known package in documentation context, though unpinned versions are a real supply chain concern."
+  },
+  "EXTDL_004": {
+    "name": "Global package installation",
+    "description": "Detects global installation of packages which affects the host system",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Replace npm install -g with a local install (npm install --save-dev) or use npx with a pinned version. Global installs modify the system and risk supply chain attacks.",
+    "fp_hint": "Likely FP if the global install is for a well-known CLI tool (e.g., typescript, eslint) in setup documentation, though the supply chain risk remains real."
+  },
+  "MCPCFG_001": {
+    "name": "npx MCP server without version pin",
+    "description": "Detects MCP server configs using npx to run packages without version pinning",
+    "category": "mcp-config",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin the npx package in the MCP config to an exact version (e.g., @scope/server@1.2.3). Unpinned npx commands can silently fetch a compromised package version.",
+    "fp_hint": "Likely FP if the MCP config is a local development setup example, though unpinned npx in production configs is a real supply chain risk."
+  },
+  "EXTDL_012": {
+    "name": "Cargo or gem install from remote",
+    "description": "Detects cargo install or gem install fetching packages from remote registries",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin Cargo/Gem packages to specific versions (e.g., cargo install tool@0.1.0, gem install tool -v 1.2.3). Use lock files for reproducibility.",
+    "fp_hint": "Likely FP if the matched text is a very short fragment (3 words or fewer) or uses placeholder package names."
+  },
+  "SUPPLY_013": {
+    "name": "Unpinned GitHub Actions",
+    "description": "Detects GitHub Actions references using mutable branch names instead of pinned commit SHAs or tags",
+    "category": "supply-chain",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Verify that build scripts and Makefiles do not download or run code from untrusted sources. Audit all build steps and pin any external tools used during the build process.",
+    "fp_hint": "Likely FP if the build script only runs standard toolchain commands (e.g., cargo build, go build) without downloading external resources."
+  },
+  "CRED_017": {
+    "name": "Docker environment credentials",
+    "description": "Detects Docker or docker-compose commands passing credentials via environment variables",
+    "category": "credential-leak",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Remove credential values from Docker environment flags (-e) and docker-compose environment sections. Use Docker secrets, .env files (in .dockerignore), or a secrets manager.",
+    "fp_hint": "Likely FP if the Docker environment variable has an empty or placeholder value (e.g., -e API_KEY= or -e PASSWORD=changeme) in setup documentation."
+  },
+  "INDIRECT_005": {
+    "name": "User-provided URL consumed by agent",
+    "description": "Detects skills where user-provided URLs are consumed and processed by the agent",
+    "category": "indirect-injection",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Validate and sanitize user-provided URLs before fetching them. Implement URL allowlisting, block private/internal IP ranges, and treat fetched content as untrusted data.",
+    "fp_hint": "Likely FP if the skill is a web browser or URL fetcher where consuming user-provided URLs is the documented core feature with appropriate sandboxing."
+  },
+  "EXTDL_010": {
+    "name": "go install from remote",
+    "description": "Detects go install fetching and compiling arbitrary Go packages",
+    "category": "external-download",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Pin Go install targets to a specific version (e.g., go install example.com/tool@v1.2.3). Avoid @latest as it fetches whatever is currently published.",
+    "fp_hint": "Likely FP if the go install target is a well-known tool (e.g., golang.org/x/ packages) pinned to a specific version in documentation."
+  },
+  "SUPPLY_014": {
+    "name": "Package install from arbitrary URL",
+    "description": "Detects installing packages directly from URLs instead of registries",
+    "category": "supply-chain",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Review installation scripts for commands that persist beyond the package installation (e.g., adding cron jobs, modifying system configs, installing additional packages).",
+    "fp_hint": "Likely FP if the persistence mechanism is a standard setup step (e.g., adding the tool to PATH) documented in the installation instructions."
+  },
+  "MCPCFG_003": {
+    "name": "Hardcoded secrets in MCP env block",
+    "description": "Detects hardcoded API keys, tokens, or passwords in MCP server environment configuration",
+    "category": "mcp-config",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Remove shell metacharacters (semicolons, pipes, ampersands, backticks) from MCP server arguments. Use explicit argument arrays and avoid shell expansion in MCP configurations.",
+    "fp_hint": "Likely FP if the metacharacter is a literal part of a non-shell argument (e.g., a regex pattern or a URL query parameter containing ampersands)."
+  },
+  "CRED_009": {
+    "name": "GCP service account key",
+    "description": "Detects Google Cloud Platform service account credentials",
+    "category": "credential-leak",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove the GCP service account key JSON from the skill. Use Workload Identity Federation or store the key file in a secrets manager. Rotate the key in the GCP IAM console.",
+    "fp_hint": "Likely FP if the match is documentation explaining GCP authentication setup without an actual private_key field containing a real RSA key."
+  },
+  "CRED_003": {
+    "name": "GitHub personal access token",
+    "description": "Detects GitHub personal access tokens",
+    "category": "credential-leak",
+    "severity": "CRITICAL",
+    "analyzer": "pattern",
+    "remediation": "Remove the GitHub token immediately and revoke it at github.com/settings/tokens. Use short-lived tokens via GitHub Apps instead of hardcoded PATs.",
+    "fp_hint": "Likely FP if the matched string is a placeholder (e.g., ghp_xxxxxxxxxxxx) or appears in documentation describing token format rather than containing a real token."
+  },
+  "EXFIL_001": {
+    "name": "Webhook URL for data exfiltration",
+    "description": "Detects webhook URLs commonly used for data exfiltration",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove or restrict the ability to read sensitive files (e.g., /etc/passwd, ~/.ssh/*, browser profiles) and transmit their contents over the network. Add file access controls.",
+    "fp_hint": "Likely FP if the match is in documentation explaining what files the tool accesses for legitimate purposes (e.g., reading SSH config for connection setup)."
+  },
+  "CRED_012": {
+    "name": "Stripe API key",
+    "description": "Detects Stripe live and test API keys",
+    "category": "credential-leak",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Remove the Stripe API key and replace it with a reference to an environment variable. Immediately roll the key in the Stripe dashboard if it was a live key (sk_live_).",
+    "fp_hint": "Likely FP if the key uses the test prefix (sk_test_) in a documentation context, or is a clearly truncated example string."
+  },
+  "EXFIL_011": {
+    "name": "External context or knowledge sync",
+    "description": "Detects CLI tools that upload project context, code, or knowledge to external services",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Block the ability to package multiple files into archives (zip, tar) and transmit them. If archiving is needed, restrict it to specific directories and require user confirmation.",
+    "fp_hint": "Likely FP if the skill is a backup or deployment tool where creating and transmitting archives is the documented core functionality."
+  },
+  "INDIRECT_003": {
+    "name": "Read external content and apply as rules",
+    "description": "Detects skills that read remote markdown or documentation and apply it as operational rules",
+    "category": "indirect-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Treat tool outputs as untrusted data. Do not act on directives found in tool responses without explicit user confirmation. Implement output validation before acting on tool results.",
+    "fp_hint": "Likely FP if the match is a skill description explaining that it processes tool outputs, rather than a payload designed to hijack the agent via tool responses."
+  },
+  "EXFIL_008": {
+    "name": "File read piped to HTTP transmission",
+    "description": "Detects reading files piped directly to network commands",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict file uploads to user-initiated actions with explicit confirmation. Block programmatic upload of sensitive files (keys, configs, credentials) to external services.",
+    "fp_hint": "Likely FP if the skill is a file-sharing tool where uploading is the documented core feature and destinations are user-configured."
+  },
+  "EXFIL_005": {
+    "name": "curl/wget POST with sensitive data",
+    "description": "Detects curl or wget commands posting sensitive files or credentials",
+    "category": "exfiltration",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict the ability to read and transmit browser data (cookies, history, passwords). If browser integration is needed, use browser extension APIs with minimal permissions.",
+    "fp_hint": "Likely FP if the match is in documentation about browser extension setup rather than actual code accessing browser storage."
+  },
+  "SUPPLY_006": {
+    "name": "Obfuscated shell command",
+    "description": "Detects obfuscated command execution patterns",
+    "category": "supply-chain",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Verify the authenticity of downloaded packages by checking GPG signatures or SHA-256 checksums against a trusted source. Do not rely solely on HTTPS for package integrity.",
+    "fp_hint": "Likely FP if the package installation uses a well-known package manager (npm, pip) which already verifies package integrity by default."
+  },
+  "CRED_010": {
+    "name": "JWT token",
+    "description": "Detects JWT tokens",
+    "category": "credential-leak",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove hardcoded JWT tokens from the skill definition. Generate tokens dynamically at runtime and set appropriate expiration times.",
+    "fp_hint": "Likely FP if the matched text is a documentation example showing JWT structure with clearly fake values, or an expired demo token."
+  },
+  "CRED_008": {
+    "name": "Slack or Discord webhook",
+    "description": "Detects Slack and Discord webhook URLs",
+    "category": "credential-leak",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove the webhook URL from the skill definition and store it as an environment variable or secret. Regenerate the webhook URL in Slack/Discord settings if it was exposed.",
+    "fp_hint": "Likely FP if the URL is a placeholder (e.g., https://hooks.slack.com/services/T00/B00/xxx) or documentation showing webhook format."
+  },
+  "EXFIL_007": {
+    "name": "Environment variable exfiltration",
+    "description": "Detects attempts to read and transmit environment variables",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Validate that HTTP requests only send intended data. Block requests that embed file contents, environment variables, or credentials in URL parameters or request bodies to unknown hosts.",
+    "fp_hint": "Likely FP if the matched text is an environment variable name that contains an HTTP verb (e.g., process.env.POST_URL) rather than an exfiltration pattern."
+  },
+  "EXFIL_014": {
+    "name": "Environment variable credential in POST data",
+    "description": "Detects credential environment variables used as POST body data in network commands",
+    "category": "exfiltration",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Prevent the tool from accessing and transmitting system information (hostname, IP, OS version, running processes). Restrict system info access to what is strictly necessary.",
+    "fp_hint": "Likely FP if the match is in a diagnostic or debug description where reporting system info to the user (not an external service) is intended."
+  },
+  "SUPPLY_010": {
+    "name": "Symlink attack",
+    "description": "Detects symbolic link creation targeting sensitive files",
+    "category": "supply-chain",
+    "severity": "LOW",
+    "analyzer": "pattern",
+    "remediation": "Review the dependency for signs of abandonment or low maintenance (no commits in 12+ months, no response to issues). Consider forking or replacing with an actively maintained alternative.",
+    "fp_hint": "Likely FP if the package is stable, feature-complete, and intentionally in maintenance mode (e.g., a utility library with no needed updates)."
+  },
+  "MCPCFG_006": {
+    "name": "Inline code execution in MCP command",
+    "description": "Detects MCP servers using inline code execution via -e, -c, or eval flags",
+    "category": "mcp-config",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Restrict MCP server permissions to the minimum required. Remove broad filesystem, network, or execution permissions and use scoped access controls (specific directories, specific tools).",
+    "fp_hint": "Likely FP if the broad permissions are in a development/testing configuration that is clearly not intended for production use."
+  },
+  "INDIRECT_004": {
+    "name": "Remote config controlling agent behavior",
+    "description": "Detects remote configuration files or URLs that control how the agent behaves",
+    "category": "indirect-injection",
+    "severity": "HIGH",
+    "analyzer": "pattern",
+    "remediation": "Validate all file contents before processing them in an agent context. Do not treat file contents as directives. Implement a clear boundary between data and commands.",
+    "fp_hint": "Likely FP if the match describes a file-reading feature where the skill processes file data without interpreting it as directives to the agent."
+  },
+  "UNI_004": {
+    "name": "Invisible separator injection",
+    "description": "Detects Unicode line/paragraph separators and soft hyphens used to hide content",
+    "category": "unicode-attack",
+    "severity": "MEDIUM",
+    "analyzer": "pattern",
+    "remediation": "Remove or replace Unicode characters that can alter text rendering (bidi overrides U+202A-U+202E, zero-width joiners U+200B-U+200F, homoglyph substitutions). Use ASCII-only identifiers in code.",
+    "fp_hint": "Likely FP if the Unicode characters are legitimate multilingual text (e.g., CJK characters, accented Latin characters) rather than bidi overrides or homoglyphs used for obfuscation."
+  }
+}

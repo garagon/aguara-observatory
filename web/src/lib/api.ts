@@ -65,6 +65,16 @@ export interface SkillFinding {
   message?: string;
 }
 
+export interface RuleInfo {
+  name: string;
+  description: string;
+  category: string;
+  severity: string;
+  analyzer: string;
+  remediation: string;
+  fp_hint: string;
+}
+
 export interface FeedItem {
   skill_id: string;
   slug: string;
@@ -194,6 +204,23 @@ export function getSearchIndex(): SearchEntry[] {
 
 export function getSkillReport(registry: string, slug: string): SkillReport | null {
   return loadJson<SkillReport>(`skills/${registry}/${slug}.json`);
+}
+
+const RULES_PATH = path.join(process.cwd(), "src", "data", "rules.json");
+let _rulesCache: Record<string, RuleInfo> | null = null;
+export function getRulesKB(): Record<string, RuleInfo> {
+  if (!_rulesCache) {
+    if (fs.existsSync(RULES_PATH)) {
+      _rulesCache = JSON.parse(fs.readFileSync(RULES_PATH, "utf-8"));
+    } else {
+      _rulesCache = {};
+    }
+  }
+  return _rulesCache!;
+}
+
+export function getRuleInfo(ruleId: string): RuleInfo | null {
+  return getRulesKB()[ruleId] ?? null;
 }
 
 export function listAllSkills(): { registry: string; slug: string }[] {
